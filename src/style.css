@@ -132,3 +132,40 @@ select option {
   background: var(--color-surface);
   color: var(--color-fg);
 }
+
+/* Circular Ripple View Transition for Theme Switching */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+  animation: theme-ripple-reveal 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes theme-ripple-reveal {
+  0% {
+    clip-path: circle(0px at var(--ripple-x, 90vw) var(--ripple-y, 34px));
+  }
+  100% {
+    clip-path: circle(var(--ripple-radius, 150vmax) at var(--ripple-x, 90vw) var(--ripple-y, 34px));
+  }
+}
+
+html.theme-transitioning,
+html.theme-transitioning * {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
