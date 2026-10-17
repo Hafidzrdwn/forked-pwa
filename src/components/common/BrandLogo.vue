@@ -1,5 +1,5 @@
 <script setup lang="ts">
-withDefaults(
+const props = withDefaults(
   defineProps<{
     size?: number
     showWordmark?: boolean
@@ -14,11 +14,11 @@ withDefaults(
 </script>
 
 <template>
-  <div class="brand-container" :style="{ '--logo-size': size + 'px' }">
+  <div class="brand-container" :style="{ '--logo-size': (props.size ?? 36) + 'px' }">
     <!-- Wonderful Custom SVG Logo for Forked: Deliberate Branching Path -->
     <svg
-      :width="size"
-      :height="size"
+      :width="props.size ?? 36"
+      :height="props.size ?? 36"
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -87,9 +87,9 @@ withDefaults(
       <circle cx="24" cy="38" r="2.2" fill="#A7DEC0" />
     </svg>
 
-    <div v-if="showWordmark" class="brand-text">
+    <div v-if="props.showWordmark" class="brand-text">
       <span class="brand-title">forked<span class="brand-dot">.</span></span>
-      <small v-if="subtitle" class="brand-subtitle">{{ subtitle }}</small>
+      <small v-if="props.subtitle" class="brand-subtitle">{{ props.subtitle }}</small>
     </div>
   </div>
 </template>

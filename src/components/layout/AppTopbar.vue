@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import LanguageSwitcher from '../common/LanguageSwitcher.vue'
+import ThemeToggle from '../common/ThemeToggle.vue'
 import VisualAvatar from '../common/VisualAvatar.vue'
 import { useI18n } from '../../i18n'
 
@@ -26,10 +27,13 @@ const pageTitle = computed(() => {
     </div>
 
     <div class="top-actions">
+      <!-- Dark/Light Theme Toggle -->
+      <ThemeToggle />
+
       <!-- Language Switcher -->
       <LanguageSwitcher />
 
-      <!-- Local-First Status Pill -->
+      <!-- Data Privacy Status Pill -->
       <span class="privacy-pill">
         <span class="status-dot"></span>
         {{ t.nav.localBadge }}
