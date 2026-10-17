@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { Check } from 'lucide-vue-next'
 import { useDecisions } from './composables/useDecisions'
+import { useConfirm } from './composables/useConfirm'
 import { useI18n } from './i18n'
 import AppSidebar from './components/layout/AppSidebar.vue'
 import AppTopbar from './components/layout/AppTopbar.vue'
@@ -11,6 +11,8 @@ import JournalView from './components/views/JournalView.vue'
 import CreateDecisionModal from './components/modals/CreateDecisionModal.vue'
 import WeightsModal from './components/modals/WeightsModal.vue'
 import JournalModal from './components/modals/JournalModal.vue'
+import ConfirmModal from './components/common/ConfirmModal.vue'
+import ToastContainer from './components/common/ToastContainer.vue'
 
 const {
   decisions, activeId, searchTerm, busy, notice, activeDecision, filteredDecisions,
@@ -20,12 +22,14 @@ const {
   saveJournal, updateDecisionWeights, updateReviewDate, exportBackup, importBackupFile
 } = useDecisions()
 
+const { confirm: confirmDialog } = useConfirm()
 const { t } = useI18n()
 
 const nav = ref<'overview' | 'decisions' | 'journal'>('overview')
 const showCreate = ref(false)
 const showWeights = ref(false)
 const showJournal = ref(false)
+const mobileMenuOpen = ref(false)
 
 onMounted(() => {
   load()
@@ -42,9 +46,16 @@ function handleCreateDecision(payload: { title: string; context: string }) {
   nav.value = 'decisions'
 }
 
-function handleDeleteActive() {
+async function handleDeleteActive() {
   if (!activeDecision.value) return
-  if (!confirm(`Hapus "${activeDecision.value.title}" beserta seluruh datanya?`)) return
+  const confirmed = await confirmDialog({
+    title: 'Hapus Keputusan Ini?',
+    message: `Apakah kamu yakin ingin menghapus "${activeDecision.value.title}" beserta seluruh jalurnya? Tindakan ini tidak dapat dibatalkan.`,
+    confirmText: 'Ya, Hapus Keputusan',
+    cancelText: 'Batal',
+    danger: true
+  })
+  if (!confirmed) return
   deleteActiveDecision()
   nav.value = 'overview'
 }
@@ -56,14 +67,19 @@ function handleDeleteActive() {
     <AppSidebar
       :current-nav="nav"
       :total-decisions="totalDecisions"
+      :mobile-open="mobileMenuOpen"
       @navigate="nav = $event"
+      @close-mobile-menu="mobileMenuOpen = false"
       @export="exportBackup"
       @import-file="importBackupFile"
     />
 
     <!-- Main Workspace Area -->
     <main class="main-area">
-      <AppTopbar :current-nav="nav" />
+      <AppTopbar
+        :current-nav="nav"
+        @toggle-mobile-menu="mobileMenuOpen = !mobileMenuOpen"
+      />
 
       <!-- Loading State -->
       <div v-if="busy" class="loading-state" role="status" aria-live="polite">
@@ -140,11 +156,10 @@ function handleDeleteActive() {
       @close="showJournal = false"
     />
 
-    <!-- Toast Feedback Notice -->
-    <Transition name="toast">
-      <div v-if="notice" class="toast-message" role="alert" aria-live="assertive">
-        <Check :size="16" /> {{ notice }}
-      </div>
-    </Transition>
+    <!-- Modern Confirmation Modal Dialog -->
+    <ConfirmModal />
+
+    <!-- Modern Toast Notifications -->
+    <ToastContainer />
   </div>
 </template>

@@ -16,6 +16,8 @@ import {
 } from '../storage'
 import { DEFAULT_WEIGHTS, normalizeWeights, scoreScenario } from '../scoring'
 import { parseBackupText } from '../validation'
+import { useToast } from './useToast'
+import { useConfirm } from './useConfirm'
 
 const uid = () =>
   typeof crypto !== 'undefined' && crypto.randomUUID
@@ -76,8 +78,16 @@ export function useDecisions() {
     return unreviewed[0] ?? null
   })
 
-  function flash(message: string) {
+  const toast = useToast()
+  const { confirm: confirmDialog } = useConfirm()
+
+  function flash(message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') {
     notice.value = message
+    if (type === 'success') toast.success(message)
+    else if (type === 'error') toast.error(message)
+    else if (type === 'warning') toast.warning(message)
+    else toast.info(message)
+
     window.setTimeout(() => {
       if (notice.value === message) notice.value = ''
     }, 3500)
@@ -115,8 +125,8 @@ export function useDecisions() {
       selectedScenarioId: null,
       weights: { ...DEFAULT_WEIGHTS },
       scenarios: [
-        makeScenario('Jalur A — Pilihan aman & stabil', 4500000, 700000, 18, 55, 20),
-        makeScenario('Jalur B — Pilihan bertumbuh cepat', 6000000, 1200000, 28, 85, 55)
+        makeScenario('Jalur A : Pilihan aman & stabil', 4500000, 700000, 18, 55, 20),
+        makeScenario('Jalur B : Pilihan bertumbuh cepat', 6000000, 1200000, 28, 85, 55)
       ],
       journal: { reason: '', expectedOutcome: '', actualOutcome: '', reflection: '' }
     }
@@ -261,7 +271,7 @@ export function useDecisions() {
       activeDecision.value.status = 'decided'
     }
     await persist(activeDecision.value)
-    flash('Jalur dipilih — skor adalah panduan, bukan vonis mutlak')
+    flash('Jalur dipilih: skor adalah panduan, bukan vonis mutlak', 'success')
   }
 
   async function updateScenario(scenario: Scenario): Promise<void> {
@@ -379,7 +389,14 @@ export function useDecisions() {
     try {
       const text = await file.text()
       const imported = parseBackupText(text)
-      if (!confirm(`Impor ${imported.length} keputusan? Data saat ini di perangkat akan digantikan.`)) {
+      const confirmed = await confirmDialog({
+        title: 'Impor Cadangan Data?',
+        message: `Impor ${imported.length} keputusan? Seluruh data yang ada saat ini di perangkat akan digantikan.`,
+        confirmText: 'Ya, Impor Data',
+        cancelText: 'Batal',
+        danger: true
+      })
+      if (!confirmed) {
         return { ok: false, message: 'Impor dibatalkan oleh pengguna.' }
       }
 
@@ -387,11 +404,11 @@ export function useDecisions() {
       await persistAll()
       activeId.value = decisions.value[0]?.id ?? null
       const note = `Berhasil mengimpor ${imported.length} keputusan.`
-      flash(note)
+      flash(note, 'success')
       return { ok: true, message: note }
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Berkas cadangan tidak valid'
-      flash(`Gagal mengimpor: ${msg}`)
+      flash(`Gagal mengimpor: ${msg}`, 'error')
       return { ok: false, message: msg }
     }
   }

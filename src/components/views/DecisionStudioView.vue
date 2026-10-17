@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   Plus, Search, Trash2, CalendarDays, ArrowRight, GitBranch,
-  SlidersHorizontal, Scale, ShieldAlert
+  SlidersHorizontal, Scale, ShieldAlert, AlertCircle
 } from 'lucide-vue-next'
 import type { Decision, Scenario, AssumptionKind } from '../../types'
 import { useI18n } from '../../i18n'
@@ -45,18 +45,29 @@ const pathCost = ref(1000000)
 const pathHours = ref(20)
 const pathGrowth = ref(70)
 const pathRisk = ref(35)
+const pathNameTouched = ref(false)
+
+const pathNameError = computed(() => {
+  if (!pathNameTouched.value) return ''
+  const trimmed = pathName.value.trim()
+  if (!trimmed) return 'Nama jalan/pilihan wajib diisi.'
+  if (trimmed.length < 2) return 'Minimal 2 karakter.'
+  return ''
+})
 
 function submitAddPath() {
-  if (!pathName.value.trim()) return
+  pathNameTouched.value = true
+  if (pathName.value.trim().length < 2) return
   emit('add-scenario', {
     name: pathName.value.trim(),
-    income: Number(pathIncome.value),
-    cost: Number(pathCost.value),
-    hours: Number(pathHours.value),
-    growth: Number(pathGrowth.value),
-    risk: Number(pathRisk.value)
+    income: Math.max(0, Number(pathIncome.value) || 0),
+    cost: Math.max(0, Number(pathCost.value) || 0),
+    hours: Math.min(168, Math.max(0, Number(pathHours.value) || 0)),
+    growth: Math.min(100, Math.max(0, Number(pathGrowth.value) || 0)),
+    risk: Math.min(100, Math.max(0, Number(pathRisk.value) || 0))
   })
   pathName.value = ''
+  pathNameTouched.value = false
   showAddPath.value = false
 }
 
@@ -177,8 +188,19 @@ function formatDate(value: string) {
         <form v-if="showAddPath" class="inline-form scenario-new" @submit.prevent="submitAddPath">
           <label>
             {{ t.addPathForm.title }}
-            <input v-model="pathName" required :placeholder="t.addPathForm.placeholder" />
+            <input
+              v-model="pathName"
+              :class="{ 'input-error': !!pathNameError }"
+              :placeholder="t.addPathForm.placeholder"
+              @blur="pathNameTouched = true"
+            />
+            <div v-if="pathNameError" class="field-error-msg">
+              <AlertCircle :size="14" />
+              <span>{{ pathNameError }}</span>
+            </div>
           </label>
+
+          <!-- Row 1: Objective Numbers -->
           <div class="form-grid three">
             <label>
               {{ t.addPathForm.monthlyIncome }}
@@ -192,20 +214,31 @@ function formatDate(value: string) {
               {{ t.addPathForm.hoursPerWeek }}
               <input v-model.number="pathHours" type="number" min="0" max="168" />
             </label>
+          </div>
+
+          <!-- Row 2: Perceived Sliders (Theme Green) -->
+          <div class="form-grid two" style="margin-top: 6px;">
             <label>
-              {{ t.addPathForm.growth }} <b>{{ pathGrowth }}/100</b>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>{{ t.addPathForm.growth }}</span>
+                <b style="font-size: 13px; color: var(--green);">{{ pathGrowth }}/100</b>
+              </div>
               <input v-model.number="pathGrowth" type="range" min="0" max="100" />
             </label>
             <label>
-              {{ t.addPathForm.risk }} <b>{{ pathRisk }}/100</b>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>{{ t.addPathForm.risk }}</span>
+                <b style="font-size: 13px; color: var(--ink);">{{ pathRisk }}/100</b>
+              </div>
               <input v-model.number="pathRisk" type="range" min="0" max="100" />
             </label>
           </div>
+
           <div class="form-actions">
             <button type="button" class="button button-ghost" @click="showAddPath = false">
               {{ t.addPathForm.cancel }}
             </button>
-            <button class="button button-primary" type="submit" :disabled="!pathName.trim()">
+            <button class="button button-primary" type="submit" :disabled="pathName.trim().length < 2">
               {{ t.addPathForm.submit }} <ArrowRight :size="15" />
             </button>
           </div>

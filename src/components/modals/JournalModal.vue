@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { X, Check, BookOpen } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { X, Check, BookOpen, AlertCircle } from 'lucide-vue-next'
 import type { DecisionJournal, DecisionStatus } from '../../types'
 import { useI18n } from '../../i18n'
 
@@ -24,24 +24,35 @@ const actualOutcome = ref(props.initialJournal.actualOutcome ?? '')
 const reflection = ref(props.initialJournal.reflection ?? '')
 const reviewDate = ref(props.initialReviewDate ?? '')
 const status = ref<DecisionStatus>(props.initialStatus ?? 'exploring')
+const dateTouched = ref(false)
+
+const dateError = computed(() => {
+  if (!dateTouched.value) return ''
+  if (!reviewDate.value) return 'Tanggal evaluasi wajib diisi.'
+  return ''
+})
 
 function setPresetDate(days: number) {
   const d = new Date()
   d.setDate(d.getDate() + days)
   reviewDate.value = d.toISOString().slice(0, 10)
+  dateTouched.value = false
 }
 
 function handleSave() {
+  dateTouched.value = true
+  if (!reviewDate.value) return
+
   let targetStatus = status.value
   if (actualOutcome.value.trim() || reflection.value.trim()) {
     targetStatus = 'reviewed'
   }
   emit('save', {
     journal: {
-      reason: reason.value,
-      expectedOutcome: expectedOutcome.value,
-      actualOutcome: actualOutcome.value,
-      reflection: reflection.value
+      reason: reason.value.trim(),
+      expectedOutcome: expectedOutcome.value.trim(),
+      actualOutcome: actualOutcome.value.trim(),
+      reflection: reflection.value.trim()
     },
     reviewDate: reviewDate.value,
     status: targetStatus
@@ -78,10 +89,10 @@ onUnmounted(() => {
         {{ interpolate(t.journalModal.intro, { title: decisionTitle }) }}
       </p>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+      <div class="form-grid two" style="margin-bottom: 14px;">
         <label>
           {{ t.journalModal.stageLabel }}
-          <select v-model="status" style="width: 100%; border: 1px solid #e0e5dc; border-radius: 8px; background: #fff; padding: 9px; font-size: 11px;">
+          <select v-model="status">
             <option value="exploring">{{ t.journalModal.stageExploring }}</option>
             <option value="decided">{{ t.journalModal.stageDecided }}</option>
             <option value="reviewed">{{ t.journalModal.stageReviewed }}</option>
@@ -90,13 +101,23 @@ onUnmounted(() => {
 
         <label>
           {{ t.journalModal.reviewDateLabel }}
-          <input v-model="reviewDate" type="date" required />
+          <input
+            v-model="reviewDate"
+            type="date"
+            :class="{ 'input-error': !!dateError }"
+            required
+            @blur="dateTouched = true"
+          />
+          <div v-if="dateError" class="field-error-msg">
+            <AlertCircle :size="14" />
+            <span>{{ dateError }}</span>
+          </div>
           <div class="quick-dates">
-            <button type="button" class="quick-date-btn" @click="setPresetDate(7)">+7d</button>
-            <button type="button" class="quick-date-btn" @click="setPresetDate(14)">+14d</button>
-            <button type="button" class="quick-date-btn" @click="setPresetDate(30)">+30d</button>
-            <button type="button" class="quick-date-btn" @click="setPresetDate(90)">+90d</button>
-            <button type="button" class="quick-date-btn" @click="setPresetDate(180)">+6m</button>
+            <button type="button" class="quick-date-btn" @click="setPresetDate(7)">+7h</button>
+            <button type="button" class="quick-date-btn" @click="setPresetDate(14)">+14h</button>
+            <button type="button" class="quick-date-btn" @click="setPresetDate(30)">+30h</button>
+            <button type="button" class="quick-date-btn" @click="setPresetDate(90)">+90h</button>
+            <button type="button" class="quick-date-btn" @click="setPresetDate(180)">+6b</button>
           </div>
         </label>
       </div>
@@ -142,7 +163,7 @@ onUnmounted(() => {
           {{ t.common.cancel }}
         </button>
         <button class="button button-primary" type="submit">
-          {{ t.journalModal.saveBtn }} <Check :size="16" />
+          <Check :size="16" /> {{ t.journalModal.saveBtn }}
         </button>
       </div>
     </form>

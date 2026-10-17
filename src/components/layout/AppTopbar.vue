@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Menu } from 'lucide-vue-next'
 import LanguageSwitcher from '../common/LanguageSwitcher.vue'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import VisualAvatar from '../common/VisualAvatar.vue'
@@ -7,6 +8,10 @@ import { useI18n } from '../../i18n'
 
 const props = defineProps<{
   currentNav: 'overview' | 'decisions' | 'journal'
+}>()
+
+const emit = defineEmits<{
+  (e: 'toggle-mobile-menu'): void
 }>()
 
 const { t } = useI18n()
@@ -20,10 +25,21 @@ const pageTitle = computed(() => {
 
 <template>
   <header class="topbar">
-    <div class="breadcrumb">
-      <span>{{ t.nav.workspace }}</span>
-      <span class="crumb-slash">/</span>
-      <strong>{{ pageTitle }}</strong>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button
+        type="button"
+        class="mobile-nav-toggle"
+        aria-label="Buka menu navigasi"
+        @click="emit('toggle-mobile-menu')"
+      >
+        <Menu :size="20" />
+      </button>
+
+      <div class="breadcrumb">
+        <span>{{ t.nav.workspace }}</span>
+        <span class="crumb-slash">/</span>
+        <strong>{{ pageTitle }}</strong>
+      </div>
     </div>
 
     <div class="top-actions">

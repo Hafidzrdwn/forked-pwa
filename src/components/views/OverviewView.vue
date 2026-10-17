@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  Sparkles, Plus, GitBranch, Activity, Check, ArrowRight,
+  Compass, Plus, GitBranch, Activity, Check, ArrowRight,
   CircleHelp, CalendarDays, ShieldAlert, AlertTriangle
 } from 'lucide-vue-next'
 import type { Decision } from '../../types'
@@ -43,7 +43,7 @@ const isOverdue = (dateStr: string) => {
   <section class="page" aria-label="Overview">
     <div class="hero-row">
       <div>
-        <div class="eyebrow"><Sparkles :size="14" /> {{ t.overview.heroEyebrow }}</div>
+        <div class="eyebrow"><Compass :size="15" /> {{ t.overview.heroEyebrow }}</div>
         <h1>{{ t.overview.heroTitle }}<br /><span>{{ t.overview.heroSpan }}</span></h1>
         <p class="hero-copy">{{ t.overview.heroDesc }}</p>
       </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Plus, CircleHelp, Trash2 } from 'lucide-vue-next'
+import { Plus, CircleHelp, Trash2, AlertCircle } from 'lucide-vue-next'
 import type { AssumptionKind, Scenario } from '../../types'
 import { useI18n } from '../../i18n'
 
@@ -31,9 +31,20 @@ const showForm = ref(false)
 const text = ref('')
 const confidence = ref(70)
 const kind = ref<AssumptionKind>('assumption')
+const textTouched = ref(false)
+
+const textError = computed(() => {
+  if (!textTouched.value) return ''
+  const trimmed = text.value.trim()
+  if (!trimmed) return 'Pernyataan perkiraan wajib diisi.'
+  if (trimmed.length < 3) return 'Minimal 3 karakter.'
+  return ''
+})
 
 function submitAssumption() {
-  if (!currentScenario.value || !text.value.trim()) return
+  textTouched.value = true
+  if (!currentScenario.value || text.value.trim().length < 3) return
+
   emit('add-assumption', {
     scenarioId: currentScenario.value.id,
     text: text.value.trim(),
@@ -41,6 +52,7 @@ function submitAssumption() {
     kind: kind.value
   })
   text.value = ''
+  textTouched.value = false
   confidence.value = 70
   kind.value = 'assumption'
   showForm.value = false
@@ -56,7 +68,7 @@ function submitAssumption() {
       </div>
       <button
         type="button"
-        class="button button-secondary button-small"
+        class="button button-secondary button-sm"
         :disabled="!currentScenario"
         @click="showForm = !showForm"
       >
@@ -65,7 +77,7 @@ function submitAssumption() {
     </div>
 
     <!-- Tabs Navigation -->
-    <div v-if="scenarios.length > 1" class="tabs-nav" role="tablist">
+    <div v-if="scenarios.length > 1" class="tabs-nav" role="tablist" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
       <button
         v-for="s in scenarios"
         :key="s.id"
@@ -76,7 +88,7 @@ function submitAssumption() {
         @click="activeTabScenarioId = s.id"
       >
         {{ s.name }}
-        <span v-if="selectedScenarioId === s.id" style="font-size: 9px; opacity: 0.8;">
+        <span v-if="selectedScenarioId === s.id" style="font-size: 11px; opacity: 0.85; margin-left: 4px;">
           ({{ t.scenario.chosenPath }})
         </span>
       </button>
@@ -86,28 +98,33 @@ function submitAssumption() {
     <div v-if="currentScenario" class="assumption-path">
       <span class="assumption-current">{{ t.assumptions.pathTab }}</span>
       <strong>{{ currentScenario.name }}</strong>
-      <span style="font-size: 10px; color: #8e958a; margin-left: auto;">
+      <span style="font-size: 12px; color: var(--submuted); margin-left: auto;">
         {{ interpolate(t.assumptions.itemsCount, { n: currentScenario.assumptions.length }) }}
       </span>
     </div>
 
     <!-- Form -->
     <form v-if="showForm && currentScenario" class="inline-form assumption-new" @submit.prevent="submitAssumption">
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+      <div class="form-grid two">
         <label>
           {{ t.assumptions.statementLabel }}
           <textarea
             v-model="text"
-            rows="2"
-            required
+            rows="3"
+            :class="{ 'input-error': !!textError }"
             :placeholder="t.assumptions.statementPlaceholder"
+            @blur="textTouched = true"
           />
+          <div v-if="textError" class="field-error-msg">
+            <AlertCircle :size="14" />
+            <span>{{ textError }}</span>
+          </div>
         </label>
 
-        <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
           <label>
             {{ t.assumptions.typeLabel }}
-            <select v-model="kind" style="width: 100%; border: 1px solid #e0e5dc; border-radius: 8px; background: #fff; padding: 7px; font-size: 11px;">
+            <select v-model="kind">
               <option value="assumption">{{ t.assumptions.typeAssumption }}</option>
               <option value="estimate">{{ t.assumptions.typeEstimate }}</option>
               <option value="fact">{{ t.assumptions.typeFact }}</option>
@@ -115,7 +132,9 @@ function submitAssumption() {
           </label>
 
           <label>
-            {{ interpolate(t.assumptions.confidenceLabel, { n: confidence }) }}
+            <div style="display: flex; justify-content: space-between;">
+              <span>{{ interpolate(t.assumptions.confidenceLabel, { n: confidence }) }}</span>
+            </div>
             <input v-model.number="confidence" type="range" min="0" max="100" />
           </label>
         </div>
@@ -125,7 +144,7 @@ function submitAssumption() {
         <button type="button" class="button button-ghost" @click="showForm = false">
           {{ t.common.cancel }}
         </button>
-        <button type="submit" class="button button-primary" :disabled="!text.trim()">
+        <button type="submit" class="button button-primary" :disabled="text.trim().length < 3">
           {{ t.assumptions.save }}
         </button>
       </div>
@@ -141,12 +160,12 @@ function submitAssumption() {
         <input
           type="checkbox"
           :checked="item.checked"
-          :aria-label="'Mark as verified'"
+          :aria-label="'Tandai terbukti'"
           @change="emit('toggle-assumption', { scenarioId: currentScenario.id, assumptionId: item.id })"
         />
 
         <div class="assumption-text" :class="{ crossed: item.checked }">
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap;">
             <span :class="['kind-badge', item.kind || 'assumption']">
               {{ item.kind || 'assumption' }}
             </span>
@@ -167,7 +186,7 @@ function submitAssumption() {
           :aria-label="t.common.delete"
           @click="emit('remove-assumption', { scenarioId: currentScenario.id, assumptionId: item.id })"
         >
-          <Trash2 :size="13" />
+          <Trash2 :size="14" />
         </button>
       </div>
     </div>

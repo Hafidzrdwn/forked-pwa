@@ -13,7 +13,7 @@ export const en = {
     noticeDeleted: 'Decision deleted',
     noticePathAdded: 'Path added',
     noticePathRemoved: 'Path removed',
-    noticePathSelected: 'Path selected — scores are a guide, not a verdict',
+    noticePathSelected: 'Path selected: scores are a guide, not a verdict',
     noticeJournalSaved: 'Decision journal saved',
     noticeWeightsSaved: 'Scoring weights updated',
     noticeReviewDateSaved: 'Review date updated',
@@ -54,14 +54,14 @@ export const en = {
     mapFirstDecision: 'Map a Decision',
     betterQuestionEyebrow: 'A BETTER QUESTION',
     betterQuestionTitle: 'What would need to be true?',
-    betterQuestionDesc: "Before choosing a path, name the assumptions behind it. The best decision isn't always the one with the highest initial score—it's the one whose trade-offs you understand and accept.",
+    betterQuestionDesc: "Before choosing a path, name the assumptions behind it. The best decision isn't always the one with the highest initial score, but the one whose trade-offs you understand and accept.",
     nextReviewEyebrow: 'NEXT REVIEW',
     nextReviewPastDue: '(Past due)',
     reviewBy: 'Review by {date}',
     openDecision: 'Open decision',
     noNextReviewTitle: 'Nothing waiting in the wings.',
     noNextReviewDesc: 'Create a decision and set a date to revisit your reasoning.',
-    disclaimer: 'Forked helps structure your thinking. Scores are transparent heuristics—not objective truth or guaranteed predictions.'
+    disclaimer: 'Forked helps structure your thinking. Scores are transparent guides, not objective truth or guaranteed predictions.'
   },
   studio: {
     eyebrow: 'THE CROSSROADS',
@@ -145,7 +145,7 @@ export const en = {
   weightsModal: {
     eyebrow: 'TRANSPARENT DECISION SCORING',
     title: 'Configure scoring weights',
-    intro: 'Customize how much each dimension influences path fit scores for {title}. The score is a personal prioritization tool—never an objective verdict.',
+    intro: 'Customize how much each dimension influences path fit scores for {title}. The score is a personal prioritization tool, never an objective verdict.',
     money: 'Money (Net Cash Flow)',
     time: 'Time & Workload',
     growth: 'Learning & Growth',

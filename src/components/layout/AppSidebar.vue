@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, FileUp
+  LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, FileUp, X
 } from 'lucide-vue-next'
 import BrandLogo from '../common/BrandLogo.vue'
 import { useI18n } from '../../i18n'
 
-const props = defineProps<{
-  currentNav: 'overview' | 'decisions' | 'journal'
-  totalDecisions: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    currentNav: 'overview' | 'decisions' | 'journal'
+    totalDecisions: number
+    mobileOpen?: boolean
+  }>(),
+  {
+    mobileOpen: false
+  }
+)
 
 const emit = defineEmits<{
   (e: 'navigate', nav: 'overview' | 'decisions' | 'journal'): void
   (e: 'export'): void
   (e: 'import-file', file: File): void
+  (e: 'close-mobile-menu'): void
 }>()
 
 const { t } = useI18n()
@@ -28,13 +35,37 @@ function handleFileChange(e: Event) {
   }
   target.value = ''
 }
+
+function handleNav(nav: 'overview' | 'decisions' | 'journal') {
+  emit('navigate', nav)
+  emit('close-mobile-menu')
+}
 </script>
 
 <template>
-  <aside class="sidebar" aria-label="Sidebar navigation">
-    <a class="brand" href="#" @click.prevent="emit('navigate', 'overview')">
-      <BrandLogo :size="36" :subtitle="t.nav.brandSubtitle" />
-    </a>
+  <!-- Mobile Backdrop Overlay -->
+  <div
+    v-if="props.mobileOpen"
+    class="sidebar-overlay"
+    @click="emit('close-mobile-menu')"
+  />
+
+  <aside :class="['sidebar', { 'mobile-open': props.mobileOpen }]" aria-label="Sidebar navigation">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <a class="brand" href="#" @click.prevent="handleNav('overview')">
+        <BrandLogo :size="36" :subtitle="t.nav.brandSubtitle" />
+      </a>
+      <button
+        v-if="props.mobileOpen"
+        type="button"
+        class="icon-button"
+        style="margin-bottom: 24px;"
+        aria-label="Tutup menu"
+        @click="emit('close-mobile-menu')"
+      >
+        <X :size="18" />
+      </button>
+    </div>
 
     <div class="workspace-label">{{ t.nav.workspace }}</div>
 
@@ -43,7 +74,7 @@ function handleFileChange(e: Event) {
         type="button"
         :class="['nav-item', { active: currentNav === 'overview' }]"
         :aria-current="currentNav === 'overview' ? 'page' : undefined"
-        @click="emit('navigate', 'overview')"
+        @click="handleNav('overview')"
       >
         <LayoutDashboard :size="18" /> {{ t.nav.overview }}
       </button>
@@ -52,7 +83,7 @@ function handleFileChange(e: Event) {
         type="button"
         :class="['nav-item', { active: currentNav === 'decisions' }]"
         :aria-current="currentNav === 'decisions' ? 'page' : undefined"
-        @click="emit('navigate', 'decisions')"
+        @click="handleNav('decisions')"
       >
         <GitBranch :size="18" /> {{ t.nav.myDecisions }}
         <span class="nav-count">{{ totalDecisions }}</span>
@@ -62,7 +93,7 @@ function handleFileChange(e: Event) {
         type="button"
         :class="['nav-item', { active: currentNav === 'journal' }]"
         :aria-current="currentNav === 'journal' ? 'page' : undefined"
-        @click="emit('navigate', 'journal')"
+        @click="handleNav('journal')"
       >
         <BookOpen :size="18" /> {{ t.nav.journal }}
       </button>

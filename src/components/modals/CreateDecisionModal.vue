@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { X, ArrowRight, Sparkles } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { X, ArrowRight, Lightbulb, AlertCircle } from 'lucide-vue-next'
 import { useI18n } from '../../i18n'
 
 const emit = defineEmits<{
@@ -12,9 +12,31 @@ const { t } = useI18n()
 
 const title = ref('')
 const context = ref('')
+const touched = ref(false)
+
+const titleError = computed(() => {
+  if (!touched.value) return ''
+  const trimmed = title.value.trim()
+  if (!trimmed) {
+    return 'Judul keputusan wajib diisi.'
+  }
+  if (trimmed.length < 3) {
+    return 'Judul terlalu pendek, minimal 3 karakter.'
+  }
+  if (trimmed.length > 120) {
+    return 'Judul maksimal 120 karakter.'
+  }
+  return ''
+})
+
+const isValid = computed(() => {
+  const trimmed = title.value.trim()
+  return trimmed.length >= 3 && trimmed.length <= 120 && context.value.length <= 500
+})
 
 function handleSubmit() {
-  if (!title.value.trim()) return
+  touched.value = true
+  if (!isValid.value) return
   emit('create', {
     title: title.value.trim(),
     context: context.value.trim()
@@ -53,23 +75,34 @@ onUnmounted(() => {
         {{ t.createModal.titleLabel }}
         <input
           v-model="title"
-          required
           autofocus
+          :class="{ 'input-error': !!titleError }"
           :placeholder="t.createModal.titlePlaceholder"
+          @blur="touched = true"
         />
+        <div v-if="titleError" class="field-error-msg">
+          <AlertCircle :size="14" />
+          <span>{{ titleError }}</span>
+        </div>
       </label>
 
       <label>
-        {{ t.createModal.contextLabel }}
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <span>{{ t.createModal.contextLabel }}</span>
+          <small :style="{ color: context.length > 500 ? 'var(--danger)' : 'var(--submuted)', fontSize: '11.5px' }">
+            {{ context.length }}/500
+          </small>
+        </div>
         <textarea
           v-model="context"
           rows="3"
+          maxlength="500"
           :placeholder="t.createModal.contextPlaceholder"
         />
       </label>
 
       <div class="modal-tip">
-        <Sparkles :size="16" />
+        <Lightbulb :size="18" style="flex-shrink: 0;" />
         <span>{{ t.createModal.tip }}</span>
       </div>
 
@@ -77,7 +110,7 @@ onUnmounted(() => {
         <button type="button" class="button button-ghost" @click="emit('close')">
           {{ t.common.cancel }}
         </button>
-        <button class="button button-primary" type="submit" :disabled="!title.trim()">
+        <button class="button button-primary" type="submit" :disabled="!isValid">
           {{ t.createModal.submit }} <ArrowRight :size="16" />
         </button>
       </div>

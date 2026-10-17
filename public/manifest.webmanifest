@@ -2,14 +2,15 @@
   "id": "/",
   "name": "Forked - Personal Decision Studio",
   "short_name": "Forked",
-  "description": "Compare paths, test assumptions, and learn from your decisions.",
+  "description": "Bandingkan pilihan, uji perkiraan, dan pelajari setiap keputusan dengan data yang aman di perangkatmu.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#f8f8f5",
-  "theme_color": "#f8f8f5",
+  "background_color": "#111612",
+  "theme_color": "#245d3e",
   "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]

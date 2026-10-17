@@ -7,7 +7,7 @@ const { locale, setLocale } = useI18n()
 
 <template>
   <div class="lang-switcher" role="group" aria-label="Pilih Bahasa / Choose Language">
-    <Globe :size="13" class="lang-globe-icon" />
+    <Globe :size="14" class="lang-globe-icon" />
     <button
       type="button"
       :class="['lang-btn', { active: locale === 'id' }]"
@@ -34,41 +34,42 @@ const { locale, setLocale } = useI18n()
 .lang-switcher {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: #ffffff;
+  gap: 4px;
+  background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 11px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
   font-weight: 700;
   user-select: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 .lang-globe-icon {
-  color: #727a6f;
-  margin-right: 1px;
+  color: var(--muted);
+  margin-right: 2px;
 }
 .lang-sep {
-  color: #ccd2ca;
-  font-size: 10px;
+  color: var(--line-hover);
+  font-size: 11px;
 }
 .lang-btn {
   border: 0;
   background: transparent;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
-  color: #838b81;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 .lang-btn:hover {
   color: var(--ink);
+  background: var(--bg-hover);
 }
 .lang-btn.active {
-  color: var(--green-dark);
+  color: var(--green);
   font-weight: 800;
-  background: #edf4ed;
+  background: var(--green-soft);
 }
 </style>
