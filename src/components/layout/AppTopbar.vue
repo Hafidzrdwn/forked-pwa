@@ -1,0 +1,42 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import LanguageSwitcher from '../common/LanguageSwitcher.vue'
+import VisualAvatar from '../common/VisualAvatar.vue'
+import { useI18n } from '../../i18n'
+
+const props = defineProps<{
+  currentNav: 'overview' | 'decisions' | 'journal'
+}>()
+
+const { t } = useI18n()
+
+const pageTitle = computed(() => {
+  if (props.currentNav === 'overview') return t.value.nav.overview
+  if (props.currentNav === 'journal') return t.value.nav.journal
+  return t.value.studio.title
+})
+</script>
+
+<template>
+  <header class="topbar">
+    <div class="breadcrumb">
+      <span>{{ t.nav.workspace }}</span>
+      <span class="crumb-slash">/</span>
+      <strong>{{ pageTitle }}</strong>
+    </div>
+
+    <div class="top-actions">
+      <!-- Language Switcher -->
+      <LanguageSwitcher />
+
+      <!-- Local-First Status Pill -->
+      <span class="privacy-pill">
+        <span class="status-dot"></span>
+        {{ t.nav.localBadge }}
+      </span>
+
+      <!-- 3D Fun Avatar -->
+      <VisualAvatar :size="32" name="Decision Maker" />
+    </div>
+  </header>
+</template>
