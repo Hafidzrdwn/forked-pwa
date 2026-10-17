@@ -6,21 +6,27 @@ const { locale, setLocale } = useI18n()
 </script>
 
 <template>
-  <div class="lang-switcher" role="group" aria-label="Pilih Bahasa / Choose Language">
-    <Globe :size="14" class="lang-globe-icon" />
+  <div class="inline-flex items-center gap-1 bg-surface border border-border rounded-full px-2.5 py-1 text-xs font-bold select-none transition-colors" role="group" aria-label="Pilih Bahasa / Choose Language">
+    <Globe :size="13" class="text-fg-subtle mr-0.5" />
     <button
       type="button"
-      :class="['lang-btn', { active: locale === 'id' }]"
+      :class="[
+        'px-1.5 py-0.5 rounded-md text-xs font-semibold cursor-pointer transition-colors',
+        locale === 'id' ? 'bg-primary-soft text-primary font-bold' : 'text-fg-muted hover:text-fg hover:bg-canvas-subtle'
+      ]"
       :aria-pressed="locale === 'id'"
       aria-label="Bahasa Indonesia"
       @click="setLocale('id')"
     >
       ID
     </button>
-    <span class="lang-sep">/</span>
+    <span class="text-fg-subtle text-[11px]">/</span>
     <button
       type="button"
-      :class="['lang-btn', { active: locale === 'en' }]"
+      :class="[
+        'px-1.5 py-0.5 rounded-md text-xs font-semibold cursor-pointer transition-colors',
+        locale === 'en' ? 'bg-primary-soft text-primary font-bold' : 'text-fg-muted hover:text-fg hover:bg-canvas-subtle'
+      ]"
       :aria-pressed="locale === 'en'"
       aria-label="English"
       @click="setLocale('en')"
@@ -29,47 +35,3 @@ const { locale, setLocale } = useI18n()
     </button>
   </div>
 </template>
-
-<style scoped>
-.lang-switcher {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 700;
-  user-select: none;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-.lang-globe-icon {
-  color: var(--muted);
-  margin-right: 2px;
-}
-.lang-sep {
-  color: var(--line-hover);
-  font-size: 11px;
-}
-.lang-btn {
-  border: 0;
-  background: transparent;
-  padding: 3px 6px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.lang-btn:hover {
-  color: var(--ink);
-  background: var(--bg-hover);
-}
-.lang-btn.active {
-  color: var(--green);
-  font-weight: 800;
-  background: var(--green-soft);
-}
-</style>

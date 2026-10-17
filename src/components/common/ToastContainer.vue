@@ -6,29 +6,29 @@ const { toasts, dismiss } = useToast()
 </script>
 
 <template>
-  <div class="toast-viewport" aria-live="polite" aria-atomic="true">
-    <TransitionGroup name="toast-anim" tag="div" class="toast-list">
+  <div class="fixed bottom-6 right-6 z-50 pointer-events-none max-w-sm w-[calc(100vw-48px)]" aria-live="polite" aria-atomic="true">
+    <TransitionGroup name="toast-anim" tag="div" class="flex flex-col gap-2.5">
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        :class="['toast-bubble', `toast-${toast.type}`]"
+        class="pointer-events-auto flex items-start gap-3 p-3.5 px-4 rounded-xl bg-surface-elevated border border-border shadow-lg text-fg"
         role="alert"
       >
-        <div class="toast-icon">
-          <CheckCircle2 v-if="toast.type === 'success'" :size="18" />
-          <AlertCircle v-else-if="toast.type === 'error'" :size="18" />
-          <AlertTriangle v-else-if="toast.type === 'warning'" :size="18" />
-          <Info v-else :size="18" />
+        <div class="shrink-0 mt-0.5">
+          <CheckCircle2 v-if="toast.type === 'success'" class="text-primary" :size="18" />
+          <AlertCircle v-else-if="toast.type === 'error'" class="text-danger" :size="18" />
+          <AlertTriangle v-else-if="toast.type === 'warning'" class="text-amber" :size="18" />
+          <Info v-else class="text-blue" :size="18" />
         </div>
 
-        <div class="toast-content">
-          <strong v-if="toast.title" class="toast-title">{{ toast.title }}</strong>
-          <span class="toast-desc">{{ toast.message }}</span>
+        <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+          <strong v-if="toast.title" class="text-xs font-bold text-fg">{{ toast.title }}</strong>
+          <span class="text-xs text-fg-muted break-words leading-relaxed">{{ toast.message }}</span>
         </div>
 
         <button
           type="button"
-          class="toast-close"
+          class="text-fg-subtle hover:text-fg p-1 rounded-md cursor-pointer transition-colors shrink-0"
           aria-label="Tutup notifikasi"
           @click="dismiss(toast.id)"
         >
@@ -40,85 +40,6 @@ const { toasts, dismiss } = useToast()
 </template>
 
 <style scoped>
-.toast-viewport {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1000;
-  pointer-events: none;
-  max-width: 420px;
-  width: calc(100vw - 48px);
-}
-.toast-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.toast-bubble {
-  pointer-events: auto;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: var(--paper-elevated, #ffffff);
-  border: 1px solid var(--line);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
-  color: var(--ink);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.toast-icon {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.toast-success .toast-icon {
-  color: #2e7a4e;
-}
-.toast-error .toast-icon {
-  color: #d94f3d;
-}
-.toast-warning .toast-icon {
-  color: #d48a1c;
-}
-.toast-info .toast-icon {
-  color: #3b82a6;
-}
-.toast-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-.toast-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-}
-.toast-desc {
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: var(--muted);
-  word-break: break-word;
-}
-.toast-close {
-  background: transparent;
-  border: 0;
-  color: var(--submuted);
-  padding: 2px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  transition: color 0.15s ease, background 0.15s ease;
-}
-.toast-close:hover {
-  color: var(--ink);
-  background: var(--bg-hover);
-}
-
-/* Animations */
 .toast-anim-enter-active,
 .toast-anim-leave-active {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -130,13 +51,5 @@ const { toasts, dismiss } = useToast()
 .toast-anim-leave-to {
   opacity: 0;
   transform: translateX(20px) scale(0.95);
-}
-@media (max-width: 640px) {
-  .toast-viewport {
-    bottom: 16px;
-    right: 16px;
-    left: 16px;
-    width: auto;
-  }
 }
 </style>

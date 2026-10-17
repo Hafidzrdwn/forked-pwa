@@ -47,38 +47,39 @@ const simulatedList = computed(() => {
 </script>
 
 <template>
-  <section class="analysis-card" aria-labelledby="stress-test-heading">
-    <div class="analysis-heading">
+  <section class="bg-surface border border-border rounded-2xl p-5 md:p-6 mt-5 shadow-xs" aria-labelledby="stress-test-heading">
+    <div class="flex items-start justify-between gap-4 mb-4">
       <div>
-        <div class="eyebrow">{{ t.whatIf.eyebrow }}</div>
-        <h3 id="stress-test-heading">{{ t.whatIf.title }}</h3>
-        <p>{{ t.whatIf.desc }}</p>
+        <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-1.5">{{ t.whatIf.eyebrow }}</div>
+        <h3 id="stress-test-heading" class="font-display font-bold text-lg text-fg m-0">{{ t.whatIf.title }}</h3>
+        <p class="text-xs text-fg-muted mt-1 max-w-lg leading-relaxed">{{ t.whatIf.desc }}</p>
       </div>
-      <div style="display: flex; gap: 8px; align-items: center;">
+      <div class="flex items-center gap-2">
         <button
           v-if="isDirty"
           type="button"
-          class="button button-ghost button-small"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-fg-muted hover:text-fg hover:bg-canvas-subtle transition-colors cursor-pointer"
           aria-label="Reset simulation"
           @click="resetSimulation"
         >
           <RotateCcw :size="13" /> {{ t.whatIf.reset }}
         </button>
-        <span class="analysis-icon"><SlidersHorizontal :size="19" /></span>
+        <span class="w-9 h-9 rounded-xl bg-primary-soft text-primary grid place-items-center shrink-0">
+          <SlidersHorizontal :size="19" />
+        </span>
       </div>
     </div>
 
     <!-- Sliders Grid -->
-    <div class="sim-controls-grid">
-      <div class="sim-control-item">
-        <div class="sim-control-header">
-          <label for="sim-income">{{ t.whatIf.incomeLabel }}</label>
-          <strong style="color: var(--green);">{{ incomePercent }}%</strong>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-canvas-subtle rounded-xl border border-border my-4">
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between text-xs font-medium">
+          <label for="sim-income" class="text-fg-muted">{{ t.whatIf.incomeLabel }}</label>
+          <strong class="font-bold text-primary">{{ incomePercent }}%</strong>
         </div>
         <input
           id="sim-income"
           v-model.number="incomePercent"
-          class="full-range"
           type="range"
           min="0"
           max="150"
@@ -86,17 +87,16 @@ const simulatedList = computed(() => {
         />
       </div>
 
-      <div class="sim-control-item">
-        <div class="sim-control-header">
-          <label for="sim-cost">{{ t.whatIf.costLabel }}</label>
-          <strong :style="{ color: costPercent > 100 ? '#b14c3f' : 'var(--ink)' }">
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between text-xs font-medium">
+          <label for="sim-cost" class="text-fg-muted">{{ t.whatIf.costLabel }}</label>
+          <strong :class="['font-bold', costPercent > 100 ? 'text-danger' : 'text-fg']">
             {{ costPercent }}%
           </strong>
         </div>
         <input
           id="sim-cost"
           v-model.number="costPercent"
-          class="full-range"
           type="range"
           min="60"
           max="180"
@@ -104,15 +104,14 @@ const simulatedList = computed(() => {
         />
       </div>
 
-      <div class="sim-control-item">
-        <div class="sim-control-header">
-          <label for="sim-hours">{{ t.whatIf.hoursLabel }}</label>
-          <strong>{{ hoursDelta > 0 ? '+' + hoursDelta : hoursDelta }} {{ t.common.hrs }}</strong>
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between text-xs font-medium">
+          <label for="sim-hours" class="text-fg-muted">{{ t.whatIf.hoursLabel }}</label>
+          <strong class="font-bold text-fg">{{ hoursDelta > 0 ? '+' + hoursDelta : hoursDelta }} {{ t.common.hrs }}</strong>
         </div>
         <input
           id="sim-hours"
           v-model.number="hoursDelta"
-          class="full-range"
           type="range"
           min="-15"
           max="25"
@@ -120,17 +119,16 @@ const simulatedList = computed(() => {
         />
       </div>
 
-      <div class="sim-control-item">
-        <div class="sim-control-header">
-          <label for="sim-risk">{{ t.whatIf.riskLabel }}</label>
-          <strong :style="{ color: riskDelta > 0 ? '#b14c3f' : 'var(--green)' }">
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between text-xs font-medium">
+          <label for="sim-risk" class="text-fg-muted">{{ t.whatIf.riskLabel }}</label>
+          <strong :class="['font-bold', riskDelta > 0 ? 'text-danger' : 'text-primary']">
             {{ riskDelta > 0 ? '+' + riskDelta : riskDelta }} {{ t.common.pts }}
           </strong>
         </div>
         <input
           id="sim-risk"
           v-model.number="riskDelta"
-          class="full-range"
           type="range"
           min="-30"
           max="30"
@@ -140,32 +138,37 @@ const simulatedList = computed(() => {
     </div>
 
     <!-- Simulated Results List -->
-    <div class="whatif-results" style="margin-top: 18px;">
+    <div class="grid gap-3 mt-4">
       <div
         v-for="item in simulatedList"
         :key="item.scenarioId"
-        class="whatif-row"
-        style="grid-template-columns: minmax(100px, 1.2fr) minmax(80px, 1fr) auto auto;"
+        class="grid grid-cols-[minmax(100px,1.2fr)_minmax(80px,1fr)_auto_auto] items-center gap-3 p-2.5 rounded-xl hover:bg-canvas-subtle transition-colors text-xs"
       >
         <span>
-          <strong>{{ item.scenarioName }}</strong>
-          <small style="display: block; font-size: 9px; color: #8e958a;">
+          <strong class="font-bold text-fg block">{{ item.scenarioName }}</strong>
+          <small class="block text-[10px] text-fg-subtle">
             {{ interpolate(t.whatIf.baseNet, { amount: formatRupiah(item.originalNet) }) }}
           </small>
         </span>
 
-        <div class="whatif-bar">
-          <i :style="{ width: Math.min(100, Math.max(0, (item.simulatedNet + 2000000) / 10000000 * 100)) + '%' }" />
+        <div class="h-2 bg-border rounded-full overflow-hidden">
+          <i
+            class="h-full block rounded-full bg-primary transition-all duration-150"
+            :style="{ width: Math.min(100, Math.max(0, (item.simulatedNet + 2000000) / 10000000 * 100)) + '%' }"
+          />
         </div>
 
-        <strong :class="{ negative: item.simulatedNet < 0 }" style="min-width: 90px;">
+        <strong :class="['min-w-[90px] text-right font-bold', item.simulatedNet < 0 ? 'text-danger' : 'text-fg']">
           {{ formatRupiah(item.simulatedNet) }}
         </strong>
 
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span style="font-size: 11px; font-weight: 700;">{{ item.simulatedScore }}</span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs font-bold text-fg">{{ item.simulatedScore }}</span>
           <span
-            :class="['delta-badge', item.scoreDelta > 0 ? 'positive' : item.scoreDelta < 0 ? 'negative' : 'neutral']"
+            :class="[
+              'inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[11px] font-bold',
+              item.scoreDelta > 0 ? 'bg-primary-soft text-primary' : item.scoreDelta < 0 ? 'bg-danger-soft text-danger' : 'bg-canvas-subtle text-fg-muted'
+            ]"
           >
             <ArrowUpRight v-if="item.scoreDelta > 0" :size="11" />
             <ArrowDownRight v-else-if="item.scoreDelta < 0" :size="11" />
@@ -176,8 +179,8 @@ const simulatedList = computed(() => {
       </div>
     </div>
 
-    <p class="micro-note">
-      <Info :size="13" />
+    <p class="flex items-center gap-1.5 text-fg-muted text-xs leading-relaxed mt-4 pt-3 border-t border-border">
+      <Info :size="13" class="shrink-0 text-primary" />
       {{ t.whatIf.microNote }}
     </p>
   </section>

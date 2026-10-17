@@ -27,40 +27,48 @@ onUnmounted(() => {
   <Transition name="confirm-fade">
     <div
       v-if="state.isOpen"
-      class="modal-backdrop confirm-backdrop"
+      class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
       role="alertdialog"
       aria-modal="true"
       :aria-labelledby="'confirm-title'"
       :aria-describedby="'confirm-desc'"
       @click.self="handleCancel"
     >
-      <div class="modal-card confirm-card">
-        <div class="confirm-head">
-          <div :class="['confirm-icon-box', state.danger ? 'danger' : 'info']">
+      <div class="max-w-md w-full rounded-2xl bg-surface border border-border p-6 shadow-2xl flex flex-col gap-4 text-fg">
+        <div class="flex items-center justify-between">
+          <div :class="['w-10 h-10 rounded-xl grid place-items-center', state.danger ? 'bg-danger-soft text-danger' : 'bg-primary-soft text-primary']">
             <AlertTriangle v-if="state.danger" :size="20" />
             <AlertCircle v-else :size="20" />
           </div>
-          <button type="button" class="icon-button" aria-label="Tutup" @click="handleCancel">
-            <X :size="18" />
+          <button
+            type="button"
+            class="w-8 h-8 rounded-xl border border-border bg-surface text-fg-muted hover:text-fg hover:bg-canvas-subtle grid place-items-center transition-colors cursor-pointer"
+            aria-label="Tutup"
+            @click="handleCancel"
+          >
+            <X :size="16" />
           </button>
         </div>
 
-        <div class="confirm-body">
-          <h3 id="confirm-title" class="confirm-title">{{ state.title }}</h3>
-          <p id="confirm-desc" class="confirm-desc">{{ state.message }}</p>
+        <div class="flex flex-col gap-1.5">
+          <h3 id="confirm-title" class="font-display text-lg font-extrabold tracking-tight text-fg m-0">{{ state.title }}</h3>
+          <p id="confirm-desc" class="text-xs leading-relaxed text-fg-muted m-0">{{ state.message }}</p>
         </div>
 
-        <div class="confirm-actions">
+        <div class="flex justify-end gap-2.5 mt-2 pt-3 border-t border-border">
           <button
             type="button"
-            class="button button-ghost"
+            class="px-4 py-2 text-xs font-bold text-fg-muted hover:text-fg cursor-pointer"
             @click="handleCancel"
           >
             {{ state.cancelText }}
           </button>
           <button
             type="button"
-            :class="['button', state.danger ? 'button-danger' : 'button-primary']"
+            :class="[
+              'inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white transition-colors cursor-pointer shadow-xs',
+              state.danger ? 'bg-danger hover:bg-danger/90' : 'bg-primary hover:bg-primary-dark'
+            ]"
             @click="handleConfirm"
           >
             {{ state.confirmText }}
@@ -72,83 +80,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.confirm-backdrop {
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  background: rgba(12, 16, 13, 0.65);
-  backdrop-filter: blur(4px);
-}
-.confirm-card {
-  max-width: 440px;
-  width: 100%;
-  border-radius: 16px;
-  background: var(--paper, #ffffff);
-  border: 1px solid var(--line);
-  padding: 24px;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.confirm-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.confirm-icon-box {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-}
-.confirm-icon-box.danger {
-  background: var(--danger-soft, #fdedeb);
-  color: var(--danger, #b14c3f);
-}
-.confirm-icon-box.info {
-  background: var(--green-soft, #eaf2ec);
-  color: var(--green, #286548);
-}
-.confirm-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.confirm-title {
-  font-family: 'Manrope', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.4px;
-  margin: 0;
-  color: var(--ink);
-}
-.confirm-desc {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--muted);
-  margin: 0;
-}
-.confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
-}
-.button-danger {
-  background: var(--danger, #b14c3f);
-  color: #ffffff;
-  border: 1px solid transparent;
-}
-.button-danger:hover {
-  background: #98382c;
-  transform: translateY(-1px);
-}
-
-/* Transitions */
 .confirm-fade-enter-active,
 .confirm-fade-leave-active {
   transition: opacity 0.2s ease;

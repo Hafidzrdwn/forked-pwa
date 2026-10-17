@@ -46,20 +46,25 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
   <!-- Mobile Backdrop Overlay -->
   <div
     v-if="props.mobileOpen"
-    class="sidebar-overlay"
+    class="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 md:hidden"
     @click="emit('close-mobile-menu')"
   />
 
-  <aside :class="['sidebar', { 'mobile-open': props.mobileOpen }]" aria-label="Sidebar navigation">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-      <a class="brand" href="#" @click.prevent="handleNav('overview')">
+  <aside
+    :class="[
+      'fixed inset-y-0 left-0 w-[252px] p-5 bg-surface border-r border-border flex flex-col z-40 transition-transform duration-200 ease-in-out md:translate-x-0',
+      props.mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+    ]"
+    aria-label="Sidebar navigation"
+  >
+    <div class="flex items-center justify-between pb-6 px-1">
+      <a class="flex items-center gap-2.5" href="#" @click.prevent="handleNav('overview')">
         <BrandLogo :size="36" :subtitle="t.nav.brandSubtitle" />
       </a>
       <button
         v-if="props.mobileOpen"
         type="button"
-        class="icon-button"
-        style="margin-bottom: 24px;"
+        class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-fg hover:bg-canvas-subtle grid place-items-center transition-colors"
         aria-label="Tutup menu"
         @click="emit('close-mobile-menu')"
       >
@@ -67,12 +72,17 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
       </button>
     </div>
 
-    <div class="workspace-label">{{ t.nav.workspace }}</div>
+    <div class="px-3 pb-3 text-[11px] tracking-wider font-bold text-fg-subtle uppercase">{{ t.nav.workspace }}</div>
 
-    <nav class="nav-list">
+    <nav class="grid gap-1.5">
       <button
         type="button"
-        :class="['nav-item', { active: currentNav === 'overview' }]"
+        :class="[
+          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150',
+          currentNav === 'overview'
+            ? 'bg-primary-soft text-primary font-bold shadow-xs'
+            : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'
+        ]"
         :aria-current="currentNav === 'overview' ? 'page' : undefined"
         @click="handleNav('overview')"
       >
@@ -81,17 +91,27 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 
       <button
         type="button"
-        :class="['nav-item', { active: currentNav === 'decisions' }]"
+        :class="[
+          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150',
+          currentNav === 'decisions'
+            ? 'bg-primary-soft text-primary font-bold shadow-xs'
+            : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'
+        ]"
         :aria-current="currentNav === 'decisions' ? 'page' : undefined"
         @click="handleNav('decisions')"
       >
         <GitBranch :size="18" /> {{ t.nav.myDecisions }}
-        <span class="nav-count">{{ totalDecisions }}</span>
+        <span class="ml-auto bg-surface border border-border rounded-md px-2 py-0.5 text-xs text-fg-subtle font-normal">{{ totalDecisions }}</span>
       </button>
 
       <button
         type="button"
-        :class="['nav-item', { active: currentNav === 'journal' }]"
+        :class="[
+          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150',
+          currentNav === 'journal'
+            ? 'bg-primary-soft text-primary font-bold shadow-xs'
+            : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'
+        ]"
         :aria-current="currentNav === 'journal' ? 'page' : undefined"
         @click="handleNav('journal')"
       >
@@ -99,33 +119,43 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
       </button>
     </nav>
 
-    <div class="sidebar-bottom">
-      <div class="local-card">
-        <span class="local-icon"><ShieldAlert :size="17" /></span>
+    <div class="mt-auto pt-4 flex flex-col gap-1.5">
+      <div class="flex gap-3 bg-canvas-subtle border border-border rounded-xl p-3.5 mb-2">
+        <span class="w-8 h-8 rounded-lg bg-primary-soft text-primary grid place-items-center shrink-0">
+          <ShieldAlert :size="17" />
+        </span>
         <div>
-          <strong>{{ t.nav.dataPrivacyTitle }}</strong>
-          <p>{{ t.nav.dataPrivacyDesc }}</p>
+          <strong class="text-xs font-bold block mb-1 text-fg">{{ t.nav.dataPrivacyTitle }}</strong>
+          <p class="text-[11.5px] leading-relaxed text-fg-muted m-0">{{ t.nav.dataPrivacyDesc }}</p>
         </div>
       </div>
 
-      <button type="button" class="nav-item" @click="emit('export')">
+      <button
+        type="button"
+        class="h-10 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium text-fg-muted hover:bg-canvas-subtle hover:text-fg transition-colors"
+        @click="emit('export')"
+      >
         <Download :size="18" /> {{ t.nav.exportBackup }}
       </button>
 
-      <button type="button" class="nav-item" @click="fileInput?.click()">
+      <button
+        type="button"
+        class="h-10 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium text-fg-muted hover:bg-canvas-subtle hover:text-fg transition-colors"
+        @click="fileInput?.click()"
+      >
         <FileUp :size="18" /> {{ t.nav.importBackup }}
       </button>
 
       <input
         ref="fileInput"
-        class="visually-hidden"
+        class="sr-only"
         type="file"
         accept="application/json,.json"
         aria-label="Upload JSON backup"
         @change="handleFileChange"
       />
 
-      <div class="sidebar-foot">{{ t.nav.tagline }}</div>
+      <div class="text-[11px] tracking-wider text-fg-subtle px-2 pt-3 uppercase font-semibold">{{ t.nav.tagline }}</div>
     </div>
   </aside>
 </template>

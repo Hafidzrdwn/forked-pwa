@@ -37,6 +37,8 @@ const emit = defineEmits<{
 
 const { t, locale, interpolate } = useI18n()
 
+import { AddScenarioInputSchema } from '../../schemas/decision.schema'
+
 // New Path Inline Form State
 const showAddPath = ref(false)
 const pathName = ref('')
@@ -47,24 +49,34 @@ const pathGrowth = ref(70)
 const pathRisk = ref(35)
 const pathNameTouched = ref(false)
 
+const scenarioValidation = computed(() => {
+  return AddScenarioInputSchema.safeParse({
+    name: pathName.value,
+    income: Number(pathIncome.value),
+    cost: Number(pathCost.value),
+    hours: Number(pathHours.value),
+    growth: Number(pathGrowth.value),
+    risk: Number(pathRisk.value)
+  })
+})
+
 const pathNameError = computed(() => {
-  if (!pathNameTouched.value) return ''
-  const trimmed = pathName.value.trim()
-  if (!trimmed) return 'Nama jalan/pilihan wajib diisi.'
-  if (trimmed.length < 2) return 'Minimal 2 karakter.'
-  return ''
+  if (!pathNameTouched.value || scenarioValidation.value.success) return ''
+  const err = scenarioValidation.value.error.format().name
+  return err?._errors[0] ?? ''
 })
 
 function submitAddPath() {
   pathNameTouched.value = true
-  if (pathName.value.trim().length < 2) return
+  if (!scenarioValidation.value.success) return
+  const data = scenarioValidation.value.data
   emit('add-scenario', {
-    name: pathName.value.trim(),
-    income: Math.max(0, Number(pathIncome.value) || 0),
-    cost: Math.max(0, Number(pathCost.value) || 0),
-    hours: Math.min(168, Math.max(0, Number(pathHours.value) || 0)),
-    growth: Math.min(100, Math.max(0, Number(pathGrowth.value) || 0)),
-    risk: Math.min(100, Math.max(0, Number(pathRisk.value) || 0))
+    name: data.name,
+    income: data.income,
+    cost: data.cost,
+    hours: data.hours,
+    growth: data.growth,
+    risk: data.risk
   })
   pathName.value = ''
   pathNameTouched.value = false
@@ -83,25 +95,31 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <section class="page" aria-label="Decision studio">
-    <div class="page-title-row">
+  <section class="max-w-[1240px] mx-auto px-4 md:px-8 py-8 md:py-10" aria-label="Decision studio">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-7">
       <div>
-        <div class="eyebrow">{{ t.studio.eyebrow }}</div>
-        <h1>{{ t.studio.title }}<span class="title-period">.</span></h1>
-        <p class="hero-copy">{{ t.studio.subtitle }}</p>
+        <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-2.5">{{ t.studio.eyebrow }}</div>
+        <h1 class="font-display font-extrabold text-3xl md:text-4xl tracking-tight text-fg">
+          {{ t.studio.title }}<span class="text-primary">.</span>
+        </h1>
+        <p class="text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-2">{{ t.studio.subtitle }}</p>
       </div>
-      <button class="button button-primary" @click="emit('new-decision')">
+      <button
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap"
+        @click="emit('new-decision')"
+      >
         <Plus :size="17" /> {{ t.studio.newDecision }}
       </button>
     </div>
 
-    <div class="studio-layout">
+    <div class="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-6 items-start">
       <!-- Left Decision Picker Sidebar -->
-      <aside class="decision-picker" aria-label="Decision selector">
-        <div class="search-box">
+      <aside class="border border-border bg-surface rounded-2xl p-3.5 lg:sticky lg:top-[85px] shadow-xs" aria-label="Decision selector">
+        <div class="flex items-center gap-2 bg-canvas-subtle border border-border rounded-xl px-3 h-10 text-fg-subtle mb-3">
           <Search :size="16" />
           <input
             :value="searchTerm"
+            class="w-full border-0 bg-transparent outline-none text-xs text-fg placeholder:text-fg-subtle"
             :placeholder="t.studio.searchPlaceholder"
             @input="emit('update:searchTerm', ($event.target as HTMLInputElement).value)"
           />
@@ -111,41 +129,56 @@ function formatDate(value: string) {
           v-for="decision in filteredDecisions"
           :key="decision.id"
           type="button"
-          :class="['picker-item', { selected: decision.id === activeId }]"
+          :class="[
+            'w-full flex items-center gap-2.5 p-2.5 rounded-xl text-left transition-all cursor-pointer mb-1',
+            decision.id === activeId
+              ? 'bg-primary-soft text-primary font-bold shadow-2xs'
+              : 'hover:bg-canvas-subtle text-fg'
+          ]"
           @click="emit('select-decision', decision.id)"
         >
-          <span class="picker-mark"><GitBranch :size="16" /></span>
-          <span class="picker-copy">
-            <strong>{{ decision.title }}</strong>
-            <small>
+          <span
+            :class="[
+              'w-8 h-8 rounded-lg grid place-items-center shrink-0 text-sm',
+              decision.id === activeId ? 'bg-surface text-primary shadow-xs' : 'bg-canvas-subtle text-fg-muted'
+            ]"
+          >
+            <GitBranch :size="16" />
+          </span>
+          <span class="min-w-0 flex-1">
+            <strong class="block text-xs font-bold truncate">{{ decision.title }}</strong>
+            <small class="text-[11px] text-fg-muted block truncate">
               {{ interpolate(t.overview.pathsCount, { n: decision.scenarios.length }) }} · {{ formatDate(decision.createdAt) }}
             </small>
           </span>
-          <span class="picker-dot" />
         </button>
 
-        <div v-if="!filteredDecisions.length" class="picker-empty">
+        <div v-if="!filteredDecisions.length" class="p-4 text-center text-xs text-fg-muted">
           {{ t.studio.noMatches }}
         </div>
 
-        <button type="button" class="picker-add" @click="emit('new-decision')">
+        <button
+          type="button"
+          class="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border border-dashed border-border text-fg-muted hover:text-fg hover:border-primary text-xs font-bold transition-colors cursor-pointer mt-2"
+          @click="emit('new-decision')"
+        >
           <Plus :size="16" /> {{ t.studio.addDecision }}
         </button>
       </aside>
 
       <!-- Right Active Decision Workspace -->
-      <div v-if="activeDecision" class="decision-detail">
-        <div class="detail-header">
+      <div v-if="activeDecision" class="min-w-0 flex flex-col gap-5">
+        <div class="border border-border rounded-2xl bg-surface p-5 md:p-6 flex items-start justify-between gap-4 shadow-xs">
           <div>
-            <div class="eyebrow">
+            <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-1">
               {{ interpolate(t.studio.briefEyebrow, { date: formatDate(activeDecision.createdAt).toUpperCase() }) }}
             </div>
-            <h2>{{ activeDecision.title }}</h2>
-            <p>{{ activeDecision.context || t.studio.noContext }}</p>
+            <h2 class="font-display font-extrabold text-2xl tracking-tight text-fg my-1">{{ activeDecision.title }}</h2>
+            <p class="text-sm text-fg-muted leading-relaxed m-0 mt-2">{{ activeDecision.context || t.studio.noContext }}</p>
           </div>
           <button
             type="button"
-            class="icon-button danger-hover"
+            class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:bg-danger-soft grid place-items-center transition-colors cursor-pointer shrink-0"
             :aria-label="t.studio.deleteAria"
             @click="emit('delete-active')"
           >
@@ -153,31 +186,38 @@ function formatDate(value: string) {
           </button>
         </div>
 
-        <div class="detail-meta">
-          <span>
+        <div class="flex flex-wrap items-center gap-3 p-3 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
+          <span class="inline-flex items-center gap-1.5">
             <CalendarDays :size="15" />
             {{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}
           </span>
-          <span :class="['status-tag', activeDecision.status]">{{ activeDecision.status }}</span>
+          <span
+            :class="[
+              'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
+              activeDecision.status === 'exploring' ? 'bg-amber-soft text-amber' : activeDecision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+            ]"
+          >
+            {{ activeDecision.status }}
+          </span>
 
-          <button type="button" class="text-button small" @click="emit('open-weights')">
+          <button type="button" class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer ml-auto" @click="emit('open-weights')">
             <Scale :size="14" /> {{ t.studio.weightsBtn }}
           </button>
 
-          <button type="button" class="text-button small" @click="emit('open-journal')">
+          <button type="button" class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('open-journal')">
             {{ t.studio.openJournal }} <ArrowRight :size="14" />
           </button>
         </div>
 
         <!-- Scenarios Section -->
-        <div class="subsection-title">
+        <div class="flex items-center justify-between gap-4 mt-2">
           <div>
-            <h3>{{ t.studio.explorePathsTitle }}</h3>
-            <p>{{ t.studio.explorePathsDesc }}</p>
+            <h3 class="font-display font-bold text-lg tracking-tight text-fg m-0">{{ t.studio.explorePathsTitle }}</h3>
+            <p class="text-xs text-fg-muted mt-1">{{ t.studio.explorePathsDesc }}</p>
           </div>
           <button
             type="button"
-            class="button button-secondary button-small"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-fg hover:bg-canvas-subtle transition-colors cursor-pointer shadow-xs"
             @click="showAddPath = !showAddPath"
           >
             <Plus :size="15" /> {{ t.studio.addPath }}
@@ -185,67 +225,70 @@ function formatDate(value: string) {
         </div>
 
         <!-- Inline Add Path Form -->
-        <form v-if="showAddPath" class="inline-form scenario-new" @submit.prevent="submitAddPath">
-          <label>
+        <form v-if="showAddPath" class="bg-canvas-subtle border border-border rounded-2xl p-5 my-2 shadow-xs" @submit.prevent="submitAddPath">
+          <label class="block text-xs font-bold text-fg mb-3.5">
             {{ t.addPathForm.title }}
             <input
               v-model="pathName"
-              :class="{ 'input-error': !!pathNameError }"
+              :class="[
+                'w-full mt-1.5 border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none transition-all',
+                pathNameError ? 'border-danger ring-2 ring-danger/20' : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/20'
+              ]"
               :placeholder="t.addPathForm.placeholder"
               @blur="pathNameTouched = true"
             />
-            <div v-if="pathNameError" class="field-error-msg">
+            <div v-if="pathNameError" class="flex items-center gap-1 text-danger text-xs font-semibold mt-1">
               <AlertCircle :size="14" />
               <span>{{ pathNameError }}</span>
             </div>
           </label>
 
           <!-- Row 1: Objective Numbers -->
-          <div class="form-grid three">
-            <label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-3.5">
+            <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.monthlyIncome }}
-              <input v-model.number="pathIncome" type="number" min="0" step="100000" />
+              <input v-model.number="pathIncome" type="number" min="0" step="100000" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none focus:border-primary" />
             </label>
-            <label>
+            <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.monthlyCost }}
-              <input v-model.number="pathCost" type="number" min="0" step="100000" />
+              <input v-model.number="pathCost" type="number" min="0" step="100000" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none focus:border-primary" />
             </label>
-            <label>
+            <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.hoursPerWeek }}
-              <input v-model.number="pathHours" type="number" min="0" max="168" />
+              <input v-model.number="pathHours" type="number" min="0" max="168" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none focus:border-primary" />
             </label>
           </div>
 
           <!-- Row 2: Perceived Sliders (Theme Green) -->
-          <div class="form-grid two" style="margin-top: 6px;">
-            <label>
-              <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4">
+            <label class="block text-xs font-bold text-fg">
+              <div class="flex justify-between items-center mb-1">
                 <span>{{ t.addPathForm.growth }}</span>
-                <b style="font-size: 13px; color: var(--green);">{{ pathGrowth }}/100</b>
+                <b class="text-xs text-primary font-bold">{{ pathGrowth }}/100</b>
               </div>
               <input v-model.number="pathGrowth" type="range" min="0" max="100" />
             </label>
-            <label>
-              <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label class="block text-xs font-bold text-fg">
+              <div class="flex justify-between items-center mb-1">
                 <span>{{ t.addPathForm.risk }}</span>
-                <b style="font-size: 13px; color: var(--ink);">{{ pathRisk }}/100</b>
+                <b class="text-xs text-fg font-bold">{{ pathRisk }}/100</b>
               </div>
               <input v-model.number="pathRisk" type="range" min="0" max="100" />
             </label>
           </div>
 
-          <div class="form-actions">
-            <button type="button" class="button button-ghost" @click="showAddPath = false">
+          <div class="flex items-center justify-end gap-2.5 pt-2">
+            <button type="button" class="px-4 py-2 text-xs font-bold text-fg-muted hover:text-fg cursor-pointer" @click="showAddPath = false">
               {{ t.addPathForm.cancel }}
             </button>
-            <button class="button button-primary" type="submit" :disabled="pathName.trim().length < 2">
+            <button class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold bg-primary text-white hover:bg-primary-dark transition-colors cursor-pointer disabled:opacity-50" type="submit" :disabled="pathName.trim().length < 2">
               {{ t.addPathForm.submit }} <ArrowRight :size="15" />
             </button>
           </div>
         </form>
 
         <!-- Scenario Cards Grid -->
-        <div class="scenario-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-2">
           <ScenarioCard
             v-for="(scenario, index) in activeDecision.scenarios"
             :key="scenario.id"
@@ -274,20 +317,23 @@ function formatDate(value: string) {
           @remove-assumption="emit('remove-assumption', $event)"
         />
 
-        <div class="detail-footer">
-          <span><ShieldAlert :size="14" /> {{ t.studio.disclaimer }}</span>
-          <button type="button" class="text-button" @click="emit('open-journal')">
+        <div class="flex items-center justify-between text-xs text-fg-subtle pt-2">
+          <span><ShieldAlert :size="14" class="inline mr-1" /> {{ t.studio.disclaimer }}</span>
+          <button type="button" class="inline-flex items-center gap-1 text-primary font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('open-journal')">
             {{ t.studio.openJournal }} <ArrowRight :size="15" />
           </button>
         </div>
       </div>
 
       <!-- Empty Picker State -->
-      <div v-else class="empty-detail">
+      <div v-else class="border border-border bg-surface rounded-2xl p-10 text-center flex flex-col items-center shadow-xs">
         <IllustrationFork :width="140" :height="110" />
-        <h3>{{ t.studio.emptyPickerTitle }}</h3>
-        <p>{{ t.studio.emptyPickerDesc }}</p>
-        <button class="button button-primary" @click="emit('new-decision')">
+        <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.studio.emptyPickerTitle }}</h3>
+        <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.studio.emptyPickerDesc }}</p>
+        <button
+          class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
+          @click="emit('new-decision')"
+        >
           <Plus :size="16" /> {{ t.studio.newDecision }}
         </button>
       </div>

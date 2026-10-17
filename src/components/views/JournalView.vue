@@ -40,121 +40,156 @@ const isOverdue = (dateStr: string) => {
 </script>
 
 <template>
-  <section class="page" aria-label="Decision journal view">
-    <div class="page-title-row">
+  <section class="max-w-[1240px] mx-auto px-4 md:px-8 py-8 md:py-10" aria-label="Decision journal view">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-7">
       <div>
-        <div class="eyebrow">{{ t.journalView.eyebrow }}</div>
-        <h1>{{ t.journalView.title }}<span class="title-period">.</span></h1>
-        <p class="hero-copy">{{ t.journalView.subtitle }}</p>
+        <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-2.5">{{ t.journalView.eyebrow }}</div>
+        <h1 class="font-display font-extrabold text-3xl md:text-4xl tracking-tight text-fg">
+          {{ t.journalView.title }}<span class="text-primary">.</span>
+        </h1>
+        <p class="text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-2">{{ t.journalView.subtitle }}</p>
       </div>
-      <button class="button button-primary" @click="emit('new-decision')">
+      <button
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap"
+        @click="emit('new-decision')"
+      >
         <GitBranch :size="16" /> {{ t.journalView.newDecision }}
       </button>
     </div>
 
     <!-- Filter Pills -->
-    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+    <div class="flex gap-2 flex-wrap mb-5">
       <button
         type="button"
-        :class="['tab-pill', { active: filterStatus === 'all' }]"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shadow-2xs',
+          filterStatus === 'all'
+            ? 'bg-primary-soft text-primary border-primary font-bold'
+            : 'bg-surface text-fg-muted border-border hover:bg-canvas-subtle hover:text-fg'
+        ]"
         @click="filterStatus = 'all'"
       >
         {{ interpolate(t.journalView.filterAll, { n: decisions.length }) }}
       </button>
       <button
         type="button"
-        :class="['tab-pill', { active: filterStatus === 'exploring' }]"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shadow-2xs',
+          filterStatus === 'exploring'
+            ? 'bg-primary-soft text-primary border-primary font-bold'
+            : 'bg-surface text-fg-muted border-border hover:bg-canvas-subtle hover:text-fg'
+        ]"
         @click="filterStatus = 'exploring'"
       >
         {{ t.journalView.filterExploring }}
       </button>
       <button
         type="button"
-        :class="['tab-pill', { active: filterStatus === 'decided' }]"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shadow-2xs',
+          filterStatus === 'decided'
+            ? 'bg-primary-soft text-primary border-primary font-bold'
+            : 'bg-surface text-fg-muted border-border hover:bg-canvas-subtle hover:text-fg'
+        ]"
         @click="filterStatus = 'decided'"
       >
         {{ t.journalView.filterDecided }}
       </button>
       <button
         type="button"
-        :class="['tab-pill', { active: filterStatus === 'reviewed' }]"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shadow-2xs',
+          filterStatus === 'reviewed'
+            ? 'bg-primary-soft text-primary border-primary font-bold'
+            : 'bg-surface text-fg-muted border-border hover:bg-canvas-subtle hover:text-fg'
+        ]"
         @click="filterStatus = 'reviewed'"
       >
         {{ t.journalView.filterReviewed }}
       </button>
     </div>
 
-    <div v-if="filteredList.length" class="journal-list">
-      <article v-for="decision in filteredList" :key="decision.id" class="journal-card">
-        <div class="journal-card-head">
+    <div v-if="filteredList.length" class="grid gap-4">
+      <article v-for="decision in filteredList" :key="decision.id" class="bg-surface border border-border rounded-2xl p-5 md:p-6 shadow-xs">
+        <div class="flex items-start justify-between gap-4 mb-3.5">
           <div>
-            <span class="eyebrow">
-              {{ decision.status.toUpperCase() }} <span class="dot-sep">·</span> {{ formatDate(decision.createdAt) }}
+            <span class="text-[11px] font-bold tracking-wider uppercase text-fg-subtle">
+              {{ decision.status.toUpperCase() }} · {{ formatDate(decision.createdAt) }}
             </span>
-            <h3>{{ decision.title }}</h3>
+            <h3 class="font-display font-bold text-lg tracking-tight text-fg my-1">{{ decision.title }}</h3>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span v-if="isOverdue(decision.reviewDate) && decision.status !== 'reviewed'" class="overdue-alert">
+          <div class="flex items-center gap-2">
+            <span v-if="isOverdue(decision.reviewDate) && decision.status !== 'reviewed'" class="inline-flex items-center gap-1 text-danger bg-danger-soft border border-danger/20 rounded-md px-2 py-0.5 text-[11px] font-bold">
               <AlertTriangle :size="12" /> {{ t.journalView.overdueWarning }}
             </span>
-            <span :class="['status-tag', decision.status]">{{ decision.status }}</span>
+            <span
+              :class="[
+                'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
+                decision.status === 'exploring' ? 'bg-amber-soft text-amber' : decision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+              ]"
+            >
+              {{ decision.status }}
+            </span>
           </div>
         </div>
 
-        <p>{{ decision.context || t.studio.noContext }}</p>
+        <p class="text-sm text-fg-muted leading-relaxed m-0">{{ decision.context || t.studio.noContext }}</p>
 
-        <div class="journal-snapshot">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-canvas-subtle rounded-xl my-4 text-xs">
           <div>
-            <span>{{ t.journalView.chosenPath }}</span>
-            <strong>
+            <span class="text-fg-subtle block mb-1">{{ t.journalView.chosenPath }}</span>
+            <strong class="font-bold text-fg text-sm">
               {{ decision.scenarios.find(s => s.id === decision.selectedScenarioId)?.name || '-' }}
             </strong>
           </div>
           <div>
-            <span>{{ t.journalView.reviewDate }}</span>
-            <strong>{{ formatDate(decision.reviewDate) }}</strong>
+            <span class="text-fg-subtle block mb-1">{{ t.journalView.reviewDate }}</span>
+            <strong class="font-bold text-fg text-sm">{{ formatDate(decision.reviewDate) }}</strong>
           </div>
           <div>
-            <span>{{ t.journalView.pathsCompared }}</span>
-            <strong>{{ decision.scenarios.length }}</strong>
+            <span class="text-fg-subtle block mb-1">{{ t.journalView.pathsCompared }}</span>
+            <strong class="font-bold text-fg text-sm">{{ decision.scenarios.length }}</strong>
           </div>
         </div>
 
         <div
           v-if="decision.journal.reason || decision.journal.expectedOutcome || decision.journal.actualOutcome || decision.journal.reflection"
-          class="journal-quote"
+          class="p-4 bg-canvas-subtle border-l-4 border-primary rounded-r-xl my-3 text-xs leading-relaxed space-y-1.5"
         >
-          <span class="eyebrow">{{ t.journalView.notesHeader }}</span>
-          <p v-if="decision.journal.reason">
-            <strong>{{ t.journalView.why }}</strong> {{ decision.journal.reason }}
+          <span class="text-[10px] font-bold tracking-wider uppercase text-primary block mb-1">{{ t.journalView.notesHeader }}</span>
+          <p v-if="decision.journal.reason" class="m-0">
+            <strong class="text-fg">{{ t.journalView.why }}:</strong> <span class="text-fg-muted">{{ decision.journal.reason }}</span>
           </p>
-          <p v-if="decision.journal.expectedOutcome">
-            <strong>{{ t.journalView.expected }}</strong> {{ decision.journal.expectedOutcome }}
+          <p v-if="decision.journal.expectedOutcome" class="m-0">
+            <strong class="text-fg">{{ t.journalView.expected }}:</strong> <span class="text-fg-muted">{{ decision.journal.expectedOutcome }}</span>
           </p>
-          <p v-if="decision.journal.actualOutcome">
-            <strong>{{ t.journalView.actual }}</strong> {{ decision.journal.actualOutcome }}
+          <p v-if="decision.journal.actualOutcome" class="m-0">
+            <strong class="text-fg">{{ t.journalView.actual }}:</strong> <span class="text-fg-muted">{{ decision.journal.actualOutcome }}</span>
           </p>
-          <p v-if="decision.journal.reflection">
-            <strong>{{ t.journalView.reflection }}</strong> {{ decision.journal.reflection }}
+          <p v-if="decision.journal.reflection" class="m-0">
+            <strong class="text-fg">{{ t.journalView.reflection }}:</strong> <span class="text-fg-muted">{{ decision.journal.reflection }}</span>
           </p>
         </div>
 
-        <div class="journal-card-actions">
-          <button class="button button-secondary button-small" @click="emit('open-decision', decision.id)">
+        <div class="flex items-center justify-end gap-3 mt-4 pt-2 border-t border-border">
+          <button class="inline-flex items-center rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-fg hover:bg-canvas-subtle transition-colors cursor-pointer" @click="emit('open-decision', decision.id)">
             {{ t.journalView.openDecision }}
           </button>
-          <button class="text-button" @click="emit('edit-journal', decision.id)">
+          <button class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('edit-journal', decision.id)">
             {{ t.journalView.editJournal }} <ArrowRight :size="14" />
           </button>
         </div>
       </article>
     </div>
 
-    <div v-else class="empty-card">
+    <div v-else class="bg-surface border border-border rounded-2xl p-10 text-center flex flex-col items-center shadow-xs">
       <IllustrationFork :width="130" :height="100" />
-      <h3>{{ t.journalView.emptyTitle }}</h3>
-      <p>{{ t.journalView.emptyDesc }}</p>
-      <button class="button button-primary" @click="emit('new-decision')">
+      <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.journalView.emptyTitle }}</h3>
+      <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.journalView.emptyDesc }}</p>
+      <button
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
+        @click="emit('new-decision')"
+      >
         <BookOpen :size="16" /> {{ t.journalView.createDecision }}
       </button>
     </div>

@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { X, ArrowRight, Lightbulb, AlertCircle } from 'lucide-vue-next'
 import { useI18n } from '../../i18n'
+import { CreateDecisionInputSchema } from '../../schemas/decision.schema'
 
 const emit = defineEmits<{
   (e: 'create', payload: { title: string; context: string }): void
@@ -14,25 +15,20 @@ const title = ref('')
 const context = ref('')
 const touched = ref(false)
 
-const titleError = computed(() => {
-  if (!touched.value) return ''
-  const trimmed = title.value.trim()
-  if (!trimmed) {
-    return 'Judul keputusan wajib diisi.'
-  }
-  if (trimmed.length < 3) {
-    return 'Judul terlalu pendek, minimal 3 karakter.'
-  }
-  if (trimmed.length > 120) {
-    return 'Judul maksimal 120 karakter.'
-  }
-  return ''
+const validationResult = computed(() => {
+  return CreateDecisionInputSchema.safeParse({
+    title: title.value,
+    context: context.value
+  })
 })
 
-const isValid = computed(() => {
-  const trimmed = title.value.trim()
-  return trimmed.length >= 3 && trimmed.length <= 120 && context.value.length <= 500
+const titleError = computed(() => {
+  if (!touched.value || validationResult.value.success) return ''
+  const err = validationResult.value.error.format().title
+  return err?._errors[0] ?? ''
 })
+
+const isValid = computed(() => validationResult.value.success)
 
 function handleSubmit() {
   touched.value = true
@@ -57,39 +53,42 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="create-modal-title" @click.self="emit('close')">
-    <form class="modal-card" @submit.prevent="handleSubmit">
-      <div class="modal-head">
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="create-modal-title" @click.self="emit('close')">
+    <form class="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-surface border border-border rounded-2xl p-6 shadow-2xl text-fg" @submit.prevent="handleSubmit">
+      <div class="flex items-start justify-between gap-4">
         <div>
-          <div class="eyebrow">{{ t.createModal.eyebrow }}</div>
-          <h2 id="create-modal-title">{{ t.createModal.title }}</h2>
+          <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-1">{{ t.createModal.eyebrow }}</div>
+          <h2 id="create-modal-title" class="font-display font-extrabold text-2xl tracking-tight text-fg my-1">{{ t.createModal.title }}</h2>
         </div>
-        <button type="button" class="icon-button" :aria-label="t.common.close" @click="emit('close')">
+        <button type="button" class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-fg hover:bg-canvas-subtle grid place-items-center transition-colors cursor-pointer" :aria-label="t.common.close" @click="emit('close')">
           <X :size="19" />
         </button>
       </div>
 
-      <p class="modal-intro">{{ t.createModal.intro }}</p>
+      <p class="text-xs text-fg-muted leading-relaxed my-3 mb-5">{{ t.createModal.intro }}</p>
 
-      <label>
+      <label class="block text-xs font-bold text-fg mb-4">
         {{ t.createModal.titleLabel }}
         <input
           v-model="title"
           autofocus
-          :class="{ 'input-error': !!titleError }"
+          :class="[
+            'w-full mt-1.5 border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none transition-all',
+            titleError ? 'border-danger ring-2 ring-danger/20' : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/20'
+          ]"
           :placeholder="t.createModal.titlePlaceholder"
           @blur="touched = true"
         />
-        <div v-if="titleError" class="field-error-msg">
+        <div v-if="titleError" class="flex items-center gap-1 text-danger text-xs font-semibold mt-1">
           <AlertCircle :size="14" />
           <span>{{ titleError }}</span>
         </div>
       </label>
 
-      <label>
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <label class="block text-xs font-bold text-fg mb-4">
+        <div class="flex justify-between items-baseline mb-1.5">
           <span>{{ t.createModal.contextLabel }}</span>
-          <small :style="{ color: context.length > 500 ? 'var(--danger)' : 'var(--submuted)', fontSize: '11.5px' }">
+          <small :class="['text-[11px]', context.length > 500 ? 'text-danger font-bold' : 'text-fg-subtle']">
             {{ context.length }}/500
           </small>
         </div>
@@ -97,20 +96,21 @@ onUnmounted(() => {
           v-model="context"
           rows="3"
           maxlength="500"
+          class="w-full border border-border rounded-xl bg-surface text-fg p-3 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
           :placeholder="t.createModal.contextPlaceholder"
         />
       </label>
 
-      <div class="modal-tip">
-        <Lightbulb :size="18" style="flex-shrink: 0;" />
+      <div class="flex items-center gap-2.5 bg-primary-soft text-primary rounded-xl p-3 text-xs leading-relaxed mb-6">
+        <Lightbulb :size="18" class="shrink-0" />
         <span>{{ t.createModal.tip }}</span>
       </div>
 
-      <div class="form-actions">
-        <button type="button" class="button button-ghost" @click="emit('close')">
+      <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
+        <button type="button" class="px-4 py-2 text-xs font-bold text-fg-muted hover:text-fg cursor-pointer" @click="emit('close')">
           {{ t.common.cancel }}
         </button>
-        <button class="button button-primary" type="submit" :disabled="!isValid">
+        <button class="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-xs font-bold bg-primary text-white hover:bg-primary-dark transition-colors cursor-pointer disabled:opacity-50" type="submit" :disabled="!isValid">
           {{ t.createModal.submit }} <ArrowRight :size="16" />
         </button>
       </div>

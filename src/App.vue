@@ -62,7 +62,7 @@ async function handleDeleteActive() {
 </script>
 
 <template>
-  <div class="app-shell">
+  <div class="min-h-screen bg-canvas text-fg font-sans antialiased selection:bg-primary-soft selection:text-primary">
     <!-- Sidebar Navigation -->
     <AppSidebar
       :current-nav="nav"
@@ -75,15 +75,15 @@ async function handleDeleteActive() {
     />
 
     <!-- Main Workspace Area -->
-    <main class="main-area">
+    <main class="md:ml-[252px] min-h-screen bg-canvas transition-colors duration-200">
       <AppTopbar
         :current-nav="nav"
         @toggle-mobile-menu="mobileMenuOpen = !mobileMenuOpen"
       />
 
       <!-- Loading State -->
-      <div v-if="busy" class="loading-state" role="status" aria-live="polite">
-        <span class="spinner"></span> Menyiapkan ruang keputusanmu…
+      <div v-if="busy" class="min-h-[60vh] flex items-center justify-center gap-3 text-fg-muted text-sm" role="status" aria-live="polite">
+        <span class="w-5 h-5 border-2 border-border border-t-primary rounded-full animate-spin"></span> Menyiapkan ruang keputusanmu…
       </div>
 
       <!-- Main View Pages -->

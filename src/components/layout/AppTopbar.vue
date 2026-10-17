@@ -24,25 +24,25 @@ const pageTitle = computed(() => {
 </script>
 
 <template>
-  <header class="topbar">
-    <div style="display: flex; align-items: center; gap: 12px;">
+  <header class="h-[68px] border-b border-border flex items-center justify-between px-4 md:px-8 bg-surface sticky top-0 z-20 transition-colors">
+    <div class="flex items-center gap-3">
       <button
         type="button"
-        class="mobile-nav-toggle"
+        class="md:hidden p-2 rounded-lg text-fg hover:bg-canvas-subtle transition-colors cursor-pointer"
         aria-label="Buka menu navigasi"
         @click="emit('toggle-mobile-menu')"
       >
         <Menu :size="20" />
       </button>
 
-      <div class="breadcrumb">
+      <div class="flex items-center gap-2 text-[13px] text-fg-muted font-medium">
         <span>{{ t.nav.workspace }}</span>
-        <span class="crumb-slash">/</span>
-        <strong>{{ pageTitle }}</strong>
+        <span class="text-fg-subtle">/</span>
+        <strong class="font-bold text-fg">{{ pageTitle }}</strong>
       </div>
     </div>
 
-    <div class="top-actions">
+    <div class="flex items-center gap-2.5">
       <!-- Dark/Light Theme Toggle -->
       <ThemeToggle />
 
@@ -50,8 +50,8 @@ const pageTitle = computed(() => {
       <LanguageSwitcher />
 
       <!-- Data Privacy Status Pill -->
-      <span class="privacy-pill">
-        <span class="status-dot"></span>
+      <span class="hidden sm:flex items-center gap-1.5 bg-surface border border-border rounded-full px-3 py-1.5 text-xs font-semibold text-fg-muted shadow-2xs">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
         {{ t.nav.localBadge }}
       </span>
 
