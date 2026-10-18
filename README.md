@@ -1,87 +1,109 @@
-# Forked — Personal Decision Studio
+# Forked: Personal Decision Studio
 
-A local-first decision simulator that helps you compare paths, make assumptions explicit, stress-test scenarios, and learn from outcomes.
+A local-first personal decision simulator built with Vue 3 and TypeScript. It allows users to compare alternative choices, model financial and time trade-offs, stress-test assumptions reactively, and maintain an evaluation journal without external servers or accounts.
 
-## Features
+## Core Features
 
-- Create and manage personal decisions
-- Compare multiple paths using a transparent heuristic score
-- Edit monthly income, costs, hours, growth potential, and risk
-- Stress-test income assumptions with a what-if slider
-- Keep assumptions and confidence levels for a selected path
-- Record reasoning, expected outcomes, actual outcomes, and reflections
-- Store data in IndexedDB in the current browser
-- Export and import a JSON backup
-- Responsive light-minimal interface
-- Editable decision title/context and scenario descriptions
-- Keyboard Escape support for closing active dialogs
-- Backup schema validation, duplicate-ID checks, and 10 MB import limit
-- Income stress test correctly adjusts income while keeping costs fixed
-- PWA manifest and service-worker shell caching
+- Multi-path decision comparison with configurable weights (financial return, time freedom, growth trajectory, risk tolerance).
+- Pure reactive simulation engine (What-If stress test) that models revenue and cost shifts without mutating stored assumptions.
+- Assumption and evidence tracking categorized by facts, estimates, and unverified assumptions.
+- Decision journal for recording decision rationale, expected timelines, and post-outcome reviews.
+- Local storage via browser IndexedDB with strict Zod schema validation.
+- JSON backup export and import with duplicate check and size validation (10 MB limit).
+- Smooth dark and light theme switching powered by the View Transitions API.
+- Bilingual interface (Indonesian and English).
 
-## Tech stack
+## Technology Stack
 
-- Vue 3 + TypeScript + Vite
-- IndexedDB for local persistence
-- Lucide Vue icons
-- Plain CSS for the design system (no Tailwind build step required)
+- Framework: Vue 3 (Composition API)
+- Language: TypeScript 5.7+
+- Styling: Tailwind CSS v4 (zero-config integration via `@tailwindcss/vite` and CSS `@theme` variables)
+- State Management: Pinia 3
+- Data Validation: Zod 4
+- Local Database: IndexedDB (`idb` native wrapper)
+- Icons: Lucide Vue Next
+- Build Tool: Vite 6
 
-## Run locally
+## Project Structure
 
-Requires Node.js 22.12+ (the built-in test runner uses Node.js TypeScript type stripping).
+```text
+src/
+├── components/          # Vue presentation components
+│   ├── common/          # Shared controls (ThemeToggle, LanguageSwitcher, ConfirmModal)
+│   ├── decision/        # Decision domain widgets (ScenarioCard, WhatIfSimulator, AssumptionManager)
+│   ├── layout/          # Application shell (AppTopbar, AppSidebar)
+│   ├── modals/          # Modal dialogs (CreateDecisionModal, WeightsModal, JournalModal)
+│   └── views/           # Primary page views (OverviewView, DecisionStudioView, JournalView)
+├── composables/         # Reusable composition helpers (useDecisions, useToast, useConfirm, useTheme)
+├── i18n/                # Internationalization dictionaries (id.ts, en.ts) and reactive loader
+├── schemas/             # Single source of truth Zod schemas for decision entities and backups
+├── services/            # Pure business logic and infrastructure services
+│   ├── scoring.ts       # Deterministic score calculation and currency formatting
+│   ├── simulation.ts    # Reactive scenario stress-testing engine
+│   ├── storage.ts       # IndexedDB persistence adapter
+│   └── validation.ts    # JSON backup parsing and schema safety checks
+├── stores/              # Pinia state stores (decision.store.ts, theme.store.ts)
+├── types/               # Type definitions derived from Zod schemas
+├── App.vue              # Main application shell
+├── main.ts              # Entry point and Pinia initialization
+└── style.css            # Base Tailwind v4 entry and semantic color tokens
+```
 
+## Running Locally
+
+Prerequisites: Node.js 22.12 or newer (required for Node.js built-in TypeScript type stripping in tests).
+
+1. Install dependencies:
 ```bash
 npm install
+```
+
+2. Start development server:
+```bash
 npm run dev
 ```
 
-Run the built-in scoring and backup-validation tests:
-
+3. Run automated tests:
 ```bash
 npm test
 ```
 
-To create a production build:
-
+4. Verify production build:
 ```bash
 npm run build
 npm run preview
 ```
 
-## Deploy for free
+## Scoring and Simulation Mechanics
 
-### Cloudflare Pages
+The heuristic score produces a normalized index between 0 and 100 based on four weighted dimensions:
 
-1. Push this folder to a GitHub repository.
-2. In Cloudflare Pages, create a project and connect the repository.
-3. Set the Node.js version to `22.12.0` (via the `NODE_VERSION` environment variable if the dashboard requires it).
-4. Set build command to `npm run build`.
-5. Set output directory to `dist`.
-6. Deploy.
+1. Financial Return (default weight: 35%): Normalized net monthly income (income minus expenses) against an Indonesian baseline reference.
+2. Time Freedom (default weight: 20%): Normalized available time based on committed hours per week (calculated from a 60-hour baseline cap).
+3. Growth Potential (default weight: 30%): Long-term career or personal upside assessment (0 to 100).
+4. Risk Tolerance (default weight: 15%): Inverted risk score where lower risk yields higher points (100 minus risk value).
 
-This is a static frontend; there is no API server or paid database requirement.
+Formula:
+```text
+Score = (MoneyIndex * WeightMoney) + (TimeIndex * WeightTime) + (GrowthIndex * WeightGrowth) + ((100 - Risk) * WeightRisk)
+```
 
-A GitHub Actions workflow runs the tests and production build on pushes and pull requests.
+Weights can be customized per decision and are automatically normalized so their sum equals 1.0. The score serves as an explicit relative guide for comparison, not an algorithmic prediction.
 
-Alternative: deploy the `dist` folder to any static host that supports Vite output.
+## Data Persistence and Privacy
 
-## Important local-data note
+All application data is stored in the user's browser using IndexedDB under the database name `forked-local`.
+- No remote telemetry or tracking.
+- No network requests for saving or reading user records.
+- Clearing browser storage or using a private/incognito window will reset local records.
+- Regular use of the Export Backup function is recommended for long-term data retention.
 
-IndexedDB data belongs to the browser profile and origin where it was created. Clearing site data, using another browser/device, or changing the deployed origin may make it unavailable. Use **Export backup** regularly and keep the JSON file somewhere safe. Import replaces the current local data after confirmation.
+## Deployment
 
-## Scoring model
+The application compiles to standard static assets (`dist/`) and can be hosted on any static provider (Cloudflare Pages, Vercel, Netlify, GitHub Pages, or AWS S3):
 
-The score is intentionally a transparent heuristic, not a prediction or an objective truth:
-- Money: 35%
-- Time: 20%
-- Growth potential: 30%
-- Risk tolerance (lower risk scores higher): 15%
+```bash
+npm run build
+```
 
-The current money normalization assumes a rough net-monthly range of -Rp2,000,000 to Rp5,000,000. Treat this as a rough comparison scale, not financial advice. Users should choose weights based on what matters to them rather than treating the score as a verdict.
-
-## MVP limitations / next steps
-
-- Add browser-level end-to-end tests for IndexedDB persistence and backup/restore
-- Run an accessibility audit and test with real screen readers and keyboard-only navigation
-- Run the production build in CI and verify deployment on the target static host
-- Consider scenario-specific journal history and optional encrypted backup in a later release
+Set the build output directory to `dist` and the Node.js version to `22.12.0` or higher.
