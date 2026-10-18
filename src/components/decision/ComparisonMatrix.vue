@@ -112,7 +112,7 @@ const matrixRows = computed<MatrixRow[]>(() => {
                 >
                   {{ String.fromCharCode(65 + idx) }}
                 </span>
-                <span class="font-bold text-fg text-xs truncate max-w-[160px]">{{ row.scenario.name }}</span>
+                <span class="font-bold text-fg text-xs leading-snug break-words min-w-[140px] max-w-[240px]">{{ row.scenario.name }}</span>
               </div>
             </td>
 

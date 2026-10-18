@@ -195,31 +195,41 @@ function formatDate(value: string) {
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 p-3 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
-          <span class="inline-flex items-center gap-1.5">
-            <CalendarDays :size="15" />
-            {{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}
-          </span>
-          <span
-            :class="[
-              'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
-              activeDecision.status === 'exploring' ? 'bg-amber-soft text-amber' : activeDecision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
-            ]"
-          >
-            {{ activeDecision.status }}
-          </span>
+        <div class="flex flex-wrap items-center justify-between gap-3 p-3 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 text-fg font-medium">
+              <CalendarDays :size="15" class="text-primary" />
+              {{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}
+            </span>
+            <span
+              :class="[
+                'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
+                activeDecision.status === 'exploring' ? 'bg-amber-soft text-amber' : activeDecision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+              ]"
+            >
+              {{ activeDecision.status }}
+            </span>
+          </div>
 
-          <button type="button" class="inline-flex items-center gap-1.5 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer ml-auto" @click="emit('open-share')">
-            <Share2 :size="14" /> {{ t.studio.shareBtn }}
-          </button>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-canvas-subtle hover:bg-surface hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs"
+              @click="emit('open-weights')"
+            >
+              <Scale :size="14" class="text-primary" />
+              <span>{{ t.studio.weightsBtn }}</span>
+            </button>
 
-          <button type="button" class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('open-weights')">
-            <Scale :size="14" /> {{ t.studio.weightsBtn }}
-          </button>
-
-          <button type="button" class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('open-journal')">
-            {{ t.studio.openJournal }} <ArrowRight :size="14" />
-          </button>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs"
+              @click="emit('open-journal')"
+            >
+              <span>{{ t.studio.openJournal }}</span>
+              <ArrowRight :size="13" />
+            </button>
+          </div>
         </div>
 
         <div class="flex items-center justify-between gap-4 mt-2">

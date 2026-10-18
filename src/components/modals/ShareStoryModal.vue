@@ -19,6 +19,7 @@ type CardFormat = 'story' | 'feed'
 const format = ref<CardFormat>('story')
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const copied = ref(false)
+const downloaded = ref(false)
 const sharing = ref(false)
 
 const chosenScenario = computed<Scenario>(() => {
@@ -47,6 +48,66 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath()
 }
 
+function drawBrandLogo(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  ctx.save()
+  const s = size / 48
+  ctx.translate(x, y)
+  ctx.scale(s, s)
+
+  const grad = ctx.createLinearGradient(6, 4, 42, 44)
+  grad.addColorStop(0, '#347852')
+  grad.addColorStop(0.5, '#245d3e')
+  grad.addColorStop(1, '#143b27')
+
+  roundRect(ctx, 2, 2, 44, 44, 14)
+  ctx.fillStyle = grad
+  ctx.fill()
+
+  const path1 = new Path2D('M24 38V25C24 20 15 19 15 13V9')
+  ctx.strokeStyle = '#FFFFFF'
+  ctx.lineWidth = 3.5
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  ctx.stroke(path1)
+
+  const path2 = new Path2D('M24 27C24 20 33 19 33 13V9')
+  ctx.strokeStyle = '#A7DEC0'
+  ctx.lineWidth = 3.5
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  ctx.stroke(path2)
+
+  ctx.fillStyle = '#FFFFFF'
+  ctx.beginPath()
+  ctx.arc(24, 27, 3.2, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = '#245d3e'
+  ctx.beginPath()
+  ctx.arc(24, 27, 1.4, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#FFFFFF'
+  ctx.beginPath()
+  ctx.arc(15, 9, 3, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#A7DEC0'
+  ctx.beginPath()
+  ctx.arc(33, 9, 3.2, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = '#143b27'
+  ctx.beginPath()
+  ctx.arc(33, 9, 1.5, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#A7DEC0'
+  ctx.beginPath()
+  ctx.arc(24, 38, 2.2, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.restore()
+}
+
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -54,7 +115,7 @@ function wrapText(
   y: number,
   maxWidth: number,
   lineHeight: number,
-  maxLines: number = 3
+  maxLines: number = 4
 ): number {
   const words = text.split(' ')
   let line = ''
@@ -64,15 +125,12 @@ function wrapText(
   for (let n = 0; n < words.length; n++) {
     const testLine = line + words[n] + ' '
     const metrics = ctx.measureText(testLine)
+    const testWidth = metrics.width
 
-    if (metrics.width > maxWidth && n > 0) {
+    if (testWidth > maxWidth && n > 0) {
       linesCount++
       if (linesCount >= maxLines) {
-        let truncated = line.trim()
-        while (truncated.length > 3 && ctx.measureText(truncated + '…').width > maxWidth) {
-          truncated = truncated.slice(0, -1)
-        }
-        ctx.fillText(truncated + '…', x, currentY)
+        ctx.fillText(line.trim(), x, currentY)
         return currentY + lineHeight
       }
       ctx.fillText(line.trim(), x, currentY)
@@ -89,15 +147,6 @@ function wrapText(
   }
 
   return currentY
-}
-
-function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-  if (ctx.measureText(text).width <= maxWidth) return text
-  let truncated = text
-  while (truncated.length > 2 && ctx.measureText(truncated + '…').width > maxWidth) {
-    truncated = truncated.slice(0, -1)
-  }
-  return truncated + '…'
 }
 
 function renderCanvas() {
@@ -147,24 +196,15 @@ function renderCanvas() {
   let cursorY = cardY + (isStory ? 64 : 48)
 
   const brandX = cardX + 44
-  roundRect(ctx, brandX, cursorY - 18, 42, 42, 12)
-  ctx.fillStyle = '#10b981'
-  ctx.fill()
-
-  ctx.fillStyle = '#ffffff'
-  ctx.beginPath()
-  ctx.arc(brandX + 14, cursorY + 3, 3.5, 0, Math.PI * 2)
-  ctx.arc(brandX + 28, cursorY - 3, 3.5, 0, Math.PI * 2)
-  ctx.arc(brandX + 28, cursorY + 9, 3.5, 0, Math.PI * 2)
-  ctx.fill()
+  drawBrandLogo(ctx, brandX, cursorY - 20, 46)
 
   ctx.font = 'bold 26px Manrope, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.fillText('FORKED', brandX + 54, cursorY + 11)
+  ctx.fillText('FORKED', brandX + 58, cursorY + 11)
 
   ctx.font = 'bold 13px sans-serif'
   ctx.fillStyle = '#10b981'
-  ctx.fillText(t.value.nav.brandSubtitle, brandX + 175, cursorY + 9)
+  ctx.fillText(t.value.nav.brandSubtitle, brandX + 180, cursorY + 9)
 
   const dateFormatted = new Intl.DateTimeFormat(locale.value === 'id' ? 'id-ID' : 'en-US', {
     day: 'numeric',
@@ -189,8 +229,8 @@ function renderCanvas() {
   cursorY += 36
   const isLongTitle = props.decision.title.length > 55
   ctx.font = isStory
-    ? isLongTitle ? 'extrabold 38px Manrope, sans-serif' : 'extrabold 44px Manrope, sans-serif'
-    : isLongTitle ? 'extrabold 28px Manrope, sans-serif' : 'extrabold 32px Manrope, sans-serif'
+    ? isLongTitle ? 'extrabold 36px Manrope, sans-serif' : 'extrabold 42px Manrope, sans-serif'
+    : isLongTitle ? 'extrabold 26px Manrope, sans-serif' : 'extrabold 30px Manrope, sans-serif'
   ctx.fillStyle = '#ffffff'
   cursorY = wrapText(
     ctx,
@@ -198,7 +238,7 @@ function renderCanvas() {
     cardX + 44,
     cursorY,
     cardW - 88,
-    isStory ? (isLongTitle ? 50 : 56) : (isLongTitle ? 36 : 42),
+    isStory ? (isLongTitle ? 48 : 54) : (isLongTitle ? 36 : 40),
     isStory ? 3 : 2
   )
 
@@ -215,7 +255,7 @@ function renderCanvas() {
   const chosenScore = scoreScenario(chosen, props.decision.weights)
   const chosenNet = chosen.monthlyIncome - chosen.monthlyCost
 
-  const heroBoxH = isStory ? 310 : 195
+  const heroBoxH = isStory ? 315 : 200
   const heroBoxX = cardX + 44
   const heroBoxW = cardW - 88
 
@@ -246,12 +286,12 @@ function renderCanvas() {
   const scoreWidth = ctx.measureText(scoreText).width
   ctx.fillText(scoreText, heroBoxX + heroBoxW - scoreWidth - 24, badgeY + 6)
 
-  ctx.font = isStory ? 'extrabold 32px Manrope, sans-serif' : 'extrabold 23px Manrope, sans-serif'
+  ctx.font = isStory ? 'extrabold 30px Manrope, sans-serif' : 'extrabold 22px Manrope, sans-serif'
   ctx.fillStyle = '#ffffff'
   const maxPathTitleW = heroBoxW - 48
-  wrapText(ctx, chosen.name, heroBoxX + 24, cursorY + (isStory ? 104 : 76), maxPathTitleW, isStory ? 38 : 28, isStory ? 2 : 1)
+  wrapText(ctx, chosen.name, heroBoxX + 24, cursorY + (isStory ? 104 : 76), maxPathTitleW, isStory ? 36 : 28, isStory ? 2 : 1)
 
-  const metricsY = cursorY + (isStory ? 190 : 124)
+  const metricsY = cursorY + (isStory ? 194 : 126)
   const pillGap = 12
   const pillW = (heroBoxW - 48 - pillGap * 2) / 3
   const pillH = isStory ? 74 : 48
@@ -309,7 +349,7 @@ function renderCanvas() {
     for (const alt of alternativeScenarios.value) {
       const altScore = scoreScenario(alt, props.decision.weights)
       const altNet = alt.monthlyIncome - alt.monthlyCost
-      const altH = isStory ? 82 : 60
+      const altH = isStory ? 86 : 64
 
       roundRect(ctx, cardX + 44, cursorY, cardW - 88, altH, 16)
       ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
@@ -323,17 +363,16 @@ function renderCanvas() {
       const altScoreW = ctx.measureText(altScoreText).width
       const altScoreX = cardX + cardW - 44 - 24 - altScoreW
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-      ctx.fillText(altScoreText, altScoreX, cursorY + (isStory ? 48 : 36))
+      ctx.fillText(altScoreText, altScoreX, cursorY + (isStory ? 50 : 38))
 
       const maxAltNameW = altScoreX - (cardX + 44 + 24) - 16
-      ctx.font = 'bold 18px Manrope, sans-serif'
+      ctx.font = 'bold 17px Manrope, sans-serif'
       ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
-      const altNameSafe = truncateText(ctx, alt.name, maxAltNameW)
-      ctx.fillText(altNameSafe, cardX + 44 + 24, cursorY + (isStory ? 38 : 28))
+      wrapText(ctx, alt.name, cardX + 44 + 24, cursorY + (isStory ? 36 : 28), maxAltNameW, isStory ? 24 : 20, 1)
 
       ctx.font = '13.5px sans-serif'
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-      ctx.fillText(`${formatRupiah(altNet)} · ${alt.hoursPerWeek} ${t.value.common.hrs}`, cardX + 44 + 24, cursorY + (isStory ? 64 : 48))
+      ctx.fillText(`${formatRupiah(altNet)} · ${alt.hoursPerWeek} ${t.value.common.hrs}`, cardX + 44 + 24, cursorY + (isStory ? 66 : 50))
 
       cursorY += altH + 12
     }
@@ -374,8 +413,7 @@ function renderCanvas() {
 
   ctx.font = isStory ? '15px sans-serif' : '13px sans-serif'
   ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  const subText = truncateText(ctx, t.value.shareModal.ctaSubtitle, maxCtaTextW)
-  ctx.fillText(subText, ctaX + 24, ctaY + (isStory ? 88 : 72))
+  wrapText(ctx, t.value.shareModal.ctaSubtitle, ctaX + 24, ctaY + (isStory ? 88 : 72), maxCtaTextW, isStory ? 22 : 18, 2)
 
   if (isStory) {
     ctx.font = '12px sans-serif'
@@ -384,7 +422,7 @@ function renderCanvas() {
   }
 }
 
-function downloadImage() {
+async function downloadImage() {
   const canvas = canvasRef.value
   if (!canvas) return
 
@@ -392,40 +430,51 @@ function downloadImage() {
   const cleanTitle = rawTitle.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'keputusan'
   const filename = `forked-${cleanTitle}-${format.value}.png`
 
-  if (canvas.toBlob) {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        fallbackDataUrlDownload(canvas, filename)
+  if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+    try {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName: filename,
+        types: [
+          {
+            description: 'PNG Image (*.png)',
+            accept: { 'image/png': ['.png'] }
+          }
+        ]
+      })
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+      if (blob) {
+        const writable = await handle.createWritable()
+        await writable.write(blob)
+        await writable.close()
+        downloaded.value = true
+        setTimeout(() => { downloaded.value = false }, 3000)
         return
       }
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.style.display = 'none'
-      link.href = url
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      setTimeout(() => {
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-      }, 1500)
-    }, 'image/png')
-  } else {
-    fallbackDataUrlDownload(canvas, filename)
+    } catch (err: any) {
+      if (err && err.name === 'AbortError') {
+        return
+      }
+    }
   }
-}
 
-function fallbackDataUrlDownload(canvas: HTMLCanvasElement, filename: string) {
   const dataUrl = canvas.toDataURL('image/png')
   const link = document.createElement('a')
-  link.style.display = 'none'
+  link.style.position = 'fixed'
+  link.style.left = '-9999px'
+  link.style.top = '-9999px'
   link.href = dataUrl
+  link.setAttribute('download', filename)
   link.download = filename
   document.body.appendChild(link)
   link.click()
   setTimeout(() => {
-    document.body.removeChild(link)
-  }, 1000)
+    if (link.parentNode) {
+      link.parentNode.removeChild(link)
+    }
+  }, 600)
+
+  downloaded.value = true
+  setTimeout(() => { downloaded.value = false }, 3000)
 }
 
 async function shareNative() {
@@ -607,8 +656,9 @@ onUnmounted(() => {
             class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary-dark transition-colors cursor-pointer shadow-xs"
             @click="downloadImage"
           >
-            <Download :size="14" />
-            {{ t.shareModal.downloadPng }}
+            <Check v-if="downloaded" :size="14" />
+            <Download v-else :size="14" />
+            {{ downloaded ? t.shareModal.downloadedNotice : t.shareModal.downloadPng }}
           </button>
         </div>
       </div>

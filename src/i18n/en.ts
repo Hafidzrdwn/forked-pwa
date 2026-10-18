@@ -293,6 +293,7 @@ export const en = {
     shareNative: 'Share to Socials',
     copySummary: 'Copy Text Summary',
     copiedNotice: 'Summary copied to clipboard!',
+    downloadedNotice: 'Image saved to your device!',
     shareTextTemplate: 'I am weighing a decision: "{title}". Current top choice: "{chosen}" with fit score {score}/100. Map your choices at: {url}'
   },
   pwa: {

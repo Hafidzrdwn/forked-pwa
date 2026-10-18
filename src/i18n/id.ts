@@ -293,6 +293,7 @@ export const id = {
     shareNative: 'Bagikan ke Medsos',
     copySummary: 'Salin Teks Ringkasan',
     copiedNotice: 'Ringkasan berhasil disalin ke clipboard!',
+    downloadedNotice: 'Gambar berhasil disimpan ke laptop!',
     shareTextTemplate: 'Saya sedang menimbang keputusan: "{title}". Jalur pilihan saat ini: "{chosen}" dengan skor kecocokan {score}/100. Timbang keputusanmu di: {url}'
   },
   pwa: {
