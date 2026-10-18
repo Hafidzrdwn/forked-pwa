@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import {
   Plus, Search, Trash2, CalendarDays, ArrowRight, GitBranch,
-  SlidersHorizontal, Scale, ShieldAlert, AlertCircle
+  SlidersHorizontal, Scale, ShieldAlert, AlertCircle, Share2
 } from 'lucide-vue-next'
 import type { Decision, Scenario, AssumptionKind } from '../../types'
 import { useI18n } from '../../i18n'
@@ -28,6 +28,7 @@ const emit = defineEmits<{
   (e: 'delete-active'): void
   (e: 'open-weights'): void
   (e: 'open-journal'): void
+  (e: 'open-share'): void
   (e: 'add-scenario', payload: { name: string; income: number; cost: number; hours: number; growth: number; risk: number }): void
   (e: 'remove-scenario', id: string): void
   (e: 'choose-scenario', id: string): void
@@ -175,14 +176,23 @@ function formatDate(value: string) {
             <h2 class="font-display font-extrabold text-2xl tracking-tight text-fg my-1">{{ activeDecision.title }}</h2>
             <p class="text-sm text-fg-muted leading-relaxed m-0 mt-2">{{ activeDecision.context || t.studio.noContext }}</p>
           </div>
-          <button
-            type="button"
-            class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:bg-danger-soft grid place-items-center transition-colors cursor-pointer shrink-0"
-            :aria-label="t.studio.deleteAria"
-            @click="emit('delete-active')"
-          >
-            <Trash2 :size="17" />
-          </button>
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-fg hover:border-primary text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              @click="emit('open-share')"
+            >
+              <Share2 :size="14" class="text-primary" /> {{ t.studio.shareBtn }}
+            </button>
+            <button
+              type="button"
+              class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:bg-danger-soft grid place-items-center transition-colors cursor-pointer shrink-0"
+              :aria-label="t.studio.deleteAria"
+              @click="emit('delete-active')"
+            >
+              <Trash2 :size="17" />
+            </button>
+          </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-3 p-3 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
@@ -199,7 +209,11 @@ function formatDate(value: string) {
             {{ activeDecision.status }}
           </span>
 
-          <button type="button" class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer ml-auto" @click="emit('open-weights')">
+          <button type="button" class="inline-flex items-center gap-1.5 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer ml-auto" @click="emit('open-share')">
+            <Share2 :size="14" /> {{ t.studio.shareBtn }}
+          </button>
+
+          <button type="button" class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('open-weights')">
             <Scale :size="14" /> {{ t.studio.weightsBtn }}
           </button>
 

@@ -11,6 +11,7 @@ import JournalView from './components/views/JournalView.vue'
 import CreateDecisionModal from './components/modals/CreateDecisionModal.vue'
 import WeightsModal from './components/modals/WeightsModal.vue'
 import JournalModal from './components/modals/JournalModal.vue'
+import ShareStoryModal from './components/modals/ShareStoryModal.vue'
 import ConfirmModal from './components/common/ConfirmModal.vue'
 import ToastContainer from './components/common/ToastContainer.vue'
 import PwaInstallBanner from './components/common/PwaInstallBanner.vue'
@@ -30,6 +31,7 @@ const nav = ref<'overview' | 'decisions' | 'journal'>('overview')
 const showCreate = ref(false)
 const showWeights = ref(false)
 const showJournal = ref(false)
+const showShare = ref(false)
 const mobileMenuOpen = ref(false)
 
 onMounted(() => {
@@ -110,6 +112,7 @@ async function handleDeleteActive() {
           @delete-active="handleDeleteActive"
           @open-weights="showWeights = true"
           @open-journal="showJournal = true"
+          @open-share="showShare = true"
           @add-scenario="addScenarioToActive($event.name, $event.income, $event.cost, $event.hours, $event.growth, $event.risk)"
           @remove-scenario="removeScenarioFromActive($event)"
           @choose-scenario="chooseScenario($event)"
@@ -151,6 +154,12 @@ async function handleDeleteActive() {
       :initial-status="activeDecision.status"
       @save="saveJournal(activeDecision.id, $event.journal, $event.status); updateReviewDate(activeDecision.id, $event.reviewDate); showJournal = false"
       @close="showJournal = false"
+    />
+
+    <ShareStoryModal
+      v-if="showShare && activeDecision"
+      :decision="activeDecision"
+      @close="showShare = false"
     />
 
     <ConfirmModal />
