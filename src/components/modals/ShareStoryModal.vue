@@ -33,7 +33,8 @@ const chosenScenario = computed<Scenario>(() => {
 })
 
 const alternativeScenarios = computed<Scenario[]>(() => {
-  return props.decision.scenarios.filter(s => s.id !== chosenScenario.value.id).slice(0, 2)
+  const others = props.decision.scenarios.filter(s => s.id !== chosenScenario.value.id)
+  return format.value === 'feed' ? others.slice(0, 1) : others.slice(0, 2)
 })
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -53,7 +54,7 @@ function wrapText(
   y: number,
   maxWidth: number,
   lineHeight: number,
-  maxLines: number = 4
+  maxLines: number = 3
 ): number {
   const words = text.split(' ')
   let line = ''
@@ -63,12 +64,15 @@ function wrapText(
   for (let n = 0; n < words.length; n++) {
     const testLine = line + words[n] + ' '
     const metrics = ctx.measureText(testLine)
-    const testWidth = metrics.width
 
-    if (testWidth > maxWidth && n > 0) {
+    if (metrics.width > maxWidth && n > 0) {
       linesCount++
       if (linesCount >= maxLines) {
-        ctx.fillText(line.trim() + '…', x, currentY)
+        let truncated = line.trim()
+        while (truncated.length > 3 && ctx.measureText(truncated + '…').width > maxWidth) {
+          truncated = truncated.slice(0, -1)
+        }
+        ctx.fillText(truncated + '…', x, currentY)
         return currentY + lineHeight
       }
       ctx.fillText(line.trim(), x, currentY)
@@ -87,6 +91,15 @@ function wrapText(
   return currentY
 }
 
+function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  if (ctx.measureText(text).width <= maxWidth) return text
+  let truncated = text
+  while (truncated.length > 2 && ctx.measureText(truncated + '…').width > maxWidth) {
+    truncated = truncated.slice(0, -1)
+  }
+  return truncated + '…'
+}
+
 function renderCanvas() {
   const canvas = canvasRef.value
   if (!canvas) return
@@ -101,251 +114,318 @@ function renderCanvas() {
 
   const bgGradient = ctx.createLinearGradient(0, 0, W, H)
   bgGradient.addColorStop(0, '#060a12')
-  bgGradient.addColorStop(0.5, '#0a101f')
+  bgGradient.addColorStop(0.5, '#0b1220')
   bgGradient.addColorStop(1, '#050811')
   ctx.fillStyle = bgGradient
   ctx.fillRect(0, 0, W, H)
 
-  const radialTop = ctx.createRadialGradient(W - 100, 100, 20, W - 100, 100, 600)
+  const radialTop = ctx.createRadialGradient(W - 80, 80, 20, W - 80, 80, 650)
   radialTop.addColorStop(0, 'rgba(16, 185, 129, 0.22)')
   radialTop.addColorStop(1, 'rgba(16, 185, 129, 0)')
   ctx.fillStyle = radialTop
   ctx.fillRect(0, 0, W, H)
 
-  const radialBottom = ctx.createRadialGradient(100, H - 100, 20, 100, H - 100, 700)
+  const radialBottom = ctx.createRadialGradient(80, H - 80, 20, 80, H - 80, 700)
   radialBottom.addColorStop(0, 'rgba(6, 182, 212, 0.16)')
   radialBottom.addColorStop(1, 'rgba(6, 182, 212, 0)')
   ctx.fillStyle = radialBottom
   ctx.fillRect(0, 0, W, H)
 
-  const pad = 64
+  const pad = isStory ? 56 : 40
   const cardW = W - pad * 2
   const cardH = H - pad * 2
   const cardX = pad
   const cardY = pad
 
-  roundRect(ctx, cardX, cardY, cardW, cardH, 40)
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.65)'
+  roundRect(ctx, cardX, cardY, cardW, cardH, 36)
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.72)'
   ctx.fill()
-  ctx.lineWidth = 2
+  ctx.lineWidth = 1.5
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
   ctx.stroke()
 
-  let cursorY = cardY + 70
+  let cursorY = cardY + (isStory ? 64 : 48)
 
-  const brandX = cardX + 60
-  roundRect(ctx, brandX, cursorY - 18, 44, 44, 12)
+  const brandX = cardX + 44
+  roundRect(ctx, brandX, cursorY - 18, 42, 42, 12)
   ctx.fillStyle = '#10b981'
   ctx.fill()
 
   ctx.fillStyle = '#ffffff'
   ctx.beginPath()
-  ctx.arc(brandX + 15, cursorY + 4, 4, 0, Math.PI * 2)
-  ctx.arc(brandX + 29, cursorY - 2, 4, 0, Math.PI * 2)
-  ctx.arc(brandX + 29, cursorY + 10, 4, 0, Math.PI * 2)
+  ctx.arc(brandX + 14, cursorY + 3, 3.5, 0, Math.PI * 2)
+  ctx.arc(brandX + 28, cursorY - 3, 3.5, 0, Math.PI * 2)
+  ctx.arc(brandX + 28, cursorY + 9, 3.5, 0, Math.PI * 2)
   ctx.fill()
 
-  ctx.font = 'bold 28px Manrope, sans-serif'
+  ctx.font = 'bold 26px Manrope, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.fillText('FORKED', brandX + 58, cursorY + 12)
+  ctx.fillText('FORKED', brandX + 54, cursorY + 11)
 
-  ctx.font = 'bold 15px sans-serif'
+  ctx.font = 'bold 13px sans-serif'
   ctx.fillStyle = '#10b981'
-  ctx.letterSpacing = '2px'
-  ctx.fillText(t.value.nav.brandSubtitle, brandX + 185, cursorY + 11)
+  ctx.fillText(t.value.nav.brandSubtitle, brandX + 175, cursorY + 9)
 
-  roundRect(ctx, cardX + cardW - 250, cursorY - 18, 190, 40, 20)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)'
-  ctx.fill()
-  ctx.font = 'bold 14px sans-serif'
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  ctx.letterSpacing = '0px'
   const dateFormatted = new Intl.DateTimeFormat(locale.value === 'id' ? 'id-ID' : 'en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric'
   }).format(new Date(`${props.decision.createdAt}T12:00:00`))
-  ctx.fillText(dateFormatted, cardX + cardW - 230, cursorY + 7)
+  ctx.font = 'bold 14px sans-serif'
+  const dateW = ctx.measureText(dateFormatted).width + 32
+  const dateX = cardX + cardW - dateW - 44
+  roundRect(ctx, dateX, cursorY - 18, dateW, 38, 19)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.07)'
+  ctx.fill()
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+  ctx.fillText(dateFormatted, dateX + 16, cursorY + 6)
 
-  cursorY += isStory ? 100 : 75
+  cursorY += isStory ? 92 : 64
 
-  ctx.font = 'bold 16px sans-serif'
+  ctx.font = 'bold 15px sans-serif'
   ctx.fillStyle = '#10b981'
-  ctx.letterSpacing = '2px'
-  ctx.fillText(t.value.shareModal.eyebrow, cardX + 60, cursorY)
+  ctx.fillText(t.value.shareModal.eyebrow, cardX + 44, cursorY)
 
-  cursorY += 42
-  ctx.font = isStory ? 'extrabold 46px Manrope, sans-serif' : 'extrabold 36px Manrope, sans-serif'
+  cursorY += 36
+  const isLongTitle = props.decision.title.length > 55
+  ctx.font = isStory
+    ? isLongTitle ? 'extrabold 38px Manrope, sans-serif' : 'extrabold 44px Manrope, sans-serif'
+    : isLongTitle ? 'extrabold 28px Manrope, sans-serif' : 'extrabold 32px Manrope, sans-serif'
   ctx.fillStyle = '#ffffff'
-  cursorY = wrapText(ctx, props.decision.title, cardX + 60, cursorY, cardW - 120, isStory ? 60 : 48, isStory ? 3 : 2)
+  cursorY = wrapText(
+    ctx,
+    props.decision.title,
+    cardX + 44,
+    cursorY,
+    cardW - 88,
+    isStory ? (isLongTitle ? 50 : 56) : (isLongTitle ? 36 : 42),
+    isStory ? 3 : 2
+  )
 
   if (props.decision.context) {
-    cursorY += 8
-    ctx.font = 'italic 20px sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
-    cursorY = wrapText(ctx, `"${props.decision.context}"`, cardX + 60, cursorY, cardW - 120, 30, 2)
+    cursorY += 6
+    ctx.font = 'italic 18px sans-serif'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
+    cursorY = wrapText(ctx, `"${props.decision.context}"`, cardX + 44, cursorY, cardW - 88, 26, isStory ? 2 : 1)
   }
 
-  cursorY += isStory ? 45 : 30
+  cursorY += isStory ? 38 : 22
 
   const chosen = chosenScenario.value
   const chosenScore = scoreScenario(chosen, props.decision.weights)
   const chosenNet = chosen.monthlyIncome - chosen.monthlyCost
 
-  const heroBoxH = isStory ? 330 : 220
-  const heroBoxX = cardX + 50
-  const heroBoxW = cardW - 100
+  const heroBoxH = isStory ? 310 : 195
+  const heroBoxX = cardX + 44
+  const heroBoxW = cardW - 88
 
-  roundRect(ctx, heroBoxX, cursorY, heroBoxW, heroBoxH, 28)
+  roundRect(ctx, heroBoxX, cursorY, heroBoxW, heroBoxH, 24)
   const heroGradient = ctx.createLinearGradient(heroBoxX, cursorY, heroBoxX + heroBoxW, cursorY + heroBoxH)
   heroGradient.addColorStop(0, 'rgba(16, 185, 129, 0.16)')
   heroGradient.addColorStop(1, 'rgba(6, 182, 212, 0.08)')
   ctx.fillStyle = heroGradient
   ctx.fill()
-  ctx.lineWidth = 2.5
+  ctx.lineWidth = 2
   ctx.strokeStyle = '#10b981'
   ctx.stroke()
 
-  const badgeX = heroBoxX + 32
-  const badgeY = cursorY + 36
-  roundRect(ctx, badgeX, badgeY - 14, 180, 32, 16)
+  const badgeX = heroBoxX + 24
+  const badgeY = cursorY + 32
+  const badgeText = `★  ${props.decision.selectedScenarioId ? t.value.shareModal.badgeChosen : t.value.shareModal.badgeExploring}`
+  ctx.font = 'bold 13px sans-serif'
+  const badgeWidth = ctx.measureText(badgeText).width + 26
+  roundRect(ctx, badgeX, badgeY - 14, badgeWidth, 30, 15)
   ctx.fillStyle = '#10b981'
   ctx.fill()
-  ctx.font = 'bold 14px sans-serif'
   ctx.fillStyle = '#060a12'
-  ctx.fillText(`★  ${props.decision.selectedScenarioId ? t.value.shareModal.badgeChosen : t.value.shareModal.badgeExploring}`, badgeX + 16, badgeY + 7)
+  ctx.fillText(badgeText, badgeX + 13, badgeY + 6)
 
-  ctx.font = 'bold 20px sans-serif'
+  const scoreText = `${chosenScore.total}/100 ${t.value.shareModal.badgeScore}`
+  ctx.font = 'bold 18px sans-serif'
   ctx.fillStyle = '#10b981'
-  ctx.fillText(`${chosenScore.total}/100 ${t.value.shareModal.badgeScore}`, heroBoxX + heroBoxW - 170, badgeY + 7)
+  const scoreWidth = ctx.measureText(scoreText).width
+  ctx.fillText(scoreText, heroBoxX + heroBoxW - scoreWidth - 24, badgeY + 6)
 
-  ctx.font = isStory ? 'extrabold 36px Manrope, sans-serif' : 'extrabold 28px Manrope, sans-serif'
+  ctx.font = isStory ? 'extrabold 32px Manrope, sans-serif' : 'extrabold 23px Manrope, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.fillText(chosen.name, heroBoxX + 32, cursorY + (isStory ? 120 : 90))
+  const maxPathTitleW = heroBoxW - 48
+  wrapText(ctx, chosen.name, heroBoxX + 24, cursorY + (isStory ? 104 : 76), maxPathTitleW, isStory ? 38 : 28, isStory ? 2 : 1)
 
-  const metricsY = cursorY + (isStory ? 190 : 138)
-  const pillW = (heroBoxW - 64 - 24) / 3
+  const metricsY = cursorY + (isStory ? 190 : 124)
+  const pillGap = 12
+  const pillW = (heroBoxW - 48 - pillGap * 2) / 3
+  const pillH = isStory ? 74 : 48
 
   const metricsData = [
     { label: t.value.shareModal.badgeScore, val: `${chosenScore.total} pts` },
     { label: t.value.shareModal.badgeNet, val: formatRupiah(chosenNet) },
-    { label: t.value.shareModal.badgeTime, val: `${chosen.hoursPerWeek} hrs` }
+    { label: t.value.shareModal.badgeTime, val: `${chosen.hoursPerWeek} ${t.value.common.hrs}` }
   ]
 
   for (let i = 0; i < 3; i++) {
-    const px = heroBoxX + 32 + i * (pillW + 12)
-    roundRect(ctx, px, metricsY, pillW, isStory ? 80 : 54, 16)
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)'
+    const px = heroBoxX + 24 + i * (pillW + pillGap)
+    roundRect(ctx, px, metricsY, pillW, pillH, 14)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
     ctx.fill()
 
-    ctx.font = '13px sans-serif'
+    ctx.font = '11px sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
-    ctx.fillText(metricsData[i].label, px + 16, metricsY + (isStory ? 30 : 22))
+    ctx.fillText(metricsData[i].label, px + 14, metricsY + (isStory ? 26 : 18))
 
-    ctx.font = 'bold 18px sans-serif'
+    const valStr = metricsData[i].val
+    ctx.font = valStr.length > 12
+      ? 'bold 14px sans-serif'
+      : isStory ? 'bold 18px sans-serif' : 'bold 15px sans-serif'
     ctx.fillStyle = '#ffffff'
-    ctx.fillText(metricsData[i].val, px + 16, metricsY + (isStory ? 60 : 42))
+    ctx.fillText(valStr, px + 14, metricsY + (isStory ? 54 : 37))
   }
 
-  cursorY += heroBoxH + (isStory ? 40 : 25)
+  cursorY += heroBoxH + (isStory ? 36 : 20)
 
   if (alternativeScenarios.value.length > 0) {
     ctx.beginPath()
-    ctx.moveTo(cardX + 60, cursorY + 10)
-    ctx.lineTo(cardX + cardW / 2 - 40, cursorY + 10)
+    ctx.moveTo(cardX + 44, cursorY + 10)
+    ctx.lineTo(cardX + cardW / 2 - 35, cursorY + 10)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
     ctx.lineWidth = 1
     ctx.stroke()
 
-    roundRect(ctx, cardX + cardW / 2 - 30, cursorY - 4, 60, 28, 14)
+    roundRect(ctx, cardX + cardW / 2 - 25, cursorY - 3, 50, 26, 13)
     ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
     ctx.fill()
-    ctx.font = 'bold 12px sans-serif'
+    ctx.font = 'bold 11px sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    ctx.fillText(t.value.shareModal.versus, cardX + cardW / 2 - 10, cursorY + 15)
+    ctx.fillText(t.value.shareModal.versus, cardX + cardW / 2 - 9, cursorY + 14)
 
     ctx.beginPath()
-    ctx.moveTo(cardX + cardW / 2 + 40, cursorY + 10)
-    ctx.lineTo(cardX + cardW - 60, cursorY + 10)
+    ctx.moveTo(cardX + cardW / 2 + 35, cursorY + 10)
+    ctx.lineTo(cardX + cardW - 44, cursorY + 10)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
     ctx.lineWidth = 1
     ctx.stroke()
 
-    cursorY += 36
+    cursorY += 32
 
     for (const alt of alternativeScenarios.value) {
       const altScore = scoreScenario(alt, props.decision.weights)
       const altNet = alt.monthlyIncome - alt.monthlyCost
-      const altH = isStory ? 84 : 64
+      const altH = isStory ? 82 : 60
 
-      roundRect(ctx, cardX + 50, cursorY, cardW - 100, altH, 18)
+      roundRect(ctx, cardX + 44, cursorY, cardW - 88, altH, 16)
       ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
       ctx.fill()
       ctx.lineWidth = 1
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)'
       ctx.stroke()
 
-      ctx.font = 'bold 20px Manrope, sans-serif'
+      const altScoreText = `${altScore.total}/100`
+      ctx.font = 'bold 17px sans-serif'
+      const altScoreW = ctx.measureText(altScoreText).width
+      const altScoreX = cardX + cardW - 44 - 24 - altScoreW
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
+      ctx.fillText(altScoreText, altScoreX, cursorY + (isStory ? 48 : 36))
+
+      const maxAltNameW = altScoreX - (cardX + 44 + 24) - 16
+      ctx.font = 'bold 18px Manrope, sans-serif'
       ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
-      ctx.fillText(alt.name, cardX + 80, cursorY + (isStory ? 42 : 36))
+      const altNameSafe = truncateText(ctx, alt.name, maxAltNameW)
+      ctx.fillText(altNameSafe, cardX + 44 + 24, cursorY + (isStory ? 38 : 28))
 
-      ctx.font = '15px sans-serif'
+      ctx.font = '13.5px sans-serif'
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-      ctx.fillText(`${formatRupiah(altNet)} · ${alt.hoursPerWeek} jam`, cardX + 80, cursorY + (isStory ? 68 : 54))
+      ctx.fillText(`${formatRupiah(altNet)} · ${alt.hoursPerWeek} ${t.value.common.hrs}`, cardX + 44 + 24, cursorY + (isStory ? 64 : 48))
 
-      ctx.font = 'bold 18px sans-serif'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
-      ctx.fillText(`${altScore.total}/100`, cardX + cardW - 170, cursorY + (isStory ? 50 : 38))
-
-      cursorY += altH + 14
+      cursorY += altH + 12
     }
   }
 
-  const ctaH = isStory ? 200 : 140
-  const ctaY = cardY + cardH - ctaH - 40
-  const ctaX = cardX + 50
-  const ctaW = cardW - 100
+  const ctaH = isStory ? 180 : 120
+  const ctaY = cardY + cardH - ctaH - (isStory ? 36 : 20)
+  const ctaX = cardX + 44
+  const ctaW = cardW - 88
 
-  roundRect(ctx, ctaX, ctaY, ctaW, ctaH, 24)
+  roundRect(ctx, ctaX, ctaY, ctaW, ctaH, 20)
   const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaW, ctaY + ctaH)
   ctaGradient.addColorStop(0, 'rgba(16, 185, 129, 0.12)')
-  ctaGradient.addColorStop(1, 'rgba(15, 23, 42, 0.8)')
+  ctaGradient.addColorStop(1, 'rgba(15, 23, 42, 0.85)')
   ctx.fillStyle = ctaGradient
   ctx.fill()
   ctx.lineWidth = 1.5
   ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)'
   ctx.stroke()
 
-  ctx.font = 'bold 20px Manrope, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  ctx.fillText(t.value.shareModal.ctaTitle, ctaX + 36, ctaY + (isStory ? 55 : 44))
-
-  ctx.font = '16px sans-serif'
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  ctx.fillText(t.value.shareModal.ctaSubtitle, ctaX + 36, ctaY + (isStory ? 92 : 72))
-
-  roundRect(ctx, ctaX + ctaW - 200, ctaY + (isStory ? 55 : 35), 160, 48, 14)
+  ctx.font = 'bold 15px Manrope, sans-serif'
+  const btnText = t.value.shareModal.ctaUrl
+  const btnW = ctx.measureText(btnText).width + 36
+  const btnH = isStory ? 44 : 38
+  const btnX = ctaX + ctaW - btnW - 24
+  const btnY = ctaY + (ctaH - btnH) / 2
+  roundRect(ctx, btnX, btnY, btnW, btnH, 12)
   ctx.fillStyle = '#10b981'
   ctx.fill()
-
-  ctx.font = 'bold 17px Manrope, sans-serif'
+  ctx.font = 'bold 15px Manrope, sans-serif'
   ctx.fillStyle = '#060a12'
-  ctx.fillText(t.value.shareModal.ctaUrl, ctaX + ctaW - 165, ctaY + (isStory ? 85 : 65))
+  ctx.fillText(btnText, btnX + 18, btnY + (btnH / 2) + 5)
+
+  const maxCtaTextW = btnX - ctaX - 40
+  ctx.font = isStory ? 'bold 21px Manrope, sans-serif' : 'bold 17px Manrope, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.fillText(t.value.shareModal.ctaTitle, ctaX + 24, ctaY + (isStory ? 52 : 44))
+
+  ctx.font = isStory ? '15px sans-serif' : '13px sans-serif'
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
+  const subText = truncateText(ctx, t.value.shareModal.ctaSubtitle, maxCtaTextW)
+  ctx.fillText(subText, ctaX + 24, ctaY + (isStory ? 88 : 72))
 
   if (isStory) {
-    ctx.font = '13px sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)'
-    ctx.fillText('100% Client-side · Bebas Akun · Privasi Lokal Terjaga', ctaX + 36, ctaY + 155)
+    ctx.font = '12px sans-serif'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
+    ctx.fillText('100% Client-side · Tanpa Akun · Data Milikmu', ctaX + 24, ctaY + 138)
   }
 }
 
 function downloadImage() {
   const canvas = canvasRef.value
   if (!canvas) return
+
+  const rawTitle = props.decision.title.trim().toLowerCase()
+  const cleanTitle = rawTitle.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'keputusan'
+  const filename = `forked-${cleanTitle}-${format.value}.png`
+
+  if (canvas.toBlob) {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        fallbackDataUrlDownload(canvas, filename)
+        return
+      }
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      setTimeout(() => {
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }, 1500)
+    }, 'image/png')
+  } else {
+    fallbackDataUrlDownload(canvas, filename)
+  }
+}
+
+function fallbackDataUrlDownload(canvas: HTMLCanvasElement, filename: string) {
+  const dataUrl = canvas.toDataURL('image/png')
   const link = document.createElement('a')
-  link.download = `forked-${props.decision.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${format.value}.png`
-  link.href = canvas.toDataURL('image/png')
+  link.style.display = 'none'
+  link.href = dataUrl
+  link.download = filename
+  document.body.appendChild(link)
   link.click()
+  setTimeout(() => {
+    document.body.removeChild(link)
+  }, 1000)
 }
 
 async function shareNative() {
@@ -390,7 +470,7 @@ async function shareNative() {
           })
         }
         sharing.value = false
-      })
+      }, 'image/png')
     } else {
       await navigator.clipboard.writeText(shareText)
       copied.value = true

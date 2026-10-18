@@ -447,8 +447,10 @@ export const useDecisionStore = defineStore('decision', () => {
     })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
+    a.style.display = 'none'
     a.href = url
     a.download = filename
+    a.setAttribute('download', filename)
     document.body.appendChild(a)
     a.click()
     setTimeout(() => {
