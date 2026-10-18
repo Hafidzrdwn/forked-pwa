@@ -55,12 +55,12 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 
   <aside
     :class="[
-      'fixed inset-y-0 left-0 w-[252px] p-5 bg-surface border-r border-border flex flex-col z-40 transition-transform duration-200 ease-in-out md:translate-x-0',
+      'fixed inset-y-0 left-0 w-[252px] p-5 bg-surface border-r border-border flex flex-col z-40 transition-transform duration-200 ease-in-out md:translate-x-0 overflow-y-auto overscroll-contain',
       props.mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
     ]"
     aria-label="Sidebar navigation"
   >
-    <div class="flex items-center justify-between pb-6 px-1">
+    <div class="flex items-center justify-between pb-6 px-1 shrink-0">
       <a class="flex items-center gap-2.5" href="#" @click.prevent="handleNav('overview')">
         <BrandLogo :size="36" :subtitle="t.nav.brandSubtitle" />
       </a>
@@ -75,9 +75,9 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
       </button>
     </div>
 
-    <div class="px-3 pb-3 text-[11px] tracking-wider font-bold text-fg-subtle uppercase">{{ t.nav.workspace }}</div>
+    <div class="px-3 pb-3 text-[11px] tracking-wider font-bold text-fg-subtle uppercase shrink-0">{{ t.nav.workspace }}</div>
 
-    <nav class="grid gap-1.5">
+    <nav class="grid gap-1.5 shrink-0">
       <button
         type="button"
         :class="[
@@ -122,7 +122,7 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
       </button>
     </nav>
 
-    <div class="mt-auto pt-4 flex flex-col gap-1.5">
+    <div class="mt-auto pt-4 flex flex-col gap-1.5 shrink-0">
       <div class="flex gap-3 bg-canvas-subtle border border-border rounded-xl p-3.5 mb-2">
         <span class="w-8 h-8 rounded-lg bg-primary-soft text-primary grid place-items-center shrink-0">
           <ShieldAlert :size="17" />

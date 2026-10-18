@@ -409,7 +409,7 @@ export const useDecisionStore = defineStore('decision', () => {
     flash('Jadwal evaluasi diperbarui', 'success')
   }
 
-  function exportBackup(): void {
+  async function exportBackup(): Promise<void> {
     const filename = `forked-backup-${today()}.json`
     const data = {
       app: 'Forked',
@@ -417,8 +417,33 @@ export const useDecisionStore = defineStore('decision', () => {
       exportedAt: new Date().toISOString(),
       decisions: JSON.parse(JSON.stringify(decisions.value))
     }
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json'
+    const jsonString = JSON.stringify(data, null, 2)
+
+    if (typeof window !== 'undefined' && 'showSaveFilePicker' in window) {
+      try {
+        const handle = await (window as any).showSaveFilePicker({
+          suggestedName: filename,
+          types: [
+            {
+              description: 'Berkas Cadangan Forked (JSON)',
+              accept: { 'application/json': ['.json'] }
+            }
+          ]
+        })
+        const writable = await handle.createWritable()
+        await writable.write(jsonString)
+        await writable.close()
+        flash(`Berkas "${filename}" berhasil disimpan ke laptopmu.`, 'success')
+        return
+      } catch (err: any) {
+        if (err && err.name === 'AbortError') {
+          return
+        }
+      }
+    }
+
+    const blob = new Blob([jsonString], {
+      type: 'application/json;charset=utf-8'
     })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -429,8 +454,8 @@ export const useDecisionStore = defineStore('decision', () => {
     setTimeout(() => {
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-    }, 1000)
-    flash(`Berkas "${filename}" tersimpan di folder Unduhan browser.`, 'success')
+    }, 2000)
+    flash(`Berkas "${filename}" diunduh ke folder Downloads laptopmu.`, 'success')
   }
 
   async function copyBackupToClipboard(): Promise<boolean> {
