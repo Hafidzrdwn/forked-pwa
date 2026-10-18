@@ -146,10 +146,20 @@ function submitAssumption() {
           </label>
 
           <label class="block text-xs font-bold text-fg">
-            <div class="flex justify-between items-center mb-1">
-              <span>{{ interpolate(t.assumptions.confidenceLabel, { n: confidence }) }}</span>
+            <div class="flex justify-between items-center mb-1.5">
+              <span>{{ t.assumptions.confidenceLabel.split(':')[0] }}</span>
+              <div class="flex items-center gap-1 shrink-0">
+                <input
+                  v-model.number="confidence"
+                  type="number"
+                  min="0"
+                  max="100"
+                  class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+                />
+                <span class="text-[11px] text-fg-muted font-bold">%</span>
+              </div>
             </div>
-            <input v-model.number="confidence" type="range" min="0" max="100" />
+            <input v-model.number="confidence" type="range" min="0" max="100" step="1" class="w-full" />
           </label>
         </div>
       </div>

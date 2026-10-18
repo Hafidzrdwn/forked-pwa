@@ -72,3 +72,18 @@ export function formatRupiah(value: number): string {
 export function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`
 }
+
+export function formatRupiahInput(value: number | string): string {
+  if (value === '' || value === null || value === undefined) return ''
+  const num = typeof value === 'string' ? parseInt(value.replace(/\D/g, ''), 10) : value
+  if (Number.isNaN(num) || num === 0) return '0'
+  return new Intl.NumberFormat('id-ID').format(num)
+}
+
+export function parseRupiahInput(str: string): number {
+  if (!str) return 0
+  const cleaned = str.replace(/\D/g, '')
+  if (!cleaned) return 0
+  const parsed = parseInt(cleaned, 10)
+  return Number.isNaN(parsed) ? 0 : parsed
+}

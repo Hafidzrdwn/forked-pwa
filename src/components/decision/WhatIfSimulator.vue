@@ -74,7 +74,16 @@ const simulatedList = computed(() => {
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between text-xs font-medium">
           <label for="sim-income" class="text-fg-muted">{{ t.whatIf.incomeLabel }}</label>
-          <strong class="font-bold text-primary">{{ incomePercent }}%</strong>
+          <div class="flex items-center gap-1 shrink-0">
+            <input
+              v-model.number="incomePercent"
+              type="number"
+              min="0"
+              max="150"
+              class="w-14 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+            />
+            <span class="text-[11px] text-fg-muted font-bold">%</span>
+          </div>
         </div>
         <input
           id="sim-income"
@@ -82,16 +91,24 @@ const simulatedList = computed(() => {
           type="range"
           min="0"
           max="150"
-          step="5"
+          step="1"
+          class="w-full"
         />
       </div>
 
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between text-xs font-medium">
           <label for="sim-cost" class="text-fg-muted">{{ t.whatIf.costLabel }}</label>
-          <strong :class="['font-bold', costPercent > 100 ? 'text-danger' : 'text-fg']">
-            {{ costPercent }}%
-          </strong>
+          <div class="flex items-center gap-1 shrink-0">
+            <input
+              v-model.number="costPercent"
+              type="number"
+              min="60"
+              max="180"
+              class="w-14 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+            />
+            <span class="text-[11px] text-fg-muted font-bold">%</span>
+          </div>
         </div>
         <input
           id="sim-cost"
@@ -99,14 +116,24 @@ const simulatedList = computed(() => {
           type="range"
           min="60"
           max="180"
-          step="5"
+          step="1"
+          class="w-full"
         />
       </div>
 
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between text-xs font-medium">
           <label for="sim-hours" class="text-fg-muted">{{ t.whatIf.hoursLabel }}</label>
-          <strong class="font-bold text-fg">{{ hoursDelta > 0 ? '+' + hoursDelta : hoursDelta }} {{ t.common.hrs }}</strong>
+          <div class="flex items-center gap-1 shrink-0">
+            <input
+              v-model.number="hoursDelta"
+              type="number"
+              min="-15"
+              max="25"
+              class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+            />
+            <span class="text-[11px] text-fg-muted">{{ t.common.hrs }}</span>
+          </div>
         </div>
         <input
           id="sim-hours"
@@ -115,15 +142,23 @@ const simulatedList = computed(() => {
           min="-15"
           max="25"
           step="1"
+          class="w-full"
         />
       </div>
 
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between text-xs font-medium">
           <label for="sim-risk" class="text-fg-muted">{{ t.whatIf.riskLabel }}</label>
-          <strong :class="['font-bold', riskDelta > 0 ? 'text-danger' : 'text-primary']">
-            {{ riskDelta > 0 ? '+' + riskDelta : riskDelta }} {{ t.common.pts }}
-          </strong>
+          <div class="flex items-center gap-1 shrink-0">
+            <input
+              v-model.number="riskDelta"
+              type="number"
+              min="-30"
+              max="30"
+              class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+            />
+            <span class="text-[11px] text-fg-muted">{{ t.common.pts }}</span>
+          </div>
         </div>
         <input
           id="sim-risk"
@@ -131,7 +166,8 @@ const simulatedList = computed(() => {
           type="range"
           min="-30"
           max="30"
-          step="5"
+          step="1"
+          class="w-full"
         />
       </div>
     </div>

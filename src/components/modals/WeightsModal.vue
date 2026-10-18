@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { X, Check, RotateCcw, Scale, Info } from 'lucide-vue-next'
+import { X, Check, RotateCcw, Scale, Info, Sparkles, AlertCircle } from 'lucide-vue-next'
 import type { ScoringWeights } from '../../types'
 import { DEFAULT_WEIGHTS, normalizeWeights } from '../../services/scoring'
 import { useI18n } from '../../i18n'
@@ -22,12 +22,20 @@ const time = ref(Math.round((props.initialWeights?.time ?? DEFAULT_WEIGHTS.time)
 const growth = ref(Math.round((props.initialWeights?.growth ?? DEFAULT_WEIGHTS.growth) * 100))
 const risk = ref(Math.round((props.initialWeights?.risk ?? DEFAULT_WEIGHTS.risk) * 100))
 
+const totalSum = computed(() => {
+  const m = Number(money.value) || 0
+  const tm = Number(time.value) || 0
+  const g = Number(growth.value) || 0
+  const r = Number(risk.value) || 0
+  return m + tm + g + r
+})
+
 const normalized = computed(() => {
   return normalizeWeights({
-    money: money.value,
-    time: time.value,
-    growth: growth.value,
-    risk: risk.value
+    money: Number(money.value) || 0,
+    time: Number(time.value) || 0,
+    growth: Number(growth.value) || 0,
+    risk: Number(risk.value) || 0
   })
 })
 
@@ -36,6 +44,22 @@ function resetDefaults() {
   time.value = Math.round(DEFAULT_WEIGHTS.time * 100)
   growth.value = Math.round(DEFAULT_WEIGHTS.growth * 100)
   risk.value = Math.round(DEFAULT_WEIGHTS.risk * 100)
+}
+
+function autoBalance() {
+  const sum = totalSum.value
+  if (sum === 0) {
+    resetDefaults()
+    return
+  }
+  const m = Math.round((Number(money.value) / sum) * 100)
+  const tm = Math.round((Number(time.value) / sum) * 100)
+  const g = Math.round((Number(growth.value) / sum) * 100)
+  const r = 100 - (m + tm + g)
+  money.value = Math.max(0, m)
+  time.value = Math.max(0, tm)
+  growth.value = Math.max(0, g)
+  risk.value = Math.max(0, r)
 }
 
 function handleSave() {
@@ -75,61 +99,145 @@ onUnmounted(() => {
       </p>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-4">
-        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5">
-          <div class="flex justify-between items-center mb-2 text-xs font-semibold">
-            <span>{{ t.weightsModal.money }}</span>
-            <strong class="text-primary font-bold">{{ Math.round(normalized.money * 100) }}%</strong>
+        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5 flex flex-col justify-between">
+          <div class="flex justify-between items-start gap-2 mb-2">
+            <div>
+              <span class="block text-xs font-bold text-fg">{{ t.weightsModal.money }}</span>
+              <small class="block text-[11px] text-fg-muted leading-tight mt-0.5">{{ t.weightsModal.moneyDesc }}</small>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <input
+                v-model.number="money"
+                type="number"
+                min="0"
+                max="100"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+              <span class="text-xs text-fg-muted font-bold">%</span>
+            </div>
           </div>
           <input
             v-model.number="money"
             type="range"
             min="0"
             max="100"
-            step="5"
+            step="1"
+            class="w-full mt-2"
           />
         </div>
 
-        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5">
-          <div class="flex justify-between items-center mb-2 text-xs font-semibold">
-            <span>{{ t.weightsModal.time }}</span>
-            <strong class="text-primary font-bold">{{ Math.round(normalized.time * 100) }}%</strong>
+        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5 flex flex-col justify-between">
+          <div class="flex justify-between items-start gap-2 mb-2">
+            <div>
+              <span class="block text-xs font-bold text-fg">{{ t.weightsModal.time }}</span>
+              <small class="block text-[11px] text-fg-muted leading-tight mt-0.5">{{ t.weightsModal.timeDesc }}</small>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <input
+                v-model.number="time"
+                type="number"
+                min="0"
+                max="100"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+              <span class="text-xs text-fg-muted font-bold">%</span>
+            </div>
           </div>
           <input
             v-model.number="time"
             type="range"
             min="0"
             max="100"
-            step="5"
+            step="1"
+            class="w-full mt-2"
           />
         </div>
 
-        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5">
-          <div class="flex justify-between items-center mb-2 text-xs font-semibold">
-            <span>{{ t.weightsModal.growth }}</span>
-            <strong class="text-primary font-bold">{{ Math.round(normalized.growth * 100) }}%</strong>
+        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5 flex flex-col justify-between">
+          <div class="flex justify-between items-start gap-2 mb-2">
+            <div>
+              <span class="block text-xs font-bold text-fg">{{ t.weightsModal.growth }}</span>
+              <small class="block text-[11px] text-fg-muted leading-tight mt-0.5">{{ t.weightsModal.growthDesc }}</small>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <input
+                v-model.number="growth"
+                type="number"
+                min="0"
+                max="100"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+              <span class="text-xs text-fg-muted font-bold">%</span>
+            </div>
           </div>
           <input
             v-model.number="growth"
             type="range"
             min="0"
             max="100"
-            step="5"
+            step="1"
+            class="w-full mt-2"
           />
         </div>
 
-        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5">
-          <div class="flex justify-between items-center mb-2 text-xs font-semibold">
-            <span>{{ t.weightsModal.safety }}</span>
-            <strong class="text-primary font-bold">{{ Math.round(normalized.risk * 100) }}%</strong>
+        <div class="bg-canvas-subtle border border-border rounded-xl p-3.5 flex flex-col justify-between">
+          <div class="flex justify-between items-start gap-2 mb-2">
+            <div>
+              <span class="block text-xs font-bold text-fg">{{ t.weightsModal.safety }}</span>
+              <small class="block text-[11px] text-fg-muted leading-tight mt-0.5">{{ t.weightsModal.safetyDesc }}</small>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <input
+                v-model.number="risk"
+                type="number"
+                min="0"
+                max="100"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+              <span class="text-xs text-fg-muted font-bold">%</span>
+            </div>
           </div>
           <input
             v-model.number="risk"
             type="range"
             min="0"
             max="100"
-            step="5"
+            step="1"
+            class="w-full mt-2"
           />
         </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-canvas-subtle rounded-xl border border-border my-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-fg">{{ t.weightsModal.totalLabel }}:</span>
+          <span
+            :class="[
+              'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold',
+              totalSum === 100
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                : totalSum < 100
+                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                  : 'bg-danger/10 text-danger'
+            ]"
+          >
+            <Check v-if="totalSum === 100" :size="13" />
+            <AlertCircle v-else :size="13" />
+            {{ totalSum }}%
+            <span class="font-medium text-[11px]">
+              ({{ totalSum === 100 ? t.weightsModal.exactTotal : totalSum < 100 ? interpolate(t.weightsModal.remainingTotal, { n: 100 - totalSum }) : interpolate(t.weightsModal.overTotal, { n: totalSum - 100 }) }})
+            </span>
+          </span>
+        </div>
+
+        <button
+          v-if="totalSum !== 100"
+          type="button"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold bg-primary-soft text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+          @click="autoBalance"
+        >
+          <Sparkles :size="13" /> {{ t.weightsModal.autoBalance }}
+        </button>
       </div>
 
       <div class="p-3.5 bg-canvas-subtle rounded-xl border border-border text-xs text-fg-muted my-4 space-y-2">

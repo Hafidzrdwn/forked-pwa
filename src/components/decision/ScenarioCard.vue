@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, nextTick, watch } from 'vue'
 import { Check, Target, Wallet, Clock3, TrendingUp, ShieldAlert, X, Pencil } from 'lucide-vue-next'
 import type { Scenario, ScoringWeights } from '../../types'
-import { scoreScenario, formatRupiah } from '../../services/scoring'
+import { scoreScenario, formatRupiah, formatRupiahInput, parseRupiahInput } from '../../services/scoring'
 import { useI18n } from '../../i18n'
 
 const props = defineProps<{
@@ -20,18 +20,70 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const titleInputRef = ref<HTMLInputElement | null>(null)
+const titleInputRef = ref<HTMLTextAreaElement | null>(null)
 
 const breakdown = computed(() => scoreScenario(props.scenario, props.weights))
-const net = computed(() => props.scenario.monthlyIncome - props.scenario.monthlyCost)
+const net = computed(() => (Number(props.scenario.monthlyIncome) || 0) - (Number(props.scenario.monthlyCost) || 0))
+
+function adjustTextareaHeight() {
+  if (!titleInputRef.value) return
+  titleInputRef.value.style.height = 'auto'
+  titleInputRef.value.style.height = `${titleInputRef.value.scrollHeight}px`
+}
+
+onMounted(() => {
+  nextTick(adjustTextareaHeight)
+})
+
+watch(() => props.scenario.name, () => {
+  nextTick(adjustTextareaHeight)
+})
 
 function onFieldChange() {
   emit('update', props.scenario)
 }
 
 function focusTitleInput() {
-  titleInputRef.value?.focus()
-  titleInputRef.value?.select()
+  if (!titleInputRef.value) return
+  titleInputRef.value.focus()
+  titleInputRef.value.select()
+}
+
+function onIncomeInput(e: Event) {
+  const target = e.target as HTMLInputElement
+  const raw = parseRupiahInput(target.value)
+  props.scenario.monthlyIncome = raw
+  target.value = formatRupiahInput(raw)
+  onFieldChange()
+}
+
+function onCostInput(e: Event) {
+  const target = e.target as HTMLInputElement
+  const raw = parseRupiahInput(target.value)
+  props.scenario.monthlyCost = raw
+  target.value = formatRupiahInput(raw)
+  onFieldChange()
+}
+
+function onHoursInput(e: Event) {
+  const target = e.target as HTMLInputElement
+  const raw = Math.max(0, Math.min(168, Number(target.value) || 0))
+  props.scenario.hoursPerWeek = raw
+  onFieldChange()
+}
+
+function onGrowthInput(e: Event) {
+  const target = e.target as HTMLInputElement
+  const raw = Math.max(0, Math.min(100, Number(target.value) || 0))
+  props.scenario.growth = raw
+  onFieldChange()
+}
+
+function onRiskInput(e: Event) {
+  const target = e.target as HTMLInputElement
+  const raw = Math.max(0, Math.min(100, Number(target.value) || 0))
+  props.scenario.risk = raw
+  onFieldChange()
 }
 </script>
 
@@ -52,19 +104,21 @@ function focusTitleInput() {
       </button>
     </div>
 
-    <div class="flex items-center gap-1.5 group/title relative my-1">
-      <input
+    <div class="flex items-start gap-1.5 group/title relative my-1">
+      <textarea
         ref="titleInputRef"
         v-model="scenario.name"
-        class="flex-1 min-w-0 bg-transparent outline-none font-display font-bold text-base text-fg rounded-lg px-2 py-1 -ml-2 border border-transparent hover:border-border focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all"
+        rows="1"
+        class="flex-1 min-w-0 bg-transparent outline-none font-display font-bold text-base text-fg rounded-lg px-2 py-1 -ml-2 border border-transparent hover:border-border focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all resize-none leading-snug overflow-hidden"
         :aria-label="t.scenario.pathLabel + ' ' + String.fromCharCode(65 + index)"
         :title="t.scenario.editingTitleHint"
+        @input="adjustTextareaHeight"
         @change="onFieldChange"
-        @keydown.enter="($event.target as HTMLInputElement).blur()"
+        @keydown.enter.prevent="($event.target as HTMLTextAreaElement).blur()"
       />
       <button
         type="button"
-        class="w-7 h-7 rounded-lg text-fg-muted hover:text-primary hover:bg-primary-soft grid place-items-center transition-colors shrink-0 cursor-pointer"
+        class="w-7 h-7 rounded-lg text-fg-muted hover:text-primary hover:bg-primary-soft grid place-items-center transition-colors shrink-0 cursor-pointer mt-0.5"
         :title="t.scenario.editTitle"
         :aria-label="t.scenario.editTitle"
         @click="focusTitleInput"
@@ -102,76 +156,135 @@ function focusTitleInput() {
       </div>
     </div>
 
-    <div class="grid gap-3 py-4">
-      <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        <span class="truncate">{{ t.scenario.monthlyIncome }}</span>
-        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ formatRupiah(scenario.monthlyIncome) }}</span>
+    <div class="grid gap-3.5 py-4">
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 text-xs text-fg-muted font-medium">
+          <span class="truncate">{{ t.scenario.monthlyIncome }}</span>
+          <div class="flex items-center gap-1 bg-surface border border-border rounded-lg px-2 py-0.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shrink-0">
+            <span class="text-xs text-fg-muted font-bold">Rp</span>
+            <input
+              class="w-28 text-right text-xs font-bold bg-transparent outline-none text-fg"
+              :value="formatRupiahInput(scenario.monthlyIncome)"
+              @input="onIncomeInput"
+              @change="onFieldChange"
+            />
+          </div>
+        </div>
         <input
           v-model.number="scenario.monthlyIncome"
-          class="col-span-2 w-full"
+          class="w-full"
+          type="range"
+          min="0"
+          max="30000000"
+          step="100000"
+          @change="onFieldChange"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 text-xs text-fg-muted font-medium">
+          <span class="truncate">{{ t.scenario.monthlyCost }}</span>
+          <div class="flex items-center gap-1 bg-surface border border-border rounded-lg px-2 py-0.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shrink-0">
+            <span class="text-xs text-fg-muted font-bold">Rp</span>
+            <input
+              class="w-28 text-right text-xs font-bold bg-transparent outline-none text-fg"
+              :value="formatRupiahInput(scenario.monthlyCost)"
+              @input="onCostInput"
+              @change="onFieldChange"
+            />
+          </div>
+        </div>
+        <input
+          v-model.number="scenario.monthlyCost"
+          class="w-full"
           type="range"
           min="0"
           max="20000000"
           step="100000"
           @change="onFieldChange"
         />
-      </label>
+      </div>
 
-      <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        <span class="truncate">{{ t.scenario.monthlyCost }}</span>
-        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ formatRupiah(scenario.monthlyCost) }}</span>
-        <input
-          v-model.number="scenario.monthlyCost"
-          class="col-span-2 w-full"
-          type="range"
-          min="0"
-          max="10000000"
-          step="100000"
-          @change="onFieldChange"
-        />
-      </label>
-
-      <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        <span class="truncate">{{ t.scenario.hoursPerWeek }}</span>
-        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ scenario.hoursPerWeek }} {{ t.common.hrs }}</span>
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 text-xs text-fg-muted font-medium">
+          <span class="truncate">{{ t.scenario.hoursPerWeek }}</span>
+          <div class="flex items-center gap-1 bg-surface border border-border rounded-lg px-2 py-0.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shrink-0">
+            <input
+              type="number"
+              min="0"
+              max="168"
+              class="w-12 text-right text-xs font-bold bg-transparent outline-none text-fg"
+              :value="scenario.hoursPerWeek"
+              @input="onHoursInput"
+              @change="onFieldChange"
+            />
+            <span class="text-xs text-fg-muted font-medium">{{ t.common.hrs }}</span>
+          </div>
+        </div>
         <input
           v-model.number="scenario.hoursPerWeek"
-          class="col-span-2 w-full"
+          class="w-full"
           type="range"
           min="0"
-          max="70"
+          max="80"
           step="1"
           @change="onFieldChange"
         />
-      </label>
+      </div>
 
-      <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        <span class="truncate">{{ t.scenario.growthPotential }}</span>
-        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ scenario.growth }}/100</span>
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 text-xs text-fg-muted font-medium">
+          <span class="truncate">{{ t.scenario.growthPotential }}</span>
+          <div class="flex items-center gap-1 bg-surface border border-border rounded-lg px-2 py-0.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shrink-0">
+            <input
+              type="number"
+              min="0"
+              max="100"
+              class="w-12 text-right text-xs font-bold bg-transparent outline-none text-fg"
+              :value="scenario.growth"
+              @input="onGrowthInput"
+              @change="onFieldChange"
+            />
+            <span class="text-xs text-fg-muted font-medium">/100</span>
+          </div>
+        </div>
         <input
           v-model.number="scenario.growth"
-          class="col-span-2 w-full"
+          class="w-full"
           type="range"
           min="0"
           max="100"
-          step="5"
+          step="1"
           @change="onFieldChange"
         />
-      </label>
+      </div>
 
-      <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        <span class="truncate">{{ t.scenario.riskLevel }}</span>
-        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ scenario.risk }}/100</span>
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2 text-xs text-fg-muted font-medium">
+          <span class="truncate">{{ t.scenario.riskLevel }}</span>
+          <div class="flex items-center gap-1 bg-surface border border-border rounded-lg px-2 py-0.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shrink-0">
+            <input
+              type="number"
+              min="0"
+              max="100"
+              class="w-12 text-right text-xs font-bold bg-transparent outline-none text-fg"
+              :value="scenario.risk"
+              @input="onRiskInput"
+              @change="onFieldChange"
+            />
+            <span class="text-xs text-fg-muted font-medium">/100</span>
+          </div>
+        </div>
         <input
           v-model.number="scenario.risk"
-          class="col-span-2 w-full"
+          class="w-full"
           type="range"
           min="0"
           max="100"
-          step="5"
+          step="1"
           @change="onFieldChange"
         />
-      </label>
+      </div>
     </div>
 
     <button

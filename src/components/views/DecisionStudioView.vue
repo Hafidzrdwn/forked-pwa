@@ -6,6 +6,7 @@ import {
 } from 'lucide-vue-next'
 import type { Decision, Scenario, AssumptionKind } from '../../types'
 import { useI18n } from '../../i18n'
+import { formatRupiahInput, parseRupiahInput } from '../../services/scoring'
 import ScenarioCard from '../decision/ScenarioCard.vue'
 import WhatIfSimulator from '../decision/WhatIfSimulator.vue'
 import AssumptionManager from '../decision/AssumptionManager.vue'
@@ -241,32 +242,75 @@ function formatDate(value: string) {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-3.5">
             <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.monthlyIncome }}
-              <input v-model.number="pathIncome" type="number" min="0" step="100000" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none focus:border-primary" />
+              <div class="flex items-center gap-1.5 bg-surface border border-border rounded-xl px-3 py-2 mt-1.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+                <span class="text-xs text-fg-muted font-bold">Rp</span>
+                <input
+                  :value="formatRupiahInput(pathIncome)"
+                  class="w-full text-xs font-bold bg-transparent outline-none text-fg"
+                  placeholder="5.000.000"
+                  @input="pathIncome = parseRupiahInput(($event.target as HTMLInputElement).value)"
+                />
+              </div>
             </label>
             <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.monthlyCost }}
-              <input v-model.number="pathCost" type="number" min="0" step="100000" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none focus:border-primary" />
+              <div class="flex items-center gap-1.5 bg-surface border border-border rounded-xl px-3 py-2 mt-1.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+                <span class="text-xs text-fg-muted font-bold">Rp</span>
+                <input
+                  :value="formatRupiahInput(pathCost)"
+                  class="w-full text-xs font-bold bg-transparent outline-none text-fg"
+                  placeholder="1.000.000"
+                  @input="pathCost = parseRupiahInput(($event.target as HTMLInputElement).value)"
+                />
+              </div>
             </label>
             <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.hoursPerWeek }}
-              <input v-model.number="pathHours" type="number" min="0" max="168" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3.5 py-2 text-sm outline-none focus:border-primary" />
+              <div class="flex items-center gap-1.5 bg-surface border border-border rounded-xl px-3 py-2 mt-1.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+                <input
+                  v-model.number="pathHours"
+                  type="number"
+                  min="0"
+                  max="168"
+                  class="w-full text-xs font-bold bg-transparent outline-none text-fg"
+                />
+                <span class="text-xs text-fg-muted font-medium shrink-0">{{ t.common.hrs }}</span>
+              </div>
             </label>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4">
             <label class="block text-xs font-bold text-fg">
-              <div class="flex justify-between items-center mb-1">
+              <div class="flex justify-between items-center mb-1.5">
                 <span>{{ t.addPathForm.growth }}</span>
-                <b class="text-xs text-primary font-bold">{{ pathGrowth }}/100</b>
+                <div class="flex items-center gap-1 shrink-0">
+                  <input
+                    v-model.number="pathGrowth"
+                    type="number"
+                    min="0"
+                    max="100"
+                    class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+                  />
+                  <span class="text-[11px] text-fg-muted">/100</span>
+                </div>
               </div>
-              <input v-model.number="pathGrowth" type="range" min="0" max="100" />
+              <input v-model.number="pathGrowth" type="range" min="0" max="100" class="w-full" />
             </label>
             <label class="block text-xs font-bold text-fg">
-              <div class="flex justify-between items-center mb-1">
+              <div class="flex justify-between items-center mb-1.5">
                 <span>{{ t.addPathForm.risk }}</span>
-                <b class="text-xs text-fg font-bold">{{ pathRisk }}/100</b>
+                <div class="flex items-center gap-1 shrink-0">
+                  <input
+                    v-model.number="pathRisk"
+                    type="number"
+                    min="0"
+                    max="100"
+                    class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+                  />
+                  <span class="text-[11px] text-fg-muted">/100</span>
+                </div>
               </div>
-              <input v-model.number="pathRisk" type="range" min="0" max="100" />
+              <input v-model.number="pathRisk" type="range" min="0" max="100" class="w-full" />
             </label>
           </div>
 
