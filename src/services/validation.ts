@@ -4,7 +4,7 @@ import {
   MAX_BACKUP_BYTES,
   MAX_DECISIONS,
   type Decision
-} from './schemas/decision.schema.ts'
+} from '../schemas/decision.schema.ts'
 
 export function isValidDecision(value: unknown): value is Decision {
   return DecisionSchema.safeParse(value).success

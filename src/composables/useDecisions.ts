@@ -8,7 +8,6 @@ export function useDecisions() {
   const refs = storeToRefs(store)
 
   return {
-    // Reactive State & Getters
     decisions: refs.decisions,
     activeId: refs.activeId,
     searchTerm: refs.searchTerm,
@@ -24,7 +23,6 @@ export function useDecisions() {
     decidedDecisions: refs.decidedDecisions,
     nextReview: refs.nextReview,
 
-    // Store Actions
     flash: store.flash,
     load: store.load,
     createDecision: store.createDecision,

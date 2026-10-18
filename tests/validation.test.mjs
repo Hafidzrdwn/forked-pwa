@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { parseBackupText } from '../src/validation.ts'
+import { parseBackupText } from '../src/services/validation.ts'
 
 const validDecision = () => ({
   id: 'd1', title: 'Choose a path', context: '', createdAt: '2026-10-17', reviewDate: '2026-11-16',

@@ -43,7 +43,6 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 </script>
 
 <template>
-  <!-- Mobile Backdrop Overlay -->
   <div
     v-if="props.mobileOpen"
     class="fixed inset-0 bg-black/50 backdrop-blur-xs z-30 md:hidden"

@@ -1,4 +1,4 @@
-import type { Decision } from './types'
+import type { Decision } from '../types'
 
 const DB_NAME = 'forked-local'
 const STORE_NAME = 'decisions'

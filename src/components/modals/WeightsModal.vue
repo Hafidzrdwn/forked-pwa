@@ -2,7 +2,7 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { X, Check, RotateCcw, Scale, Info } from 'lucide-vue-next'
 import type { ScoringWeights } from '../../types'
-import { DEFAULT_WEIGHTS, normalizeWeights } from '../../scoring'
+import { DEFAULT_WEIGHTS, normalizeWeights } from '../../services/scoring'
 import { useI18n } from '../../i18n'
 
 const props = defineProps<{

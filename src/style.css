@@ -82,7 +82,6 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Custom Range Slider Styling */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -133,7 +132,6 @@ select option {
   color: var(--color-fg);
 }
 
-/* Circular Ripple View Transition for Theme Switching */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

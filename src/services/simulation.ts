@@ -1,4 +1,4 @@
-import type { Scenario, ScoringWeights } from './types'
+import type { Scenario, ScoringWeights } from '../types'
 import { clamp, scoreScenario, type ScoreBreakdown } from './scoring'
 
 export interface WhatIfParams {
@@ -34,9 +34,6 @@ export interface SimulatedScenarioResult {
   simulatedBreakdown: ScoreBreakdown
 }
 
-/**
- * Pure simulation function. Does not mutate the original scenario object.
- */
 export function simulateScenario(
   scenario: Scenario,
   params: Partial<WhatIfParams> = {},
@@ -84,9 +81,6 @@ export function simulateScenario(
   }
 }
 
-/**
- * Simulates all scenarios for a decision reactively under the stress test parameters.
- */
 export function simulateAllScenarios(
   scenarios: Scenario[],
   params: Partial<WhatIfParams> = {},

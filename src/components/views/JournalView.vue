@@ -57,7 +57,6 @@ const isOverdue = (dateStr: string) => {
       </button>
     </div>
 
-    <!-- Filter Pills -->
     <div class="flex gap-2 flex-wrap mb-5">
       <button
         type="button"

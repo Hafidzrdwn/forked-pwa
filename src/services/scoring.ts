@@ -1,4 +1,4 @@
-import type { Scenario, ScoringWeights } from './types'
+import type { Scenario, ScoringWeights } from '../types'
 
 export const DEFAULT_WEIGHTS: ScoringWeights = {
   money: 0.35,

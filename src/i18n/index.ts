@@ -11,7 +11,7 @@ function getInitialLocale(): Locale {
     const saved = window.localStorage.getItem(STORAGE_KEY)
     if (saved === 'en' || saved === 'id') return saved
   }
-  return 'id' // Default to Indonesian
+  return 'id'
 }
 
 const currentLocale = ref<Locale>(getInitialLocale())

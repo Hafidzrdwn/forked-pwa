@@ -39,7 +39,6 @@ const { t, locale, interpolate } = useI18n()
 
 import { AddScenarioInputSchema } from '../../schemas/decision.schema'
 
-// New Path Inline Form State
 const showAddPath = ref(false)
 const pathName = ref('')
 const pathIncome = ref(5000000)
@@ -113,7 +112,6 @@ function formatDate(value: string) {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-6 items-start">
-      <!-- Left Decision Picker Sidebar -->
       <aside class="border border-border bg-surface rounded-2xl p-3.5 lg:sticky lg:top-[85px] shadow-xs" aria-label="Decision selector">
         <div class="flex items-center gap-2 bg-canvas-subtle border border-border rounded-xl px-3 h-10 text-fg-subtle mb-3">
           <Search :size="16" />
@@ -166,7 +164,6 @@ function formatDate(value: string) {
         </button>
       </aside>
 
-      <!-- Right Active Decision Workspace -->
       <div v-if="activeDecision" class="min-w-0 flex flex-col gap-5">
         <div class="border border-border rounded-2xl bg-surface p-5 md:p-6 flex items-start justify-between gap-4 shadow-xs">
           <div>
@@ -209,7 +206,6 @@ function formatDate(value: string) {
           </button>
         </div>
 
-        <!-- Scenarios Section -->
         <div class="flex items-center justify-between gap-4 mt-2">
           <div>
             <h3 class="font-display font-bold text-lg tracking-tight text-fg m-0">{{ t.studio.explorePathsTitle }}</h3>
@@ -224,7 +220,6 @@ function formatDate(value: string) {
           </button>
         </div>
 
-        <!-- Inline Add Path Form -->
         <form v-if="showAddPath" class="bg-canvas-subtle border border-border rounded-2xl p-5 my-2 shadow-xs" @submit.prevent="submitAddPath">
           <label class="block text-xs font-bold text-fg mb-3.5">
             {{ t.addPathForm.title }}
@@ -243,7 +238,6 @@ function formatDate(value: string) {
             </div>
           </label>
 
-          <!-- Row 1: Objective Numbers -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-3.5">
             <label class="block text-xs font-bold text-fg">
               {{ t.addPathForm.monthlyIncome }}
@@ -259,7 +253,6 @@ function formatDate(value: string) {
             </label>
           </div>
 
-          <!-- Row 2: Perceived Sliders (Theme Green) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4">
             <label class="block text-xs font-bold text-fg">
               <div class="flex justify-between items-center mb-1">
@@ -287,7 +280,6 @@ function formatDate(value: string) {
           </div>
         </form>
 
-        <!-- Scenario Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-2">
           <ScenarioCard
             v-for="(scenario, index) in activeDecision.scenarios"
@@ -302,13 +294,11 @@ function formatDate(value: string) {
           />
         </div>
 
-        <!-- Reactive What-If Stress Test -->
         <WhatIfSimulator
           :scenarios="activeDecision.scenarios"
           :weights="activeDecision.weights"
         />
 
-        <!-- Assumptions & Evidence Tracking -->
         <AssumptionManager
           :scenarios="activeDecision.scenarios"
           :selected-scenario-id="activeDecision.selectedScenarioId"
@@ -325,7 +315,6 @@ function formatDate(value: string) {
         </div>
       </div>
 
-      <!-- Empty Picker State -->
       <div v-else class="border border-border bg-surface rounded-2xl p-10 text-center flex flex-col items-center shadow-xs">
         <IllustrationFork :width="140" :height="110" />
         <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.studio.emptyPickerTitle }}</h3>

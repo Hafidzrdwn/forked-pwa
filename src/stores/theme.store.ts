@@ -52,7 +52,6 @@ export const useThemeStore = defineStore('theme', () => {
       return
     }
 
-    // Determine circular ripple center coordinates
     let x = window.innerWidth - 80
     let y = 34
 
@@ -116,7 +115,6 @@ export const useThemeStore = defineStore('theme', () => {
       })
   }
 
-  // Initial apply
   if (typeof window !== 'undefined') {
     applyTheme(theme.value)
   }

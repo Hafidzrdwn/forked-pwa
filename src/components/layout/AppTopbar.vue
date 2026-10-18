@@ -43,19 +43,12 @@ const pageTitle = computed(() => {
     </div>
 
     <div class="flex items-center gap-2.5">
-      <!-- Dark/Light Theme Toggle -->
       <ThemeToggle />
-
-      <!-- Language Switcher -->
       <LanguageSwitcher />
-
-      <!-- Data Privacy Status Pill -->
       <span class="hidden sm:flex items-center gap-1.5 bg-surface border border-border rounded-full px-3 py-1.5 text-xs font-semibold text-fg-muted shadow-2xs">
         <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
         {{ t.nav.localBadge }}
       </span>
-
-      <!-- 3D Fun Avatar -->
       <VisualAvatar :size="32" name="Decision Maker" />
     </div>
   </header>

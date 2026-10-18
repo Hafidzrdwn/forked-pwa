@@ -5,7 +5,6 @@ export const MAX_DECISIONS = 5000
 export const MAX_SCENARIOS_PER_DECISION = 50
 export const MAX_ASSUMPTIONS_PER_SCENARIO = 200
 
-// Calendar Date Regex & Strict Gregorian Calendar Validation
 const DateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD').refine((val) => {
   const [year, month, day] = val.split('-').map(Number)
   const d = new Date(Date.UTC(year, month - 1, day))
@@ -77,10 +76,10 @@ export const DecisionSchema = z.object({
 }).refine((data) => {
   const scenarioIds = new Set(data.scenarios.map(s => s.id))
   if (scenarioIds.size !== data.scenarios.length) {
-    return false // duplicate scenario IDs
+    return false
   }
   if (data.selectedScenarioId !== null && !scenarioIds.has(data.selectedScenarioId)) {
-    return false // selectedScenarioId must point to an existing scenario
+    return false
   }
   return true
 }, { message: 'ID skenario tidak konsisten atau jalur terpilih tidak ditemukan' })
@@ -94,7 +93,6 @@ export const BackupEnvelopeSchema = z.union([
   })
 ])
 
-// Input form validation schemas
 export const CreateDecisionInputSchema = z.object({
   title: z.string().trim().min(3, 'Judul keputusan minimal 3 karakter').max(120, 'Judul maksimal 120 karakter'),
   context: z.string().trim().max(500, 'Konteks maksimal 500 karakter').default('')
@@ -115,7 +113,6 @@ export const AddAssumptionInputSchema = z.object({
   kind: AssumptionKindSchema.default('assumption')
 })
 
-// TypeScript types inferred directly from Zod schemas
 export type AssumptionKind = z.infer<typeof AssumptionKindSchema>
 export type AssumptionStatus = z.infer<typeof AssumptionStatusSchema>
 export type Assumption = z.infer<typeof AssumptionSchema>

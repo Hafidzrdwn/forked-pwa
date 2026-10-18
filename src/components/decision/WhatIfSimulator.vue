@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue'
 import { SlidersHorizontal, RotateCcw, Info, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-vue-next'
 import type { Scenario, ScoringWeights } from '../../types'
-import { simulateAllScenarios } from '../../simulation'
-import { formatRupiah } from '../../scoring'
+import { simulateAllScenarios } from '../../services/simulation'
+import { formatRupiah } from '../../services/scoring'
 import { useI18n } from '../../i18n'
 
 const props = defineProps<{
@@ -70,7 +70,6 @@ const simulatedList = computed(() => {
       </div>
     </div>
 
-    <!-- Sliders Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-canvas-subtle rounded-xl border border-border my-4">
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between text-xs font-medium">
@@ -137,7 +136,6 @@ const simulatedList = computed(() => {
       </div>
     </div>
 
-    <!-- Simulated Results List -->
     <div class="grid gap-3 mt-4">
       <div
         v-for="item in simulatedList"

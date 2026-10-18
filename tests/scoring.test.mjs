@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { scoreScenario, formatRupiah } from '../src/scoring.ts'
+import { scoreScenario, formatRupiah } from '../src/services/scoring.ts'
 
 const scenario = {
   id: 's1', name: 'Path A', description: '', monthlyIncome: 5_000_000, monthlyCost: 1_000_000,

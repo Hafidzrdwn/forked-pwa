@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { Check, Target, Wallet, Clock3, TrendingUp, ShieldAlert, X } from 'lucide-vue-next'
 import type { Scenario, ScoringWeights } from '../../types'
-import { scoreScenario, formatRupiah } from '../../scoring'
+import { scoreScenario, formatRupiah } from '../../services/scoring'
 import { useI18n } from '../../i18n'
 
 const props = defineProps<{

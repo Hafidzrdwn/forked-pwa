@@ -14,9 +14,9 @@ import {
   getAllDecisions as idbGetAllDecisions,
   putDecision as idbPutDecision,
   replaceAllDecisions as idbReplaceAllDecisions
-} from '../storage'
-import { DEFAULT_WEIGHTS, normalizeWeights, scoreScenario } from '../scoring'
-import { parseBackupText } from '../validation'
+} from '../services/storage'
+import { DEFAULT_WEIGHTS, normalizeWeights, scoreScenario } from '../services/scoring'
+import { parseBackupText } from '../services/validation'
 import { useToast } from '../composables/useToast'
 import { useConfirm } from '../composables/useConfirm'
 

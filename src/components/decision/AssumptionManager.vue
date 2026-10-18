@@ -85,7 +85,6 @@ function submitAssumption() {
       </button>
     </div>
 
-    <!-- Tabs Navigation -->
     <div v-if="scenarios.length > 1" class="flex gap-2 flex-wrap mb-3.5" role="tablist">
       <button
         v-for="s in scenarios"
@@ -108,7 +107,6 @@ function submitAssumption() {
       </button>
     </div>
 
-    <!-- Banner -->
     <div v-if="currentScenario" class="flex items-center gap-2.5 flex-wrap p-3 bg-canvas-subtle rounded-xl my-3 border border-border text-xs">
       <span class="text-[11px] font-bold uppercase tracking-wider text-fg-subtle">{{ t.assumptions.pathTab }}</span>
       <strong class="font-bold text-fg">{{ currentScenario.name }}</strong>
@@ -117,7 +115,6 @@ function submitAssumption() {
       </span>
     </div>
 
-    <!-- Form -->
     <form v-if="showForm && currentScenario" class="bg-canvas-subtle border border-border rounded-2xl p-4 my-3 shadow-xs" @submit.prevent="submitAssumption">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label class="block text-xs font-bold text-fg">
@@ -167,7 +164,6 @@ function submitAssumption() {
       </div>
     </form>
 
-    <!-- Assumption List -->
     <div v-if="currentScenario?.assumptions.length" class="divide-y divide-border">
       <div
         v-for="item in currentScenario.assumptions"
@@ -219,7 +215,6 @@ function submitAssumption() {
       </div>
     </div>
 
-    <!-- Empty State -->
     <div v-else class="flex gap-2.5 items-start text-fg-muted text-xs leading-relaxed py-4">
       <CircleHelp :size="18" class="text-primary shrink-0 mt-0.5" />
       <span>{{ t.assumptions.emptyDesc }}</span>
