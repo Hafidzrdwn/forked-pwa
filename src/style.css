@@ -127,6 +127,17 @@ input[type="range"]::-moz-range-track {
   border-radius: 9999px;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 select option {
   background: var(--color-surface);
   color: var(--color-fg);

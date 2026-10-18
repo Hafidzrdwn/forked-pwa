@@ -111,7 +111,7 @@ onUnmounted(() => {
                 type="number"
                 min="0"
                 max="100"
-                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span class="text-xs text-fg-muted font-bold">%</span>
             </div>
@@ -138,7 +138,7 @@ onUnmounted(() => {
                 type="number"
                 min="0"
                 max="100"
-                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span class="text-xs text-fg-muted font-bold">%</span>
             </div>
@@ -165,7 +165,7 @@ onUnmounted(() => {
                 type="number"
                 min="0"
                 max="100"
-                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span class="text-xs text-fg-muted font-bold">%</span>
             </div>
@@ -192,7 +192,7 @@ onUnmounted(() => {
                 type="number"
                 min="0"
                 max="100"
-                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                class="w-14 h-7 text-center text-xs font-bold border border-border rounded-lg bg-surface text-fg outline-none focus:border-primary focus:ring-1 focus:ring-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span class="text-xs text-fg-muted font-bold">%</span>
             </div>

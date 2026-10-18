@@ -8,6 +8,7 @@ import type { Decision, Scenario, AssumptionKind } from '../../types'
 import { useI18n } from '../../i18n'
 import { formatRupiahInput, parseRupiahInput } from '../../services/scoring'
 import ScenarioCard from '../decision/ScenarioCard.vue'
+import ComparisonMatrix from '../decision/ComparisonMatrix.vue'
 import WhatIfSimulator from '../decision/WhatIfSimulator.vue'
 import AssumptionManager from '../decision/AssumptionManager.vue'
 import IllustrationFork from '../common/IllustrationFork.vue'
@@ -272,7 +273,7 @@ function formatDate(value: string) {
                   type="number"
                   min="0"
                   max="168"
-                  class="w-full text-xs font-bold bg-transparent outline-none text-fg"
+                  class="w-full text-xs font-bold bg-transparent outline-none text-fg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <span class="text-xs text-fg-muted font-medium shrink-0">{{ t.common.hrs }}</span>
               </div>
@@ -289,7 +290,7 @@ function formatDate(value: string) {
                     type="number"
                     min="0"
                     max="100"
-                    class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+                    class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span class="text-[11px] text-fg-muted">/100</span>
                 </div>
@@ -305,7 +306,7 @@ function formatDate(value: string) {
                     type="number"
                     min="0"
                     max="100"
-                    class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+                    class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span class="text-[11px] text-fg-muted">/100</span>
                 </div>
@@ -337,6 +338,13 @@ function formatDate(value: string) {
             @remove="emit('remove-scenario', $event)"
           />
         </div>
+
+        <ComparisonMatrix
+          :scenarios="activeDecision.scenarios"
+          :weights="activeDecision.weights"
+          :selected-scenario-id="activeDecision.selectedScenarioId"
+          @choose-scenario="emit('choose-scenario', $event)"
+        />
 
         <WhatIfSimulator
           :scenarios="activeDecision.scenarios"

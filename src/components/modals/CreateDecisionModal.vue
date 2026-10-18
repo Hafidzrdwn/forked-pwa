@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { X, ArrowRight, Lightbulb, AlertCircle } from 'lucide-vue-next'
+import { X, ArrowRight, Lightbulb, AlertCircle, Sparkles } from 'lucide-vue-next'
 import { useI18n } from '../../i18n'
 import { CreateDecisionInputSchema } from '../../schemas/decision.schema'
 
@@ -16,6 +16,65 @@ const context = ref('')
 const pathAName = ref('')
 const pathBName = ref('')
 const touched = ref(false)
+const selectedTemplate = ref<string | null>(null)
+
+interface PresetTemplate {
+  id: string
+  label: string
+  desc: string
+  title: string
+  context: string
+  pathAName: string
+  pathBName: string
+}
+
+const templates = computed<PresetTemplate[]>(() => [
+  {
+    id: 'career',
+    label: t.value.createModal.templateCareer,
+    desc: t.value.createModal.templateCareerDesc,
+    title: t.value.createModal.templateCareerTitle,
+    context: t.value.createModal.templateCareerContext,
+    pathAName: t.value.createModal.templateCareerPathA,
+    pathBName: t.value.createModal.templateCareerPathB
+  },
+  {
+    id: 'study',
+    label: t.value.createModal.templateStudy,
+    desc: t.value.createModal.templateStudyDesc,
+    title: t.value.createModal.templateStudyTitle,
+    context: t.value.createModal.templateStudyContext,
+    pathAName: t.value.createModal.templateStudyPathA,
+    pathBName: t.value.createModal.templateStudyPathB
+  },
+  {
+    id: 'freelance',
+    label: t.value.createModal.templateFreelance,
+    desc: t.value.createModal.templateFreelanceDesc,
+    title: t.value.createModal.templateFreelanceTitle,
+    context: t.value.createModal.templateFreelanceContext,
+    pathAName: t.value.createModal.templateFreelancePathA,
+    pathBName: t.value.createModal.templateFreelancePathB
+  },
+  {
+    id: 'housing',
+    label: t.value.createModal.templateHousing,
+    desc: t.value.createModal.templateHousingDesc,
+    title: t.value.createModal.templateHousingTitle,
+    context: t.value.createModal.templateHousingContext,
+    pathAName: t.value.createModal.templateHousingPathA,
+    pathBName: t.value.createModal.templateHousingPathB
+  }
+])
+
+function applyTemplate(tpl: PresetTemplate) {
+  selectedTemplate.value = tpl.id
+  title.value = tpl.title
+  context.value = tpl.context
+  pathAName.value = tpl.pathAName
+  pathBName.value = tpl.pathBName
+  touched.value = false
+}
 
 const validationResult = computed(() => {
   return CreateDecisionInputSchema.safeParse({
@@ -71,7 +130,32 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <p class="text-xs text-fg-muted leading-relaxed my-3 mb-5">{{ t.createModal.intro }}</p>
+      <p class="text-xs text-fg-muted leading-relaxed my-3 mb-4">{{ t.createModal.intro }}</p>
+
+      <div class="mb-5 p-3.5 bg-canvas-subtle border border-border rounded-xl">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-fg mb-1">
+          <Sparkles :size="14" class="text-primary" />
+          <span>{{ t.createModal.templatesLabel }}</span>
+        </div>
+        <p class="text-[11px] text-fg-muted mb-2.5">{{ t.createModal.templatesHelper }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button
+            v-for="tpl in templates"
+            :key="tpl.id"
+            type="button"
+            :class="[
+              'p-2.5 rounded-lg border text-left transition-all cursor-pointer',
+              selectedTemplate === tpl.id
+                ? 'bg-primary-soft border-primary text-primary shadow-2xs'
+                : 'bg-surface border-border hover:border-primary/50 text-fg'
+            ]"
+            @click="applyTemplate(tpl)"
+          >
+            <div class="text-xs font-bold">{{ tpl.label }}</div>
+            <div class="text-[10.5px] text-fg-muted truncate mt-0.5">{{ tpl.desc }}</div>
+          </button>
+        </div>
+      </div>
 
       <label class="block text-xs font-bold text-fg mb-4">
         {{ t.createModal.titleLabel }}

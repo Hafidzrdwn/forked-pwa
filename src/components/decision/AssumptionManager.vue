@@ -154,7 +154,7 @@ function submitAssumption() {
                   type="number"
                   min="0"
                   max="100"
-                  class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary"
+                  class="w-12 h-6 text-center text-xs font-bold border border-border rounded-md bg-surface text-fg outline-none focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <span class="text-[11px] text-fg-muted font-bold">%</span>
               </div>
