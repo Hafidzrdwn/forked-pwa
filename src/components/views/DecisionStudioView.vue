@@ -90,7 +90,7 @@ function formatDate(value: string) {
   const loc = locale.value === 'id' ? 'id-ID' : 'en-GB'
   return new Intl.DateTimeFormat(loc, {
     day: 'numeric',
-    month: 'short',
+    month: 'long',
     year: 'numeric'
   }).format(new Date(`${value}T12:00:00`))
 }

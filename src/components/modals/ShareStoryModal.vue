@@ -115,7 +115,7 @@ function wrapText(
   y: number,
   maxWidth: number,
   lineHeight: number,
-  maxLines: number = 4
+  maxLines: number = 8
 ): number {
   const words = text.split(' ')
   let line = ''
@@ -208,7 +208,7 @@ function renderCanvas() {
 
   const dateFormatted = new Intl.DateTimeFormat(locale.value === 'id' ? 'id-ID' : 'en-US', {
     day: 'numeric',
-    month: 'short',
+    month: 'long',
     year: 'numeric'
   }).format(new Date(`${props.decision.createdAt}T12:00:00`))
   ctx.font = 'bold 14px sans-serif'
@@ -244,12 +244,18 @@ function renderCanvas() {
 
   if (props.decision.context) {
     cursorY += 6
-    ctx.font = 'italic 18px sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
-    cursorY = wrapText(ctx, `"${props.decision.context}"`, cardX + 44, cursorY, cardW - 88, 26, isStory ? 2 : 1)
+    const ctxLen = props.decision.context.length
+    ctx.font = isStory
+      ? (ctxLen > 180 ? 'italic 16px sans-serif' : ctxLen > 90 ? 'italic 17px sans-serif' : 'italic 18px sans-serif')
+      : (ctxLen > 180 ? 'italic 14px sans-serif' : ctxLen > 90 ? 'italic 15px sans-serif' : 'italic 16px sans-serif')
+    const ctxLineHeight = isStory
+      ? (ctxLen > 180 ? 24 : 26)
+      : (ctxLen > 180 ? 21 : 23)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
+    cursorY = wrapText(ctx, `"${props.decision.context}"`, cardX + 44, cursorY, cardW - 88, ctxLineHeight, 6)
   }
 
-  cursorY += isStory ? 38 : 22
+  cursorY += isStory ? 34 : 20
 
   const chosen = chosenScenario.value
   const chosenScore = scoreScenario(chosen, props.decision.weights)
@@ -297,7 +303,7 @@ function renderCanvas() {
   const pillH = isStory ? 74 : 48
 
   const metricsData = [
-    { label: t.value.shareModal.badgeScore, val: `${chosenScore.total} pts` },
+    { label: t.value.shareModal.badgeScore, val: `${chosenScore.total} ${t.value.common.pts}` },
     { label: t.value.shareModal.badgeNet, val: formatRupiah(chosenNet) },
     { label: t.value.shareModal.badgeTime, val: `${chosen.hoursPerWeek} ${t.value.common.hrs}` }
   ]
@@ -477,6 +483,14 @@ async function downloadImage() {
   setTimeout(() => { downloaded.value = false }, 3000)
 }
 
+function getShareUrl(): string {
+  if (typeof window === 'undefined') return 'https://forked.hafidzrdwn.dev'
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'https://forked.hafidzrdwn.dev'
+  }
+  return window.location.origin
+}
+
 async function shareNative() {
   const canvas = canvasRef.value
   if (!canvas) return
@@ -488,7 +502,7 @@ async function shareNative() {
     title: props.decision.title,
     chosen: chosen.name,
     score: score,
-    url: window.location.origin
+    url: getShareUrl()
   })
 
   try {
@@ -498,7 +512,7 @@ async function shareNative() {
           await navigator.share({
             title: props.decision.title,
             text: shareText,
-            url: window.location.origin
+            url: getShareUrl()
           })
           sharing.value = false
           return
@@ -515,7 +529,7 @@ async function shareNative() {
           await navigator.share({
             title: props.decision.title,
             text: shareText,
-            url: window.location.origin
+            url: getShareUrl()
           })
         }
         sharing.value = false
@@ -538,7 +552,7 @@ async function copyTextSummary() {
     title: props.decision.title,
     chosen: chosen.name,
     score: score,
-    url: window.location.origin
+    url: getShareUrl()
   })
 
   await navigator.clipboard.writeText(shareText)
