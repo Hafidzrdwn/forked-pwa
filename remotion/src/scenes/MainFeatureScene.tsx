@@ -1,15 +1,6 @@
 import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import {
-  Wallet,
-  Clock,
-  SlidersHorizontal,
-  MousePointer2,
-  CheckCircle2,
-  Award,
-  ShieldCheck,
-  TrendingUp
-} from 'lucide-react';
+import { SlidersHorizontal, MousePointer2 } from 'lucide-react';
 import { scoreScenario, formatRupiah } from '../utils/scoring';
 
 export const MainFeatureScene: React.FC = () => {
@@ -23,62 +14,70 @@ export const MainFeatureScene: React.FC = () => {
   });
 
   const cardsEntrance = spring({
-    frame: frame - 12,
-    fps,
-    config: { damping: 14, stiffness: 85 }
-  });
-
-  const sliderEntrance = spring({
-    frame: frame - 25,
+    frame: frame - 10,
     fps,
     config: { damping: 14, stiffness: 90 }
   });
 
-  const matrixEntrance = spring({
-    frame: frame - 40,
+  const sliderEntrance = spring({
+    frame: frame - 22,
     fps,
     config: { damping: 14, stiffness: 85 }
   });
 
-  const sliderProgress = interpolate(frame, [70, 180], [0, 0.45], {
+  const matrixEntrance = spring({
+    frame: frame - 34,
+    fps,
+    config: { damping: 14, stiffness: 85 }
+  });
+
+  const cameraScale = interpolate(
+    frame,
+    [0, 120, 200, 270],
+    [0.98, 1.01, 1.01, 0.98],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
+  const sliderProgress = interpolate(frame, [110, 195], [0, 0.40], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp'
   });
 
-  const thumbX = 92 + (sliderProgress / 0.5) * 896;
+  const trackWidth = 850;
+  const thumbLeft = (sliderProgress / 0.5) * trackWidth;
 
   const cursorX =
-    frame < 70
-      ? interpolate(frame, [45, 70], [580, 96], {
+    frame < 110
+      ? interpolate(frame, [80, 110], [750, 52 + thumbLeft], {
           extrapolateLeft: 'clamp',
           extrapolateRight: 'clamp'
         })
-      : frame <= 180
-      ? thumbX + 4
-      : interpolate(frame, [180, 215], [thumbX + 4, 750], {
+      : frame <= 195
+      ? 52 + thumbLeft
+      : interpolate(frame, [195, 225], [52 + thumbLeft, 700], {
           extrapolateLeft: 'clamp',
           extrapolateRight: 'clamp'
         });
 
   const cursorY =
-    frame < 70
-      ? interpolate(frame, [45, 70], [1250, 912], {
+    frame < 110
+      ? interpolate(frame, [80, 110], [280, 136], {
           extrapolateLeft: 'clamp',
           extrapolateRight: 'clamp'
         })
-      : frame <= 180
-      ? 912
-      : interpolate(frame, [180, 215], [912, 1160], {
+      : frame <= 195
+      ? 136
+      : interpolate(frame, [195, 225], [136, 300], {
           extrapolateLeft: 'clamp',
           extrapolateRight: 'clamp'
         });
 
-  const cursorOpacity = interpolate(frame, [40, 52, 205, 220], [0, 1, 1, 0], {
+  const cursorOpacity = interpolate(frame, [80, 95, 215, 230], [0, 1, 1, 0], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp'
   });
 
-  const cursorScale = interpolate(frame, [66, 72, 180, 186], [1, 0.85, 0.85, 1], {
+  const cursorScale = interpolate(frame, [105, 112, 194, 200], [1, 0.85, 0.85, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp'
   });
@@ -93,14 +92,13 @@ export const MainFeatureScene: React.FC = () => {
     risk: 25
   };
 
-  const baseIncomeB = 16000000;
   const baseCostB = 5000000;
   const simulatedCostB = Math.round(baseCostB * (1 + sliderProgress));
 
   const pathB = {
     id: 'path-b',
     name: 'Jalur B: Remote Tech Startup',
-    monthlyIncome: baseIncomeB,
+    monthlyIncome: 16000000,
     monthlyCost: simulatedCostB,
     hoursPerWeek: 35,
     growth: 85,
@@ -130,477 +128,394 @@ export const MainFeatureScene: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '190px 60px 250px',
+        justifyContent: 'space-between',
+        padding: '180px 60px 220px',
         opacity: exitOpacity,
-        transform: `scale(${exitScale})`,
+        transform: `scale(${exitScale * cameraScale})`,
         transformOrigin: 'center center',
         boxSizing: 'border-box'
       }}
     >
       <div
         style={{
-          width: '100%',
-          textAlign: 'center',
-          transform: `translateY(${interpolate(sceneEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, sceneEntrance),
-          marginBottom: 32
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.05) 1px, transparent 0)',
+          backgroundSize: '40px 40px',
+          pointerEvents: 'none'
+        }}
+      />
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          transform: `scale(${Math.max(0, sceneEntrance)}) translateY(${interpolate(
+            sceneEntrance,
+            [0, 1],
+            [30, 0]
+          )}px)`,
+          opacity: Math.max(0, sceneEntrance)
         }}
       >
         <div
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 10,
-            padding: '10px 24px',
+            gap: 12,
+            padding: '12px 34px',
             borderRadius: 999,
-            backgroundColor: '#ecfdf5',
-            border: '1.5px solid #a7f3d0',
-            color: '#065f46',
-            fontSize: 18,
+            backgroundColor: '#eff6ff',
+            border: '2px solid #bfdbfe',
+            color: '#1d4ed8',
+            fontSize: 24,
             fontWeight: 800,
-            letterSpacing: 1.2,
+            letterSpacing: 1.5,
             textTransform: 'uppercase',
             marginBottom: 16
           }}
         >
-          <SlidersHorizontal size={22} color="#059669" />
-          SIMULASI WHAT-IF INTERAKTIF
+          SIMULASI DUA JALUR REALISTIS
         </div>
 
         <h2
           style={{
-            fontSize: 54,
+            fontSize: 58,
+            lineHeight: 1.15,
             fontWeight: 800,
+            fontFamily: 'var(--font-display)',
             color: '#0f172a',
             margin: 0,
-            lineHeight: 1.2,
-            fontFamily: 'var(--font-display)',
-            letterSpacing: -1
+            letterSpacing: -1.5,
+            textAlign: 'center'
           }}
         >
-          Change the numbers.
-          <br />
-          <span style={{ color: '#059669' }}>Compare the paths.</span>
+          Bandingkan Angka, Bukan Firasat
         </h2>
       </div>
 
       <div
         style={{
-          width: '100%',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          width: 960,
+          display: 'flex',
           gap: 24,
-          transform: `translateY(${interpolate(cardsEntrance, [0, 1], [40, 0])}px)`,
-          opacity: Math.max(0, cardsEntrance),
-          marginBottom: 26
+          transform: `translateY(${interpolate(cardsEntrance, [0, 1], [30, 0])}px)`,
+          opacity: Math.max(0, cardsEntrance)
         }}
       >
         <div
           style={{
+            flex: 1,
             backgroundColor: '#ffffff',
-            borderRadius: 28,
-            border: '2px solid #e2e8f0',
-            padding: '26px 24px',
-            boxShadow: '0 12px 30px rgba(0,0,0,0.05)',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: '#64748b',
-              letterSpacing: 1.2,
-              textTransform: 'uppercase',
-              marginBottom: 6
-            }}
-          >
-            PILIHAN 1
-          </div>
-          <div
-            style={{
-              fontSize: 22,
-              fontWeight: 800,
-              color: '#1e293b',
-              lineHeight: 1.3,
-              marginBottom: 18
-            }}
-          >
-            MT BUMN Surabaya
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 8,
-              padding: '14px 20px',
-              backgroundColor: '#f8fafc',
-              borderRadius: 20,
-              marginBottom: 20
-            }}
-          >
-            <span
-              style={{
-                fontSize: 46,
-                fontWeight: 900,
-                color: '#1e293b',
-                fontFamily: 'var(--font-display)',
-                lineHeight: 1
-              }}
-            >
-              {scoreA.total}
-            </span>
-            <span style={{ fontSize: 16, color: '#64748b', fontWeight: 700 }}>/100 Skor</span>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16 }}>
-              <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Wallet size={16} /> Pemasukan
-              </span>
-              <strong style={{ color: '#0f172a' }}>{formatRupiah(pathA.monthlyIncome)}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16 }}>
-              <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Wallet size={16} /> Pengeluaran
-              </span>
-              <strong style={{ color: '#ef4444' }}>{formatRupiah(pathA.monthlyCost)}</strong>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontSize: 16,
-                paddingTop: 10,
-                borderTop: '1px solid #f1f5f9'
-              }}
-            >
-              <span style={{ color: '#065f46', fontWeight: 700 }}>Sisa Bersih</span>
-              <strong style={{ color: '#065f46', fontWeight: 800 }}>
-                {formatRupiah(scoreA.net)}/bulan
-              </strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16 }}>
-              <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Clock size={16} /> Waktu
-              </span>
-              <strong style={{ color: '#0f172a' }}>{pathA.hoursPerWeek} jam/minggu</strong>
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 28,
-            border: '2.5px solid #10b981',
-            padding: '26px 24px',
-            boxShadow: '0 16px 36px rgba(16,185,129,0.14)',
+            borderRadius: 36,
+            border: '2.5px solid #dbeafe',
+            padding: '36px 32px',
+            boxShadow: '0 20px 45px -10px rgba(37, 99, 235, 0.1)',
             display: 'flex',
             flexDirection: 'column',
-            position: 'relative'
+            gap: 18
           }}
         >
-          <div
-            style={{
-              position: 'absolute',
-              top: -14,
-              right: 20,
-              backgroundColor: '#10b981',
-              color: '#ffffff',
-              fontSize: 12,
-              fontWeight: 800,
-              padding: '4px 14px',
-              borderRadius: 999,
-              letterSpacing: 0.8
-            }}
-          >
-            TERPILIH
-          </div>
-
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: '#059669',
-              letterSpacing: 1.2,
-              textTransform: 'uppercase',
-              marginBottom: 6
-            }}
-          >
-            PILIHAN 2
-          </div>
-          <div
-            style={{
-              fontSize: 22,
-              fontWeight: 800,
-              color: '#064e3b',
-              lineHeight: 1.3,
-              marginBottom: 18
-            }}
-          >
-            Remote Tech Startup
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 8,
-              padding: '14px 20px',
-              backgroundColor: '#ecfdf5',
-              borderRadius: 20,
-              marginBottom: 20
-            }}
-          >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span
               style={{
-                fontSize: 46,
-                fontWeight: 900,
-                color: '#059669',
-                fontFamily: 'var(--font-display)',
-                lineHeight: 1
+                backgroundColor: '#eff6ff',
+                color: '#1d4ed8',
+                padding: '8px 20px',
+                borderRadius: 14,
+                fontSize: 22,
+                fontWeight: 800
               }}
             >
-              {scoreB.total}
+              JALUR A
             </span>
-            <span style={{ fontSize: 16, color: '#059669', fontWeight: 700 }}>/100 Skor</span>
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#64748b' }}>
+              BUMN (Surabaya)
+            </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16 }}>
-              <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Wallet size={16} /> Pemasukan
-              </span>
-              <strong style={{ color: '#0f172a' }}>{formatRupiah(pathB.monthlyIncome)}</strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16 }}>
-              <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Wallet size={16} /> Pengeluaran
-              </span>
-              <strong
-                style={{
-                  color: simulatedCostB > baseCostB ? '#b91c1c' : '#ef4444',
-                  transition: 'color 0.2s'
-                }}
-              >
-                {formatRupiah(pathB.monthlyCost)}
-              </strong>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontSize: 16,
-                paddingTop: 10,
-                borderTop: '1px solid #f1f5f9'
-              }}
-            >
-              <span style={{ color: '#065f46', fontWeight: 700 }}>Sisa Bersih</span>
-              <strong style={{ color: '#065f46', fontWeight: 800 }}>
-                {formatRupiah(scoreB.net)}/bulan
-              </strong>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16 }}>
-              <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Clock size={16} /> Waktu
-              </span>
-              <strong style={{ color: '#0f172a' }}>{pathB.hoursPerWeek} jam/minggu</strong>
+          <div style={{ borderBottom: '1.5px solid #f1f5f9', paddingBottom: 14 }}>
+            <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Gaji Pokok</div>
+            <div style={{ fontSize: 38, fontWeight: 800, color: '#0f172a', marginTop: 4 }}>
+              {formatRupiah(pathA.monthlyIncome)}
+              <span style={{ fontSize: 20, color: '#94a3b8', fontWeight: 500 }}> / bulan</span>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div
-        style={{
-          width: '100%',
-          backgroundColor: '#ffffff',
-          borderRadius: 28,
-          border: '2px solid #e2e8f0',
-          padding: '26px 30px',
-          boxShadow: '0 16px 36px rgba(15,23,42,0.06)',
-          transform: `translateY(${interpolate(sliderEntrance, [0, 1], [40, 0])}px)`,
-          opacity: Math.max(0, sliderEntrance),
-          marginBottom: 24
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16
-          }}
-        >
-          <div style={{ fontSize: 18, fontWeight: 700, color: '#1e293b' }}>
-            Uji Asumsi: Kenaikan Biaya Hidup (What-If)
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Biaya Hidup</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: '#334155', marginTop: 4 }}>
+                {formatRupiah(pathA.monthlyCost)}
+                <span style={{ fontSize: 18, color: '#94a3b8' }}> / bulan</span>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Jam Kerja</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: '#334155', marginTop: 4 }}>
+                45 jam per minggu
+              </div>
+            </div>
           </div>
+
           <div
             style={{
-              fontSize: 18,
-              fontWeight: 800,
-              color: '#059669',
-              backgroundColor: '#ecfdf5',
-              padding: '4px 14px',
-              borderRadius: 999
+              backgroundColor: '#f8fafc',
+              padding: '16px 20px',
+              borderRadius: 20,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
             }}
           >
-            +{Math.round(sliderProgress * 100)}%
+            <span style={{ fontSize: 20, fontWeight: 700, color: '#475569' }}>Tabungan Bersih:</span>
+            <span style={{ fontSize: 28, fontWeight: 800, color: '#059669' }}>
+              {formatRupiah(pathA.monthlyIncome - pathA.monthlyCost)}
+            </span>
           </div>
         </div>
 
         <div
           style={{
-            position: 'relative',
-            width: '100%',
-            height: 16,
-            backgroundColor: '#e2e8f0',
-            borderRadius: 8,
-            marginBottom: 16
-          }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              height: '100%',
-              width: `${(sliderProgress / 0.5) * 100}%`,
-              backgroundColor: '#10b981',
-              borderRadius: 8
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: `${(sliderProgress / 0.5) * 100}%`,
-              transform: 'translate(-50%, -50%)',
-              width: 34,
-              height: 34,
-              borderRadius: '50%',
-              backgroundColor: '#ffffff',
-              border: '4px solid #10b981',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-            }}
-          />
-        </div>
-
-        <div
-          style={{
+            flex: 1,
+            backgroundColor: '#ffffff',
+            borderRadius: 36,
+            border: '2.5px solid #a7f3d0',
+            padding: '36px 32px',
+            boxShadow: '0 20px 45px -10px rgba(16, 185, 129, 0.12)',
             display: 'flex',
-            gap: 16,
-            fontSize: 15,
-            color: '#475569',
-            fontWeight: 600
+            flexDirection: 'column',
+            gap: 18
           }}
         >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CheckCircle2 size={18} color="#10b981" /> Rumus transparan
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CheckCircle2 size={18} color="#10b981" /> Reaktif tanpa ubah data asli
-          </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span
+              style={{
+                backgroundColor: '#ecfdf5',
+                color: '#047857',
+                padding: '8px 20px',
+                borderRadius: 14,
+                fontSize: 22,
+                fontWeight: 800
+              }}
+            >
+              JALUR B
+            </span>
+            <span style={{ fontSize: 24, fontWeight: 700, color: '#64748b' }}>
+              Startup (Remote)
+            </span>
+          </div>
+
+          <div style={{ borderBottom: '1.5px solid #f1f5f9', paddingBottom: 14 }}>
+            <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Gaji Pokok</div>
+            <div style={{ fontSize: 38, fontWeight: 800, color: '#0f172a', marginTop: 4 }}>
+              {formatRupiah(pathB.monthlyIncome)}
+              <span style={{ fontSize: 20, color: '#94a3b8', fontWeight: 500 }}> / bulan</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Biaya Hidup</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: sliderProgress > 0.05 ? '#dc2626' : '#0f172a', marginTop: 4 }}>
+                {formatRupiah(pathB.monthlyCost)}
+                <span style={{ fontSize: 18, color: '#94a3b8' }}> / bulan</span>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Jam Kerja</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: '#334155', marginTop: 4 }}>
+                35 jam per minggu
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#ecfdf5',
+              padding: '16px 20px',
+              borderRadius: 20,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <span style={{ fontSize: 20, fontWeight: 700, color: '#065f46' }}>Tabungan Bersih:</span>
+            <span style={{ fontSize: 28, fontWeight: 800, color: '#059669' }}>
+              {formatRupiah(pathB.monthlyIncome - pathB.monthlyCost)}
+            </span>
+          </div>
         </div>
       </div>
 
       <div
         style={{
-          width: '100%',
+          width: 960,
           backgroundColor: '#ffffff',
-          borderRadius: 28,
-          border: '2px solid #e2e8f0',
-          padding: '24px 28px',
-          boxShadow: '0 14px 30px rgba(15,23,42,0.05)',
+          borderRadius: 36,
+          border: '2.5px solid #e2e8f0',
+          padding: '38px 48px',
+          boxShadow: '0 24px 50px -12px rgba(15, 23, 42, 0.1)',
+          position: 'relative',
+          transform: `translateY(${interpolate(sliderEntrance, [0, 1], [30, 0])}px)`,
+          opacity: Math.max(0, sliderEntrance)
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div
+              style={{
+                backgroundColor: '#eff6ff',
+                padding: 12,
+                borderRadius: 16,
+                color: '#2563eb'
+              }}
+            >
+              <SlidersHorizontal size={32} />
+            </div>
+            <div>
+              <div style={{ fontSize: 30, fontWeight: 800, color: '#0f172a' }}>
+                Simulasi Risiko What-If
+              </div>
+              <div style={{ fontSize: 22, color: '#64748b', marginTop: 2 }}>
+                Uji ketahanan jika biaya hidup membengkak
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: sliderProgress > 0.1 ? '#fef2f2' : '#f8fafc',
+              border: `2px solid ${sliderProgress > 0.1 ? '#fecaca' : '#e2e8f0'}`,
+              padding: '10px 24px',
+              borderRadius: 20,
+              fontSize: 24,
+              fontWeight: 800,
+              color: sliderProgress > 0.1 ? '#dc2626' : '#64748b'
+            }}
+          >
+            +{Math.round(sliderProgress * 100)}% Biaya Hidup
+          </div>
+        </div>
+
+        <div style={{ position: 'relative', marginTop: 32, marginBottom: 18 }}>
+          <div
+            style={{
+              width: '100%',
+              height: 26,
+              backgroundColor: '#e2e8f0',
+              borderRadius: 999,
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                width: `${(sliderProgress / 0.5) * 100}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #3b82f6 0%, #ef4444 100%)',
+                borderRadius: 999
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              position: 'absolute',
+              top: -15,
+              left: `calc(${(sliderProgress / 0.5) * 100}% - 28px)`,
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              backgroundColor: '#ffffff',
+              border: '4px solid #2563eb',
+              boxShadow: '0 8px 24px rgba(37, 99, 235, 0.4)'
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, color: '#94a3b8', fontWeight: 600 }}>
+          <span>Kondisi Normal (0%)</span>
+          <span>Inflasi & Gaya Hidup (+50%)</span>
+        </div>
+
+        <div
+          style={{
+            position: 'absolute',
+            left: cursorX,
+            top: cursorY,
+            opacity: cursorOpacity,
+            transform: `scale(${cursorScale})`,
+            pointerEvents: 'none',
+            zIndex: 100,
+            filter: 'drop-shadow(0 12px 20px rgba(0,0,0,0.35))'
+          }}
+        >
+          <MousePointer2 size={48} color="#0f172a" fill="#2563eb" />
+        </div>
+      </div>
+
+      <div
+        style={{
+          width: 960,
+          backgroundColor: '#0f172a',
+          borderRadius: 36,
+          padding: '38px 44px',
+          color: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 22,
+          boxShadow: '0 30px 60px -15px rgba(15, 23, 42, 0.4)',
           transform: `translateY(${interpolate(matrixEntrance, [0, 1], [30, 0])}px)`,
           opacity: Math.max(0, matrixEntrance)
         }}
       >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 20, color: '#94a3b8', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+              LIVE DECISION SCORE
+            </div>
+            <div style={{ fontSize: 30, fontWeight: 800, marginTop: 4 }}>
+              Skor Kelayakan Trade-Off
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 28 }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 18, color: '#93c5fd', fontWeight: 700 }}>SKOR JALUR A</div>
+              <div style={{ fontSize: 46, fontWeight: 900, color: '#ffffff' }}>
+                {scoreA.total}
+                <span style={{ fontSize: 24, color: '#64748b', fontWeight: 500 }}>/100</span>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 18, color: '#6ee7b7', fontWeight: 700 }}>SKOR JALUR B</div>
+              <div style={{ fontSize: 46, fontWeight: 900, color: scoreB.total >= scoreA.total ? '#10b981' : '#f59e0b' }}>
+                {scoreB.total}
+                <span style={{ fontSize: 24, color: '#64748b', fontWeight: 500 }}>/100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div
           style={{
-            fontSize: 13,
-            fontWeight: 800,
-            color: '#059669',
-            letterSpacing: 1.5,
-            textTransform: 'uppercase',
-            marginBottom: 14,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            padding: '20px 24px',
+            borderRadius: 20,
+            fontSize: 22,
+            lineHeight: 1.45,
+            color: '#cbd5e1',
+            fontWeight: 600
           }}
         >
-          <span>KOMPARASI HEAD-TO-HEAD</span>
-          <span style={{ color: '#64748b', fontSize: 13, fontWeight: 700 }}>2 Opsi Aktif</span>
+          <span style={{ color: '#38bdf8', fontWeight: 800 }}>Insight Forked: </span>
+          {sliderProgress > 0.2
+            ? 'Saat biaya hidup melonjak, stabilitas tabungan Jalur A mulai mengimbangi potensi gaji tinggi Jalur B.'
+            : 'Jalur B unggul pada fleksibilitas waktu kerja dan pertumbuhan karir yang cepat.'}
         </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 18px',
-              backgroundColor: '#f8fafc',
-              borderRadius: 16,
-              fontSize: 15
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, color: '#1e293b' }}>
-              <span style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#e2e8f0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
-                A
-              </span>
-              MT BUMN
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ color: '#64748b' }}>45 jam/minggu</span>
-              <span style={{ padding: '3px 10px', borderRadius: 6, backgroundColor: '#f1f5f9', color: '#475569', fontWeight: 700, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <ShieldCheck size={14} color="#64748b" /> Risiko Terendah
-              </span>
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 18px',
-              backgroundColor: '#ecfdf5',
-              borderRadius: 16,
-              fontSize: 15
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, color: '#064e3b' }}>
-              <span style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#10b981', color: '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
-                B
-              </span>
-              Remote Startup
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ color: '#059669', fontWeight: 700 }}>35 jam/minggu</span>
-              <span style={{ padding: '3px 10px', borderRadius: 6, backgroundColor: '#10b981', color: '#ffffff', fontWeight: 700, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Award size={14} color="#ffffff" /> Rekomendasi Tertinggi
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          position: 'absolute',
-          left: cursorX,
-          top: cursorY,
-          opacity: cursorOpacity,
-          transform: `scale(${cursorScale})`,
-          pointerEvents: 'none',
-          zIndex: 50,
-          filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.25))'
-        }}
-      >
-        <MousePointer2 size={46} color="#0f172a" fill="#ffffff" />
       </div>
     </div>
   );
