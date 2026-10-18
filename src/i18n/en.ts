@@ -209,5 +209,14 @@ export const en = {
     contextPlaceholder: 'What makes this difficult? What values or trade-offs matter most?',
     tip: 'Good decisions start with clarity about trade-offs, not false certainty.',
     submit: 'Create workspace'
+  },
+  pwa: {
+    installBannerTitle: 'Install Forked on Your Device',
+    installBannerDesc: 'Use it like a native app offline with faster access from your home screen.',
+    installBtn: 'Install App',
+    installDismiss: 'Maybe Later',
+    installed: 'App Installed',
+    iosTitle: 'How to Install on iPhone / iPad',
+    iosInstruction: 'Tap the Share button at the bottom of Safari, then select "Add to Home Screen".'
   }
 }

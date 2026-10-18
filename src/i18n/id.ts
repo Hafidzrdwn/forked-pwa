@@ -209,5 +209,14 @@ export const id = {
     contextPlaceholder: 'Apa yang membuat keputusan ini berat bagimu? Hal apa yang paling kamu jaga?',
     tip: 'Keputusan yang baik berawal dari kejelasan untung rugi, bukan rasa yakin yang dipaksakan.',
     submit: 'Lanjut ke lembar kerja'
+  },
+  pwa: {
+    installBannerTitle: 'Pasang Forked di Perangkatmu',
+    installBannerDesc: 'Gunakan layaknya aplikasi native tanpa koneksi internet dan buka lebih cepat dari layar utama.',
+    installBtn: 'Pasang Aplikasi',
+    installDismiss: 'Nanti Saja',
+    installed: 'Aplikasi Terpasang',
+    iosTitle: 'Cara Pasang di iPhone / iPad',
+    iosInstruction: 'Ketuk ikon Bagikan (Share) di menu bawah Safari, lalu pilih "Tambahkan ke Layar Utama" (Add to Home Screen).'
   }
 }

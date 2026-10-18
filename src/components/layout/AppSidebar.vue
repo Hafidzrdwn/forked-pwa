@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, FileUp, X
+  LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, FileUp, X, Smartphone
 } from 'lucide-vue-next'
 import BrandLogo from '../common/BrandLogo.vue'
 import { useI18n } from '../../i18n'
+import { usePwa } from '../../composables/usePwa'
+
+const { canInstall, isInstalled, promptInstall } = usePwa()
 
 const props = withDefaults(
   defineProps<{
@@ -128,6 +131,15 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
           <p class="text-[11.5px] leading-relaxed text-fg-muted m-0">{{ t.nav.dataPrivacyDesc }}</p>
         </div>
       </div>
+
+      <button
+        v-if="canInstall && !isInstalled"
+        type="button"
+        class="h-10 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-semibold text-primary bg-primary-soft hover:bg-primary/20 transition-colors cursor-pointer"
+        @click="promptInstall"
+      >
+        <Smartphone :size="18" /> {{ t.pwa.installBtn }}
+      </button>
 
       <button
         type="button"

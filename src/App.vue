@@ -13,6 +13,7 @@ import WeightsModal from './components/modals/WeightsModal.vue'
 import JournalModal from './components/modals/JournalModal.vue'
 import ConfirmModal from './components/common/ConfirmModal.vue'
 import ToastContainer from './components/common/ToastContainer.vue'
+import PwaInstallBanner from './components/common/PwaInstallBanner.vue'
 
 const {
   decisions, activeId, searchTerm, busy, notice, activeDecision, filteredDecisions,
@@ -154,5 +155,7 @@ async function handleDeleteActive() {
     <ConfirmModal />
 
     <ToastContainer />
+
+    <PwaInstallBanner />
   </div>
 </template>
