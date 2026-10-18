@@ -5,7 +5,7 @@ import { useI18n } from '../../i18n'
 import { CreateDecisionInputSchema } from '../../schemas/decision.schema'
 
 const emit = defineEmits<{
-  (e: 'create', payload: { title: string; context: string }): void
+  (e: 'create', payload: { title: string; context: string; pathAName?: string; pathBName?: string }): void
   (e: 'close'): void
 }>()
 
@@ -13,12 +13,16 @@ const { t } = useI18n()
 
 const title = ref('')
 const context = ref('')
+const pathAName = ref('')
+const pathBName = ref('')
 const touched = ref(false)
 
 const validationResult = computed(() => {
   return CreateDecisionInputSchema.safeParse({
     title: title.value,
-    context: context.value
+    context: context.value,
+    pathAName: pathAName.value,
+    pathBName: pathBName.value
   })
 })
 
@@ -35,7 +39,9 @@ function handleSubmit() {
   if (!isValid.value) return
   emit('create', {
     title: title.value.trim(),
-    context: context.value.trim()
+    context: context.value.trim(),
+    pathAName: pathAName.value.trim(),
+    pathBName: pathBName.value.trim()
   })
 }
 
@@ -100,6 +106,33 @@ onUnmounted(() => {
           :placeholder="t.createModal.contextPlaceholder"
         />
       </label>
+
+      <div class="bg-canvas-subtle border border-border rounded-xl p-3.5 mb-4">
+        <div class="text-[11px] font-bold tracking-wider uppercase text-fg-subtle mb-1">
+          {{ t.createModal.pathsSectionTitle }}
+        </div>
+        <p class="text-[11.5px] text-fg-muted mb-3 leading-relaxed">
+          {{ t.createModal.pathsSectionDesc }}
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block text-xs font-bold text-fg">
+            {{ t.createModal.pathALabel }}
+            <input
+              v-model="pathAName"
+              class="w-full mt-1 border border-border rounded-xl bg-surface text-fg px-3 py-1.5 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-fg-subtle"
+              :placeholder="t.createModal.pathAPlaceholder"
+            />
+          </label>
+          <label class="block text-xs font-bold text-fg">
+            {{ t.createModal.pathBLabel }}
+            <input
+              v-model="pathBName"
+              class="w-full mt-1 border border-border rounded-xl bg-surface text-fg px-3 py-1.5 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-fg-subtle"
+              :placeholder="t.createModal.pathBPlaceholder"
+            />
+          </label>
+        </div>
+      </div>
 
       <div class="flex items-center gap-2.5 bg-primary-soft text-primary rounded-xl p-3 text-xs leading-relaxed mb-6">
         <Lightbulb :size="18" class="shrink-0" />

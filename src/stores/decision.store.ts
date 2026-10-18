@@ -118,7 +118,14 @@ export const useDecisionStore = defineStore('decision', () => {
     }
   }
 
-  function makeDecision(title: string, context = ''): Decision {
+  function makeDecision(
+    title: string,
+    context = '',
+    pathAName = '',
+    pathBName = ''
+  ): Decision {
+    const finalPathA = pathAName.trim() || 'Pilihan A'
+    const finalPathB = pathBName.trim() || 'Pilihan B'
     return {
       id: uid(),
       title,
@@ -129,8 +136,8 @@ export const useDecisionStore = defineStore('decision', () => {
       selectedScenarioId: null,
       weights: { ...DEFAULT_WEIGHTS },
       scenarios: [
-        makeScenario('Jalur A : Pilihan aman & stabil', 4500000, 700000, 18, 55, 20),
-        makeScenario('Jalur B : Pilihan bertumbuh cepat', 6000000, 1200000, 28, 85, 55)
+        makeScenario(finalPathA, 5000000, 1500000, 20, 60, 30),
+        makeScenario(finalPathB, 6000000, 2000000, 30, 75, 50)
       ],
       journal: { reason: '', expectedOutcome: '', actualOutcome: '', reflection: '' }
     }
@@ -244,8 +251,13 @@ export const useDecisionStore = defineStore('decision', () => {
     }
   }
 
-  async function createDecision(title: string, context = ''): Promise<Decision> {
-    const d = makeDecision(title, context)
+  async function createDecision(
+    title: string,
+    context = '',
+    pathAName = '',
+    pathBName = ''
+  ): Promise<Decision> {
+    const d = makeDecision(title, context, pathAName, pathBName)
     decisions.value.unshift(d)
     activeId.value = d.id
     await persist(d)
@@ -398,11 +410,12 @@ export const useDecisionStore = defineStore('decision', () => {
   }
 
   function exportBackup(): void {
+    const filename = `forked-backup-${today()}.json`
     const data = {
       app: 'Forked',
       version: 1,
       exportedAt: new Date().toISOString(),
-      decisions: decisions.value
+      decisions: JSON.parse(JSON.stringify(decisions.value))
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: 'application/json'
@@ -410,10 +423,31 @@ export const useDecisionStore = defineStore('decision', () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `forked-backup-${today()}.json`
+    a.download = filename
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(url)
-    flash('Cadangan data berhasil diekspor', 'success')
+    setTimeout(() => {
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }, 1000)
+    flash(`Berkas "${filename}" tersimpan di folder Unduhan browser.`, 'success')
+  }
+
+  async function copyBackupToClipboard(): Promise<boolean> {
+    try {
+      const data = {
+        app: 'Forked',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        decisions: JSON.parse(JSON.stringify(decisions.value))
+      }
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2))
+      flash('Data cadangan (JSON) berhasil disalin ke clipboard.', 'success')
+      return true
+    } catch {
+      flash('Gagal menyalin ke clipboard. Gunakan tombol Simpan File Cadangan.', 'error')
+      return false
+    }
   }
 
   async function importBackupFile(file: File): Promise<{ ok: boolean; message: string }> {
@@ -474,6 +508,7 @@ export const useDecisionStore = defineStore('decision', () => {
     updateDecisionWeights,
     updateReviewDate,
     exportBackup,
+    copyBackupToClipboard,
     importBackupFile
   }
 })

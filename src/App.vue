@@ -20,7 +20,7 @@ const {
   totalDecisions, openDecisions, reviewedDecisions, nextReview,
   load, createDecision, deleteActiveDecision, addScenarioToActive, removeScenarioFromActive,
   chooseScenario, updateScenario, addAssumptionToScenario, toggleAssumption, removeAssumption,
-  saveJournal, updateDecisionWeights, updateReviewDate, exportBackup, importBackupFile
+  saveJournal, updateDecisionWeights, updateReviewDate, exportBackup, copyBackupToClipboard, importBackupFile
 } = useDecisions()
 
 const { confirm: confirmDialog } = useConfirm()
@@ -41,8 +41,8 @@ function openDecision(id: string) {
   nav.value = 'decisions'
 }
 
-function handleCreateDecision(payload: { title: string; context: string }) {
-  createDecision(payload.title, payload.context)
+function handleCreateDecision(payload: { title: string; context: string; pathAName?: string; pathBName?: string }) {
+  createDecision(payload.title, payload.context, payload.pathAName, payload.pathBName)
   showCreate.value = false
   nav.value = 'decisions'
 }
@@ -71,6 +71,7 @@ async function handleDeleteActive() {
       @navigate="nav = $event"
       @close-mobile-menu="mobileMenuOpen = false"
       @export="exportBackup"
+      @copy-backup="copyBackupToClipboard"
       @import-file="importBackupFile"
     />
 

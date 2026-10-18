@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Check, Target, Wallet, Clock3, TrendingUp, ShieldAlert, X } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { Check, Target, Wallet, Clock3, TrendingUp, ShieldAlert, X, Pencil } from 'lucide-vue-next'
 import type { Scenario, ScoringWeights } from '../../types'
 import { scoreScenario, formatRupiah } from '../../services/scoring'
 import { useI18n } from '../../i18n'
@@ -20,17 +20,24 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
+const titleInputRef = ref<HTMLInputElement | null>(null)
+
 const breakdown = computed(() => scoreScenario(props.scenario, props.weights))
 const net = computed(() => props.scenario.monthlyIncome - props.scenario.monthlyCost)
 
 function onFieldChange() {
   emit('update', props.scenario)
 }
+
+function focusTitleInput() {
+  titleInputRef.value?.focus()
+  titleInputRef.value?.select()
+}
 </script>
 
 <template>
-  <article :class="['bg-surface border rounded-2xl p-5 relative transition-all duration-200 flex flex-col shadow-xs', isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-border-hover']">
-    <div class="flex items-center justify-between mb-3">
+  <article :class="['bg-surface border rounded-2xl p-4 sm:p-5 relative transition-all duration-200 flex flex-col shadow-xs', isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-border-hover']">
+    <div class="flex items-center justify-between mb-2">
       <span class="inline-flex items-center gap-1.5 text-xs font-bold text-fg-muted">
         <span :class="['w-2.5 h-2.5 rounded-full', ['bg-emerald-600', 'bg-amber-600', 'bg-sky-600', 'bg-purple-600'][index % 4]]" />
         {{ t.scenario.pathLabel }} {{ String.fromCharCode(65 + index) }}
@@ -45,14 +52,28 @@ function onFieldChange() {
       </button>
     </div>
 
-    <input
-      v-model="scenario.name"
-      class="w-full border-0 bg-transparent outline-none pb-1 font-display font-bold text-base text-fg border-b border-transparent focus:border-primary transition-colors"
-      :aria-label="t.scenario.pathLabel + ' ' + String.fromCharCode(65 + index)"
-      @change="onFieldChange"
-    />
+    <div class="flex items-center gap-1.5 group/title relative my-1">
+      <input
+        ref="titleInputRef"
+        v-model="scenario.name"
+        class="flex-1 min-w-0 bg-transparent outline-none font-display font-bold text-base text-fg rounded-lg px-2 py-1 -ml-2 border border-transparent hover:border-border focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all"
+        :aria-label="t.scenario.pathLabel + ' ' + String.fromCharCode(65 + index)"
+        :title="t.scenario.editingTitleHint"
+        @change="onFieldChange"
+        @keydown.enter="($event.target as HTMLInputElement).blur()"
+      />
+      <button
+        type="button"
+        class="w-7 h-7 rounded-lg text-fg-muted hover:text-primary hover:bg-primary-soft grid place-items-center transition-colors shrink-0 cursor-pointer"
+        :title="t.scenario.editTitle"
+        :aria-label="t.scenario.editTitle"
+        @click="focusTitleInput"
+      >
+        <Pencil :size="14" />
+      </button>
+    </div>
 
-    <div class="flex items-baseline gap-1 mt-2.5">
+    <div class="flex items-baseline gap-1 mt-2">
       <span class="font-display font-extrabold text-3xl tracking-tight text-fg tabular-nums">{{ breakdown.total }}</span>
       <span class="text-xs text-fg-muted">/100</span>
       <span class="ml-auto text-[11px] font-bold tracking-wider uppercase text-fg-subtle">{{ t.scenario.fitScore }}</span>
@@ -64,30 +85,30 @@ function onFieldChange() {
 
     <div class="grid gap-2.5 border-b border-border pb-4">
       <div class="flex items-center justify-between gap-2 text-xs">
-        <span class="flex items-center gap-1.5 text-fg-muted"><Wallet :size="14" /> {{ t.scenario.netPerMonth }}</span>
-        <strong :class="['font-bold text-sm', net < 0 ? 'text-danger' : 'text-fg']">{{ formatRupiah(net) }}</strong>
+        <span class="flex items-center gap-1.5 text-fg-muted min-w-0"><Wallet :size="14" class="shrink-0" /> <span class="truncate">{{ t.scenario.netPerMonth }}</span></span>
+        <strong :class="['font-bold text-sm shrink-0 tabular-nums', net < 0 ? 'text-danger' : 'text-fg']">{{ formatRupiah(net) }}</strong>
       </div>
       <div class="flex items-center justify-between gap-2 text-xs">
-        <span class="flex items-center gap-1.5 text-fg-muted"><Clock3 :size="14" /> {{ t.scenario.timePerWeek }}</span>
-        <strong class="font-bold text-sm text-fg">{{ scenario.hoursPerWeek }} {{ t.common.hrs }}</strong>
+        <span class="flex items-center gap-1.5 text-fg-muted min-w-0"><Clock3 :size="14" class="shrink-0" /> <span class="truncate">{{ t.scenario.timePerWeek }}</span></span>
+        <strong class="font-bold text-sm text-fg shrink-0 tabular-nums">{{ scenario.hoursPerWeek }} {{ t.common.hrs }}</strong>
       </div>
       <div class="flex items-center justify-between gap-2 text-xs">
-        <span class="flex items-center gap-1.5 text-fg-muted"><TrendingUp :size="14" /> {{ t.scenario.growth }}</span>
-        <strong class="font-bold text-sm text-fg">{{ scenario.growth }}<small class="text-fg-subtle font-normal">/100</small></strong>
+        <span class="flex items-center gap-1.5 text-fg-muted min-w-0"><TrendingUp :size="14" class="shrink-0" /> <span class="truncate">{{ t.scenario.growth }}</span></span>
+        <strong class="font-bold text-sm text-fg shrink-0 tabular-nums">{{ scenario.growth }}<small class="text-fg-subtle font-normal">/100</small></strong>
       </div>
       <div class="flex items-center justify-between gap-2 text-xs">
-        <span class="flex items-center gap-1.5 text-fg-muted"><ShieldAlert :size="14" /> {{ t.scenario.risk }}</span>
-        <strong class="font-bold text-sm text-fg">{{ scenario.risk }}<small class="text-fg-subtle font-normal">/100</small></strong>
+        <span class="flex items-center gap-1.5 text-fg-muted min-w-0"><ShieldAlert :size="14" class="shrink-0" /> <span class="truncate">{{ t.scenario.risk }}</span></span>
+        <strong class="font-bold text-sm text-fg shrink-0 tabular-nums">{{ scenario.risk }}<small class="text-fg-subtle font-normal">/100</small></strong>
       </div>
     </div>
 
     <div class="grid gap-3 py-4">
       <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        {{ t.scenario.monthlyIncome }}
-        <span class="font-bold text-fg text-right">{{ formatRupiah(scenario.monthlyIncome) }}</span>
+        <span class="truncate">{{ t.scenario.monthlyIncome }}</span>
+        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ formatRupiah(scenario.monthlyIncome) }}</span>
         <input
           v-model.number="scenario.monthlyIncome"
-          class="col-span-2"
+          class="col-span-2 w-full"
           type="range"
           min="0"
           max="20000000"
@@ -97,11 +118,11 @@ function onFieldChange() {
       </label>
 
       <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        {{ t.scenario.monthlyCost }}
-        <span class="font-bold text-fg text-right">{{ formatRupiah(scenario.monthlyCost) }}</span>
+        <span class="truncate">{{ t.scenario.monthlyCost }}</span>
+        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ formatRupiah(scenario.monthlyCost) }}</span>
         <input
           v-model.number="scenario.monthlyCost"
-          class="col-span-2"
+          class="col-span-2 w-full"
           type="range"
           min="0"
           max="10000000"
@@ -111,11 +132,11 @@ function onFieldChange() {
       </label>
 
       <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        {{ t.scenario.hoursPerWeek }}
-        <span class="font-bold text-fg text-right">{{ scenario.hoursPerWeek }} {{ t.common.hrs }}</span>
+        <span class="truncate">{{ t.scenario.hoursPerWeek }}</span>
+        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ scenario.hoursPerWeek }} {{ t.common.hrs }}</span>
         <input
           v-model.number="scenario.hoursPerWeek"
-          class="col-span-2"
+          class="col-span-2 w-full"
           type="range"
           min="0"
           max="70"
@@ -125,11 +146,11 @@ function onFieldChange() {
       </label>
 
       <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        {{ t.scenario.growthPotential }}
-        <span class="font-bold text-fg text-right">{{ scenario.growth }}/100</span>
+        <span class="truncate">{{ t.scenario.growthPotential }}</span>
+        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ scenario.growth }}/100</span>
         <input
           v-model.number="scenario.growth"
-          class="col-span-2"
+          class="col-span-2 w-full"
           type="range"
           min="0"
           max="100"
@@ -139,11 +160,11 @@ function onFieldChange() {
       </label>
 
       <label class="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-xs text-fg-muted font-medium">
-        {{ t.scenario.riskLevel }}
-        <span class="font-bold text-fg text-right">{{ scenario.risk }}/100</span>
+        <span class="truncate">{{ t.scenario.riskLevel }}</span>
+        <span class="font-bold text-fg text-right shrink-0 tabular-nums">{{ scenario.risk }}/100</span>
         <input
           v-model.number="scenario.risk"
-          class="col-span-2"
+          class="col-span-2 w-full"
           type="range"
           min="0"
           max="100"

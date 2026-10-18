@@ -95,7 +95,9 @@ export const BackupEnvelopeSchema = z.union([
 
 export const CreateDecisionInputSchema = z.object({
   title: z.string().trim().min(3, 'Judul keputusan minimal 3 karakter').max(120, 'Judul maksimal 120 karakter'),
-  context: z.string().trim().max(500, 'Konteks maksimal 500 karakter').default('')
+  context: z.string().trim().max(500, 'Konteks maksimal 500 karakter').default(''),
+  pathAName: z.string().trim().max(80, 'Nama jalan maksimal 80 karakter').optional().default(''),
+  pathBName: z.string().trim().max(80, 'Nama jalan maksimal 80 karakter').optional().default('')
 })
 
 export const AddScenarioInputSchema = z.object({

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, FileUp, X, Smartphone
+  LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, Copy, FileUp, X, Smartphone
 } from 'lucide-vue-next'
 import BrandLogo from '../common/BrandLogo.vue'
 import { useI18n } from '../../i18n'
@@ -23,6 +23,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'navigate', nav: 'overview' | 'decisions' | 'journal'): void
   (e: 'export'): void
+  (e: 'copy-backup'): void
   (e: 'import-file', file: File): void
   (e: 'close-mobile-menu'): void
 }>()
@@ -143,10 +144,18 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 
       <button
         type="button"
-        class="h-10 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium text-fg-muted hover:bg-canvas-subtle hover:text-fg transition-colors"
+        class="h-10 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium text-fg-muted hover:bg-canvas-subtle hover:text-fg transition-colors cursor-pointer"
         @click="emit('export')"
       >
         <Download :size="18" /> {{ t.nav.exportBackup }}
+      </button>
+
+      <button
+        type="button"
+        class="h-10 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium text-fg-muted hover:bg-canvas-subtle hover:text-fg transition-colors cursor-pointer"
+        @click="emit('copy-backup')"
+      >
+        <Copy :size="18" /> {{ t.nav.copyBackup }}
       </button>
 
       <button

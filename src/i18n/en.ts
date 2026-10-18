@@ -30,6 +30,7 @@ export const en = {
     dataPrivacyTitle: 'Your data stays yours',
     dataPrivacyDesc: 'Stored on this device. No account, no external server.',
     exportBackup: 'Export Backup',
+    copyBackup: 'Copy Backup (JSON)',
     importBackup: 'Import Backup',
     tagline: 'MADE FOR THE MOMENTS THAT MATTER.'
   },
@@ -99,7 +100,9 @@ export const en = {
     riskLevel: 'Risk level',
     chooseThisPath: 'Choose this path',
     chosenPath: 'Your chosen path',
-    removePathAria: 'Remove path'
+    removePathAria: 'Remove path',
+    editTitle: 'Edit path name',
+    editingTitleHint: 'Press Enter or click outside to save'
   },
   addPathForm: {
     title: 'Path name',
@@ -207,6 +210,12 @@ export const en = {
     titlePlaceholder: 'e.g. Should I accept the senior role or stay remote?',
     contextLabel: "What's at stake? (optional)",
     contextPlaceholder: 'What makes this difficult? What values or trade-offs matter most?',
+    pathsSectionTitle: 'INITIAL COMPARISON PATHS',
+    pathsSectionDesc: 'Every decision needs at least 2 alternative paths to compare. Name your initial options:',
+    pathALabel: 'Path 1 (Option A)',
+    pathAPlaceholder: 'e.g. Accept new job offer / relocation',
+    pathBLabel: 'Path 2 (Option B)',
+    pathBPlaceholder: 'e.g. Stay at current role / focus on studies',
     tip: 'Good decisions start with clarity about trade-offs, not false certainty.',
     submit: 'Create workspace'
   },

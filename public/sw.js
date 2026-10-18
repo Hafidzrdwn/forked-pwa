@@ -1,4 +1,4 @@
-const CACHE_NAME = 'forked-shell-v4';
+const CACHE_NAME = 'forked-shell-v5';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
@@ -29,6 +29,10 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  if (url.pathname.startsWith('/src/') || url.pathname.startsWith('/@') || url.pathname.includes('node_modules') || url.search.includes('t=')) {
+    return;
+  }
 
   if (request.mode === 'navigate') {
     event.respondWith(

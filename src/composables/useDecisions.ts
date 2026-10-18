@@ -38,6 +38,7 @@ export function useDecisions() {
     updateDecisionWeights: store.updateDecisionWeights,
     updateReviewDate: store.updateReviewDate,
     exportBackup: store.exportBackup,
+    copyBackupToClipboard: store.copyBackupToClipboard,
     importBackupFile: store.importBackupFile
   }
 }

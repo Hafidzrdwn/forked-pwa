@@ -30,6 +30,7 @@ export const id = {
     dataPrivacyTitle: 'Data Sepenuhnya Milikmu',
     dataPrivacyDesc: 'Semua tersimpan langsung di HP atau laptopmu, tanpa perlu akun dan tanpa dikirim ke server luar.',
     exportBackup: 'Simpan File Cadangan',
+    copyBackup: 'Salin Cadangan (JSON)',
     importBackup: 'Buka File Cadangan',
     tagline: 'UNTUK SETIAP LANGKAH PENTING DALAM HIDUPMU.'
   },
@@ -99,7 +100,9 @@ export const id = {
     riskLevel: 'Tingkat risiko',
     chooseThisPath: 'Pilih jalan ini',
     chosenPath: 'Jalan yang kamu pilih',
-    removePathAria: 'Hapus jalan ini'
+    removePathAria: 'Hapus jalan ini',
+    editTitle: 'Ubah nama pilihan jalan',
+    editingTitleHint: 'Tekan Enter atau klik di luar untuk menyimpan'
   },
   addPathForm: {
     title: 'Nama pilihan jalan',
@@ -207,6 +210,12 @@ export const id = {
     titlePlaceholder: 'contoh: Sebaiknya aku pindah kerja ke startup atau tetap di kantor sekarang?',
     contextLabel: 'Apa yang sedang dipertaruhkan? (opsional)',
     contextPlaceholder: 'Apa yang membuat keputusan ini berat bagimu? Hal apa yang paling kamu jaga?',
+    pathsSectionTitle: 'PILIHAN AWAL YANG DIBANDINGKAN',
+    pathsSectionDesc: 'Setiap keputusan butuh minimal 2 alternatif untuk dibandingkan. Tentukan nama opsi awalmu:',
+    pathALabel: 'Pilihan 1 (Jalur A)',
+    pathAPlaceholder: 'contoh: Ambil tawaran magang / kerja baru',
+    pathBLabel: 'Pilihan 2 (Jalur B)',
+    pathBPlaceholder: 'contoh: Tetap di posisi saat ini / fokus kuliah',
     tip: 'Keputusan yang baik berawal dari kejelasan untung rugi, bukan rasa yakin yang dipaksakan.',
     submit: 'Lanjut ke lembar kerja'
   },
