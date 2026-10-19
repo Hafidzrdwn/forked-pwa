@@ -228,10 +228,10 @@ export const forkedUncertaintyLog = {
     adaptation: 'Story video uses a verified 2.2x to 2.6x scale factor so text remains crisp and readable on vertical phone screens.',
     status: 'Verified proportionally'
   },
-  darkToneCardVariation: {
-    source: 'ComparisonMatrix and dark theme in style.css use --color-canvas #111612 and surface #18201a.',
-    adaptation: 'Dark accent cards in video match style.css .dark tokens rather than generic #0f172a.',
-    status: 'Verified directly from style.css'
+  lightModeLock: {
+    source: 'Website light mode :root tokens in style.css (--color-canvas #f8f8f5, --color-surface #ffffff, --color-fg #1e261f).',
+    adaptation: 'All 5 scenes strictly locked to authentic Light Mode. Zero dark mode surfaces or switching throughout the 25-second video.',
+    status: 'Locked to 100% Light Mode'
   }
 } as const;
 

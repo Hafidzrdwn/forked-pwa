@@ -1,6 +1,6 @@
 import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import { forkedPalette } from '../theme/forkedTheme';
+import { forkedPalette, forkedShadows } from '../theme/forkedTheme';
 import { MainHookText, SupportingText, UILabelBadge } from '../components/TypographyComponents';
 import { BranchingPathGraphic, DecisionNodeGraphic } from '../components/ForkedGraphics';
 import { CameraRig } from '../components/CameraRig';
@@ -41,7 +41,7 @@ export const HookScene: React.FC = () => {
 
   return (
     <SceneTransition type="fade" enterDuration={10} exitDuration={15} totalSceneDuration={150}>
-      <CameraRig scale={cameraScale} style={{ backgroundColor: forkedPalette.canvas.dark }}>
+      <CameraRig scale={cameraScale} style={{ backgroundColor: forkedPalette.canvas.base }}>
         <div
           style={{
             width: 1080,
@@ -66,9 +66,9 @@ export const HookScene: React.FC = () => {
             }}
           >
             <UILabelBadge
-              color={forkedPalette.danger.darkBase}
-              bg="rgba(217, 98, 83, 0.15)"
-              borderColor="rgba(217, 98, 83, 0.3)"
+              color={forkedPalette.danger.base}
+              bg={forkedPalette.danger.soft}
+              borderColor={forkedPalette.border.default}
               style={{ fontSize: 18, letterSpacing: '0.12em', textTransform: 'uppercase' }}
             >
               Dilema Keputusan
@@ -77,7 +77,7 @@ export const HookScene: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <MainHookText
                 delayFrames={6}
-                color={forkedPalette.text.darkPrimary}
+                color={forkedPalette.text.primary}
                 style={{ fontSize: 86, letterSpacing: -2.2 }}
               >
                 Terlalu Banyak Opsi.
@@ -85,7 +85,7 @@ export const HookScene: React.FC = () => {
 
               <MainHookText
                 delayFrames={35}
-                color={forkedPalette.danger.darkBase}
+                color={forkedPalette.danger.base}
                 style={{ fontSize: 80, letterSpacing: -2.0 }}
               >
                 Minim Kepastian.
@@ -95,7 +95,7 @@ export const HookScene: React.FC = () => {
             <SupportingText
               delayFrames={55}
               animated={true}
-              color={forkedPalette.text.darkMuted}
+              color={forkedPalette.text.muted}
               style={{ fontSize: 34, maxWidth: 820, textAlign: 'center', marginTop: 12 }}
             >
               Memilih tanpa simulasi adalah spekulasi berisiko tinggi.
@@ -117,7 +117,7 @@ export const HookScene: React.FC = () => {
           >
             <BranchingPathGraphic
               size={540}
-              color={forkedPalette.primary.glowStart}
+              color={forkedPalette.primary.base}
               animated={true}
             />
 
@@ -134,17 +134,18 @@ export const HookScene: React.FC = () => {
                 gap: 8
               }}
             >
-              <DecisionNodeGraphic size={56} color={forkedPalette.danger.darkBase} pulse={true} />
+              <DecisionNodeGraphic size={56} color={forkedPalette.danger.base} pulse={true} />
               <span
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: 20,
                   fontWeight: 600,
-                  color: forkedPalette.danger.darkBase,
-                  backgroundColor: 'rgba(30, 38, 31, 0.8)',
-                  padding: '4px 12px',
+                  color: forkedPalette.danger.base,
+                  backgroundColor: forkedPalette.surface.base,
+                  padding: '6px 14px',
                   borderRadius: 8,
-                  border: `1px solid ${forkedPalette.danger.darkBase}`
+                  border: `1px solid ${forkedPalette.border.default}`,
+                  boxShadow: forkedShadows.subtle
                 }}
               >
                 Jalur Ragu (34%)
@@ -164,17 +165,18 @@ export const HookScene: React.FC = () => {
                 gap: 8
               }}
             >
-              <DecisionNodeGraphic size={56} color={forkedPalette.amber.darkBase} pulse={true} />
+              <DecisionNodeGraphic size={56} color={forkedPalette.amber.base} pulse={true} />
               <span
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: 20,
                   fontWeight: 600,
-                  color: forkedPalette.amber.darkBase,
-                  backgroundColor: 'rgba(30, 38, 31, 0.8)',
-                  padding: '4px 12px',
+                  color: forkedPalette.amber.base,
+                  backgroundColor: forkedPalette.surface.base,
+                  padding: '6px 14px',
                   borderRadius: 8,
-                  border: `1px solid ${forkedPalette.amber.darkBase}`
+                  border: `1px solid ${forkedPalette.border.default}`,
+                  boxShadow: forkedShadows.subtle
                 }}
               >
                 Alternatif B (?)
@@ -195,8 +197,9 @@ export const HookScene: React.FC = () => {
               style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: 22,
-                color: forkedPalette.text.darkSubtle,
-                letterSpacing: '0.08em'
+                color: forkedPalette.text.subtle,
+                letterSpacing: '0.08em',
+                fontWeight: 600
               }}
             >
               BAGAIMANA JIKA ANDA BISA MENGUJINYA LEBIH DULU?
