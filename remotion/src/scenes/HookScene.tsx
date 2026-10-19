@@ -184,27 +184,7 @@ export const HookScene: React.FC = () => {
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 16,
-              opacity: interpolate(frame, [80, 110], [0, 1], { extrapolateRight: 'clamp' }),
-              zIndex: 3
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 22,
-                color: forkedPalette.text.subtle,
-                letterSpacing: '0.08em',
-                fontWeight: 600
-              }}
-            >
-              BAGAIMANA JIKA ANDA BISA MENGUJINYA LEBIH DULU?
-            </span>
-          </div>
+          <div style={{ height: 40 }} />
         </div>
       </CameraRig>
     </SceneTransition>

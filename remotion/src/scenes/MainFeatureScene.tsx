@@ -7,7 +7,6 @@ import { NumericCounter } from '../components/NumericCounter';
 import { MascotCharacter } from '../components/MascotCharacter';
 import { CameraRig } from '../components/CameraRig';
 import { SceneTransition } from '../components/SceneTransition';
-import { DecisionNodeGraphic } from '../components/ForkedGraphics';
 import { FORKED_DEMO_DATA } from '../theme/demoData';
 
 export const MainFeatureScene: React.FC = () => {
@@ -152,16 +151,6 @@ export const MainFeatureScene: React.FC = () => {
                 >
                   {isOptimal ? FORKED_DEMO_DATA.simulation.targetLabel : FORKED_DEMO_DATA.simulation.initialLabel}
                 </span>
-
-                <span
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 16,
-                    color: forkedPalette.text.muted
-                  }}
-                >
-                  {isOptimal ? 'Runway Aman: 14 Bulan' : 'Runway Kritis: 4 Bulan'}
-                </span>
               </div>
             </div>
 
@@ -174,40 +163,16 @@ export const MainFeatureScene: React.FC = () => {
               }}
             >
               <SimulationSlider
-                label={FORKED_DEMO_DATA.simulation.assumptionSliderLabel}
+                label="Alokasi Modal"
                 startProgress={0.25}
                 endProgress={0.82}
                 dragStartFrame={15}
                 dragDuration={60}
                 width={832}
-                leftLabel="Runway 3 Bulan"
-                rightLabel="Runway 18 Bulan"
+                leftLabel="25%"
+                rightLabel="100%"
                 currentValueText={(p) => `Alokasi: ${Math.round(p * 100)}%`}
               />
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderTop: `1px solid ${forkedPalette.border.default}`,
-                paddingTop: 24
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <DecisionNodeGraphic size={36} color={forkedPalette.primary.base} pulse={isOptimal} />
-                <span
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 18,
-                    fontWeight: 600,
-                    color: forkedPalette.text.primary
-                  }}
-                >
-                  Node Optimasi Terverifikasi
-                </span>
-              </div>
             </div>
           </div>
 

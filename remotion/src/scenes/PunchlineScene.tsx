@@ -124,46 +124,35 @@ export const PunchlineScene: React.FC = () => {
                 <span
                   style={{
                     fontFamily: "'Manrope', sans-serif",
-                    fontSize: 26,
+                    fontSize: 28,
                     fontWeight: 700,
                     color: forkedPalette.text.primary
                   }}
                 >
-                  {FORKED_DEMO_DATA.simulation.scenarios.statusQuo.name}
+                  Jalur A: Status Quo
                 </span>
                 <span
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 18,
+                    fontSize: 20,
                     color: forkedPalette.text.muted
                   }}
                 >
-                  {FORKED_DEMO_DATA.simulation.scenarios.statusQuo.tagline}
+                  Tanpa simulasi adaptif
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                  <span
-                    style={{
-                      fontFamily: "'Manrope', sans-serif",
-                      fontSize: 40,
-                      fontWeight: 800,
-                      color: forkedPalette.danger.base
-                    }}
-                  >
-                    34%
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 16,
-                      color: forkedPalette.text.muted
-                    }}
-                  >
-                    Runway 4 Bulan
-                  </span>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    fontFamily: "'Manrope', sans-serif",
+                    fontSize: 52,
+                    fontWeight: 800,
+                    color: forkedPalette.danger.base
+                  }}
+                >
+                  34%
+                </span>
               </div>
             </div>
 
@@ -172,7 +161,7 @@ export const PunchlineScene: React.FC = () => {
                 width: '100%',
                 backgroundColor: forkedPalette.surface.base,
                 borderRadius: forkedRadius['2xl'],
-                border: `2px solid ${forkedPalette.primary.base}`,
+                border: `2.5px solid ${forkedPalette.primary.base}`,
                 padding: '36px 40px',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -188,12 +177,12 @@ export const PunchlineScene: React.FC = () => {
                   <span
                     style={{
                       fontFamily: "'Manrope', sans-serif",
-                      fontSize: 28,
+                      fontSize: 30,
                       fontWeight: 800,
                       color: forkedPalette.primary.base
                     }}
                   >
-                    {FORKED_DEMO_DATA.simulation.scenarios.forkedOptimized.name}
+                    Jalur B: Simulasi Forked
                   </span>
                   <span
                     style={{
@@ -202,7 +191,7 @@ export const PunchlineScene: React.FC = () => {
                       fontWeight: 700,
                       color: forkedPalette.primary.base,
                       backgroundColor: forkedPalette.primary.soft,
-                      padding: '4px 10px',
+                      padding: '4px 12px',
                       borderRadius: 9999,
                       textTransform: 'uppercase'
                     }}
@@ -214,37 +203,25 @@ export const PunchlineScene: React.FC = () => {
                 <span
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: 18,
+                    fontSize: 20,
                     color: forkedPalette.text.muted
                   }}
                 >
-                  {FORKED_DEMO_DATA.simulation.scenarios.forkedOptimized.tagline}
+                  Alokasi modal teruji
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                  <span
-                    style={{
-                      fontFamily: "'Manrope', sans-serif",
-                      fontSize: 48,
-                      fontWeight: 800,
-                      color: forkedPalette.primary.base
-                    }}
-                  >
-                    89%
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 16,
-                      fontWeight: 600,
-                      color: forkedPalette.primary.base
-                    }}
-                  >
-                    Runway 14 Bulan
-                  </span>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <span
+                  style={{
+                    fontFamily: "'Manrope', sans-serif",
+                    fontSize: 56,
+                    fontWeight: 800,
+                    color: forkedPalette.primary.base
+                  }}
+                >
+                  89%
+                </span>
 
                 {isReviewed && (
                   <div
@@ -260,25 +237,7 @@ export const PunchlineScene: React.FC = () => {
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 16,
-              zIndex: 3
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 22,
-                color: forkedPalette.text.muted,
-                letterSpacing: '0.04em'
-              }}
-            >
-              Keputusan terbaik selalu berawal dari skenario teruji.
-            </span>
-          </div>
+          <div style={{ height: 40 }} />
         </div>
       </CameraRig>
     </SceneTransition>

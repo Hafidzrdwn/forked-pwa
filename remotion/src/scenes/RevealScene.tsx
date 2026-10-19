@@ -3,7 +3,7 @@ import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { BrandLogo } from '../components/BrandLogo';
 import { forkedPalette, forkedElevations, forkedRadius } from '../theme/forkedTheme';
 import { HeadlineText, SupportingText, UILabelBadge } from '../components/TypographyComponents';
-import { BranchingPathGraphic, DecisionNodeGraphic, ScenarioIndicatorGraphic } from '../components/ForkedGraphics';
+import { BranchingPathGraphic, ScenarioIndicatorGraphic } from '../components/ForkedGraphics';
 import { MascotCharacter } from '../components/MascotCharacter';
 import { CameraRig } from '../components/CameraRig';
 import { SceneTransition } from '../components/SceneTransition';
@@ -182,29 +182,20 @@ export const RevealScene: React.FC = () => {
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <DecisionNodeGraphic size={48} color={forkedPalette.primary.base} pulse={true} />
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span
-                    style={{
-                      fontFamily: "'Manrope', sans-serif",
-                      fontSize: 20,
-                      fontWeight: 700,
-                      color: forkedPalette.text.primary
-                    }}
-                  >
-                    Simulasi Parameter
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: 16,
-                      color: forkedPalette.text.muted
-                    }}
-                  >
-                    Menghubungkan 3 jalur variabel
-                  </span>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: forkedPalette.danger.base,
+                    backgroundColor: forkedPalette.danger.soft,
+                    padding: '8px 20px',
+                    borderRadius: 9999
+                  }}
+                >
+                  Belum Teruji
+                </span>
               </div>
             </div>
 
