@@ -36,6 +36,10 @@ export const SCENE_TIMINGS = {
     from: 150,
     durationInFrames: 150
   },
+  simulation: {
+    from: 300,
+    durationInFrames: 300
+  },
   mainFeature: {
     from: 300,
     durationInFrames: 180
