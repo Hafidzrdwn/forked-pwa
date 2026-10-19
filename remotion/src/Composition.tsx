@@ -5,6 +5,7 @@ import { RevealScene } from './scenes/RevealScene';
 import { MainFeatureScene } from './scenes/MainFeatureScene';
 import { PunchlineScene } from './scenes/PunchlineScene';
 import { ClosingScene } from './scenes/ClosingScene';
+import { SCENE_TIMINGS, getAudioVolume } from './theme/audioSync';
 
 export const ForkedStoryPromo: React.FC = () => {
   return (
@@ -12,32 +13,56 @@ export const ForkedStoryPromo: React.FC = () => {
       style={{
         width: 1080,
         height: 1920,
-        backgroundColor: '#fbfbf9',
+        backgroundColor: '#f8f8f5',
         overflow: 'hidden',
         position: 'relative'
       }}
     >
-      <Audio src={staticFile('soundtrack.wav')} />
+      <Audio
+        src={staticFile('soundtrack.wav')}
+        volume={(f) => getAudioVolume(f)}
+      />
 
-      <Sequence from={0} durationInFrames={120} name="Hook">
+      <Sequence
+        from={SCENE_TIMINGS.hook.from}
+        durationInFrames={SCENE_TIMINGS.hook.durationInFrames}
+        name="Hook"
+      >
         <HookScene />
       </Sequence>
 
-      <Sequence from={120} durationInFrames={120} name="Reveal">
+      <Sequence
+        from={SCENE_TIMINGS.reveal.from}
+        durationInFrames={SCENE_TIMINGS.reveal.durationInFrames}
+        name="Reveal"
+      >
         <RevealScene />
       </Sequence>
 
-      <Sequence from={240} durationInFrames={300} name="MainFeature">
+      <Sequence
+        from={SCENE_TIMINGS.mainFeature.from}
+        durationInFrames={SCENE_TIMINGS.mainFeature.durationInFrames}
+        name="MainFeature"
+      >
         <MainFeatureScene />
       </Sequence>
 
-      <Sequence from={540} durationInFrames={120} name="Punchline">
+      <Sequence
+        from={SCENE_TIMINGS.punchline.from}
+        durationInFrames={SCENE_TIMINGS.punchline.durationInFrames}
+        name="Punchline"
+      >
         <PunchlineScene />
       </Sequence>
 
-      <Sequence from={660} durationInFrames={90} name="Closing">
+      <Sequence
+        from={SCENE_TIMINGS.closing.from}
+        durationInFrames={SCENE_TIMINGS.closing.durationInFrames}
+        name="Closing"
+      >
         <ClosingScene />
       </Sequence>
     </div>
   );
 };
+
