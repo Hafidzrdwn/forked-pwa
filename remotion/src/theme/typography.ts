@@ -150,3 +150,6 @@ export const safeZoneMargins = {
   bottom: 220,
   horizontal: 72
 } as const;
+
+export const typography = typographyStyles;
+
