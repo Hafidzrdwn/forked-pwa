@@ -5,7 +5,8 @@ import { RevealScene } from './scenes/RevealScene';
 import { MainFeatureScene } from './scenes/MainFeatureScene';
 import { PunchlineScene } from './scenes/PunchlineScene';
 import { ClosingScene } from './scenes/ClosingScene';
-import { SCENE_TIMINGS, getAudioVolume } from './theme/audioSync';
+import { SCENE_TIMINGS } from './theme/audioSync';
+import { SOUND_CUES } from './theme/soundCues';
 
 export const ForkedStoryPromo: React.FC = () => {
   return (
@@ -18,10 +19,16 @@ export const ForkedStoryPromo: React.FC = () => {
         position: 'relative'
       }}
     >
-      <Audio
-        src={staticFile('soundtrack.wav')}
-        volume={(f) => getAudioVolume(f)}
-      />
+      {SOUND_CUES.map((cue) => (
+        <Sequence
+          key={cue.id}
+          from={cue.startFrame}
+          durationInFrames={cue.durationInFrames}
+          name={cue.id}
+        >
+          <Audio src={staticFile(cue.file)} volume={cue.volume} />
+        </Sequence>
+      ))}
 
       <Sequence
         from={SCENE_TIMINGS.hook.from}
