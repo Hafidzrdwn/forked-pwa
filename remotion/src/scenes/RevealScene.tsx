@@ -1,273 +1,246 @@
 import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { BrandLogo } from '../components/BrandLogo';
-import { Sparkles, ShieldCheck, Sliders, LineChart } from 'lucide-react';
+import { forkedPalette, forkedElevations, forkedRadius } from '../theme/forkedTheme';
+import { HeadlineText, SupportingText, UILabelBadge } from '../components/TypographyComponents';
+import { BranchingPathGraphic, DecisionNodeGraphic, ScenarioIndicatorGraphic } from '../components/ForkedGraphics';
+import { MascotCharacter } from '../components/MascotCharacter';
+import { CameraRig } from '../components/CameraRig';
+import { SceneTransition } from '../components/SceneTransition';
+import { FORKED_DEMO_DATA } from '../theme/demoData';
 
 export const RevealScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const logoEntrance = spring({
+  const cameraScale = interpolate(frame, [0, 150], [0.97, 1.02], {
+    extrapolateRight: 'clamp'
+  });
+
+  const logoSpring = spring({
     frame,
     fps,
-    config: { damping: 13, stiffness: 100 }
+    config: { damping: 15, stiffness: 95 }
   });
 
-  const textEntrance = spring({
-    frame: frame - 12,
+  const cardSpring = spring({
+    frame: Math.max(0, frame - 16),
     fps,
-    config: { damping: 13, stiffness: 95 }
+    config: { damping: 16, stiffness: 85 }
   });
 
-  const taglineEntrance = spring({
-    frame: frame - 22,
-    fps,
-    config: { damping: 14, stiffness: 90 }
-  });
-
-  const cardsEntrance = spring({
-    frame: frame - 32,
-    fps,
-    config: { damping: 14, stiffness: 85 }
-  });
-
-  const cameraScale = interpolate(frame, [0, 110], [1, 1.05], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const exitOpacity = interpolate(frame, [106, 120], [1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const exitScale = interpolate(frame, [106, 120], [1, 0.95], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
+  const cardTranslateY = interpolate(cardSpring, [0, 1], [60, 0]);
+  const cardOpacity = interpolate(cardSpring, [0, 0.4], [0, 1], { extrapolateRight: 'clamp' });
 
   return (
-    <div
-      style={{
-        width: 1080,
-        height: 1920,
-        backgroundColor: '#fbfbf9',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '190px 60px 220px',
-        opacity: exitOpacity,
-        transform: `scale(${exitScale * cameraScale})`,
-        transformOrigin: 'center center',
-        boxSizing: 'border-box'
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage:
-            'radial-gradient(circle at 1px 1px, rgba(16, 185, 129, 0.08) 1px, transparent 0)',
-          backgroundSize: '44px 44px',
-          pointerEvents: 'none'
-        }}
-      />
-
-      <div
-        style={{
-          position: 'absolute',
-          top: '25%',
-          width: 700,
-          height: 700,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-          pointerEvents: 'none'
-        }}
-      />
-
-      <div
-        style={{
-          transform: `scale(${Math.max(0, logoEntrance)}) translateY(${interpolate(
-            logoEntrance,
-            [0, 1],
-            [40, 0]
-          )}px)`,
-          opacity: Math.max(0, logoEntrance),
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          marginBottom: 28
-        }}
-      >
-        <BrandLogo size={240} animated={true} />
-      </div>
-
-      <div
-        style={{
-          textAlign: 'center',
-          transform: `translateY(${interpolate(textEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, textEntrance),
-          marginBottom: 20
-        }}
-      >
+    <SceneTransition type="fade" enterDuration={12} exitDuration={15} totalSceneDuration={150}>
+      <CameraRig scale={cameraScale} style={{ backgroundColor: forkedPalette.canvas.base }}>
         <div
           style={{
-            fontSize: 114,
-            lineHeight: 1,
-            fontWeight: 800,
-            fontFamily: 'var(--font-display)',
-            letterSpacing: -3,
-            color: '#0f172a'
-          }}
-        >
-          forked<span style={{ color: '#10b981' }}>.</span>
-        </div>
-      </div>
-
-      <div
-        style={{
-          transform: `scale(${Math.max(0, taglineEntrance)})`,
-          opacity: Math.max(0, taglineEntrance),
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 14,
-          padding: '16px 42px',
-          borderRadius: 999,
-          backgroundColor: '#ecfdf5',
-          border: '2.5px solid #a7f3d0',
-          color: '#065f46',
-          fontSize: 38,
-          fontWeight: 800,
-          letterSpacing: 0.5,
-          marginBottom: 52,
-          boxShadow: '0 16px 36px -8px rgba(16, 185, 129, 0.22)'
-        }}
-      >
-        <Sparkles size={36} color="#059669" />
-        Explore your options.
-      </div>
-
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 940,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
-          transform: `translateY(${interpolate(cardsEntrance, [0, 1], [40, 0])}px)`,
-          opacity: Math.max(0, cardsEntrance)
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 36,
-            border: '2.5px solid #e2e8f0',
-            padding: '38px 44px',
-            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08)',
+            width: 1080,
+            height: 1920,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 28
+            justifyContent: 'space-between',
+            padding: '200px 72px 230px',
+            boxSizing: 'border-box',
+            position: 'relative'
           }}
         >
           <div
             style={{
-              width: 76,
-              height: 76,
-              borderRadius: 24,
-              backgroundColor: '#eff6ff',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
+              gap: 22,
+              zIndex: 3
             }}
           >
-            <Sliders size={40} color="#2563eb" />
-          </div>
-          <div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#0f172a' }}>
-              Simulasi Multi Skenario
+            <div
+              style={{
+                transform: `scale(${logoSpring})`,
+                opacity: logoSpring
+              }}
+            >
+              <BrandLogo size={68} />
             </div>
-            <div style={{ fontSize: 24, color: '#64748b', marginTop: 6, fontWeight: 500 }}>
-              Bandingkan gaji, biaya hidup, dan waktu kerja dalam satu canvas
-            </div>
-          </div>
-        </div>
 
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 36,
-            border: '2.5px solid #e2e8f0',
-            padding: '38px 44px',
-            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 28
-          }}
-        >
+            <UILabelBadge
+              color={forkedPalette.primary.base}
+              bg={forkedPalette.primary.soft}
+              style={{ fontSize: 18, letterSpacing: '0.1em', textTransform: 'uppercase' }}
+            >
+              The Forked Engine
+            </UILabelBadge>
+
+            <HeadlineText
+              delayFrames={14}
+              color={forkedPalette.text.primary}
+              style={{ fontSize: 68, letterSpacing: -1.6, textAlign: 'center' }}
+            >
+              {FORKED_DEMO_DATA.reveal.engineTitle}
+            </HeadlineText>
+
+            <SupportingText
+              delayFrames={30}
+              animated={true}
+              color={forkedPalette.text.muted}
+              style={{ fontSize: 32, textAlign: 'center', maxWidth: 840 }}
+            >
+              Bangun pohon keputusan dan uji konsekuensi sebelum mengalokasikan sumber daya.
+            </SupportingText>
+          </div>
+
           <div
             style={{
-              width: 76,
-              height: 76,
-              borderRadius: 24,
-              backgroundColor: '#ecfdf5',
+              width: 936,
+              backgroundColor: forkedPalette.surface.base,
+              borderRadius: forkedRadius['3xl'],
+              boxShadow: forkedElevations.card,
+              border: `1px solid ${forkedPalette.border.default}`,
+              padding: '44px 48px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
+              flexDirection: 'column',
+              gap: 32,
+              transform: `translate3d(0, ${cardTranslateY}px, 0)`,
+              opacity: cardOpacity,
+              zIndex: 2,
+              position: 'relative'
             }}
           >
-            <LineChart size={40} color="#059669" />
-          </div>
-          <div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#0f172a' }}>
-              Uji Risiko What-If
-            </div>
-            <div style={{ fontSize: 24, color: '#64748b', marginTop: 6, fontWeight: 500 }}>
-              Ketahui ketahanan tabungan saat inflasi atau kebutuhan membengkak
-            </div>
-          </div>
-        </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: `1px solid ${forkedPalette.border.default}`,
+                paddingBottom: 24
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <ScenarioIndicatorGraphic size={36} scenario="B" />
+                <span
+                  style={{
+                    fontFamily: "'Manrope', sans-serif",
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: forkedPalette.text.primary
+                  }}
+                >
+                  {FORKED_DEMO_DATA.reveal.projectTitle}
+                </span>
+              </div>
 
-        <div
-          style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 36,
-            border: '2.5px solid #e2e8f0',
-            padding: '38px 44px',
-            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 28
-          }}
-        >
+              <span
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: forkedPalette.primary.base,
+                  backgroundColor: forkedPalette.primary.soft,
+                  padding: '6px 16px',
+                  borderRadius: 9999
+                }}
+              >
+                {FORKED_DEMO_DATA.reveal.statusBadge}
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: forkedPalette.canvas.subtle,
+                borderRadius: forkedRadius.xl,
+                padding: '28px 32px'
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 18,
+                    color: forkedPalette.text.muted,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em'
+                  }}
+                >
+                  Probabilitas Awal
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'Manrope', sans-serif",
+                    fontSize: 54,
+                    fontWeight: 800,
+                    color: forkedPalette.danger.base,
+                    lineHeight: 1
+                  }}
+                >
+                  34%
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <DecisionNodeGraphic size={48} color={forkedPalette.primary.base} pulse={true} />
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span
+                    style={{
+                      fontFamily: "'Manrope', sans-serif",
+                      fontSize: 20,
+                      fontWeight: 700,
+                      color: forkedPalette.text.primary
+                    }}
+                  >
+                    Simulasi Parameter
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 16,
+                      color: forkedPalette.text.muted
+                    }}
+                  >
+                    Menghubungkan 3 jalur variabel
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: 12
+              }}
+            >
+              <BranchingPathGraphic
+                size={220}
+                color={forkedPalette.primary.base}
+                animated={true}
+              />
+            </div>
+          </div>
+
           <div
             style={{
-              width: 76,
-              height: 76,
-              borderRadius: 24,
-              backgroundColor: '#fef3c7',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
+              position: 'absolute',
+              bottom: 190,
+              right: 64,
+              zIndex: 4
             }}
           >
-            <ShieldCheck size={40} color="#d97706" />
-          </div>
-          <div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#0f172a' }}>
-              100% Privat di Browser
-            </div>
-            <div style={{ fontSize: 24, color: '#64748b', marginTop: 6, fontWeight: 500 }}>
-              Data finansial tidak pernah dikirim ke server mana pun
-            </div>
+            <MascotCharacter
+              pose="overthinking"
+              action="look-branch"
+              size={260}
+              flipX={true}
+              actionStartFrame={30}
+            />
           </div>
         </div>
-      </div>
-    </div>
+      </CameraRig>
+    </SceneTransition>
   );
 };

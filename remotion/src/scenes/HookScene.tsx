@@ -1,281 +1,209 @@
 import React from 'react';
-import { interpolate, spring, useCurrentFrame, useVideoConfig, staticFile, Img } from 'remotion';
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { forkedPalette } from '../theme/forkedTheme';
+import { MainHookText, SupportingText, UILabelBadge } from '../components/TypographyComponents';
+import { BranchingPathGraphic, DecisionNodeGraphic } from '../components/ForkedGraphics';
+import { CameraRig } from '../components/CameraRig';
+import { SceneTransition } from '../components/SceneTransition';
 
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const titleSpring = spring({
-    frame,
-    fps,
-    config: { damping: 14, stiffness: 90 }
-  });
-
-  const subtitleSpring = spring({
-    frame: frame - 10,
-    fps,
-    config: { damping: 14, stiffness: 85 }
-  });
-
-  const mascotSpring = spring({
-    frame: frame - 18,
-    fps,
-    config: { damping: 12, stiffness: 80 }
-  });
-
-  const isFrozen = frame >= 65;
-  const freezeSpring = spring({
-    frame: frame - 65,
-    fps,
-    config: { damping: 11, stiffness: 140 }
-  });
-
-  const slowZoom = interpolate(frame, [0, 65], [1, 1.06], {
-    extrapolateLeft: 'clamp',
+  const cameraScale = interpolate(frame, [0, 150], [1.0, 1.04], {
     extrapolateRight: 'clamp'
   });
 
-  const cameraScale = isFrozen ? 1.08 + Math.sin((frame - 65) * 0.1) * 0.01 : slowZoom;
+  const branchEntrance = spring({
+    frame: Math.max(0, frame - 18),
+    fps,
+    config: { damping: 15, stiffness: 85 }
+  });
 
-  const exitOpacity = interpolate(frame, [110, 120], [1, 0], {
-    extrapolateLeft: 'clamp',
+  const branchScale = interpolate(branchEntrance, [0, 1], [0.85, 1]);
+  const branchOpacity = interpolate(branchEntrance, [0, 0.4], [0, 1], {
     extrapolateRight: 'clamp'
   });
 
-  const exitScale = interpolate(frame, [110, 120], [1, 0.94], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
+  const nodeAEntrance = spring({
+    frame: Math.max(0, frame - 40),
+    fps,
+    config: { damping: 14, stiffness: 100 }
   });
+
+  const nodeBEntrance = spring({
+    frame: Math.max(0, frame - 55),
+    fps,
+    config: { damping: 14, stiffness: 100 }
+  });
+
+  const tensionPulse = Math.sin((frame / fps) * Math.PI * 4) * 0.04;
 
   return (
-    <div
-      style={{
-        width: 1080,
-        height: 1920,
-        backgroundColor: '#fbfbf9',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '190px 60px 220px',
-        opacity: exitOpacity,
-        transform: `scale(${exitScale})`,
-        transformOrigin: 'center center',
-        boxSizing: 'border-box'
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage:
-            'radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.06) 1px, transparent 0)',
-          backgroundSize: '40px 40px',
-          pointerEvents: 'none'
-        }}
-      />
-
-      <div
-        style={{
-          transform: `scale(${Math.max(0, titleSpring)}) translateY(${interpolate(
-            titleSpring,
-            [0, 1],
-            [30, 0]
-          )}px)`,
-          opacity: Math.max(0, titleSpring),
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 12,
-          padding: '14px 32px',
-          borderRadius: 999,
-          backgroundColor: '#fef2f2',
-          border: '2px solid #fecaca',
-          color: '#dc2626',
-          fontSize: 24,
-          fontWeight: 800,
-          letterSpacing: 1.5,
-          textTransform: 'uppercase',
-          marginBottom: 28
-        }}
-      >
-        DILEMA PILIHAN HIDUP
-      </div>
-
-      <div
-        style={{
-          textAlign: 'center',
-          maxWidth: 960,
-          transform: `translateY(${interpolate(subtitleSpring, [0, 1], [35, 0])}px)`,
-          opacity: Math.max(0, subtitleSpring),
-          marginBottom: 44
-        }}
-      >
-        <h1
-          style={{
-            fontSize: 82,
-            lineHeight: 1.14,
-            fontWeight: 800,
-            fontFamily: 'var(--font-display)',
-            color: '#0f172a',
-            margin: 0,
-            letterSpacing: -1.5
-          }}
-        >
-          Bingung Pilih
-          <br />
-          <span style={{ color: '#2563eb' }}>Jalur Masa Depan?</span>
-        </h1>
-        <p
-          style={{
-            fontSize: 32,
-            color: '#64748b',
-            marginTop: 18,
-            lineHeight: 1.4,
-            fontWeight: 500
-          }}
-        >
-          Saat kepala penuh pertimbangan tapi takut salah langkah.
-        </p>
-      </div>
-
-      <div
-        style={{
-          width: 860,
-          height: 980,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transform: `scale(${Math.max(0, mascotSpring) * cameraScale})`,
-          opacity: Math.max(0, mascotSpring)
-        }}
-      >
+    <SceneTransition type="fade" enterDuration={10} exitDuration={15} totalSceneDuration={150}>
+      <CameraRig scale={cameraScale} style={{ backgroundColor: forkedPalette.canvas.dark }}>
         <div
           style={{
-            width: 780,
-            height: 780,
-            borderRadius: 48,
-            overflow: 'hidden',
-            boxShadow: '0 30px 70px -15px rgba(15, 23, 42, 0.18), 0 0 0 2px rgba(15, 23, 42, 0.05)',
-            backgroundColor: '#ffffff',
+            width: 1080,
+            height: 1920,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '210px 72px 250px',
+            boxSizing: 'border-box',
             position: 'relative'
           }}
         >
-          <Img
-            src={staticFile(isFrozen ? 'assets/mascot_overthinking.jpg' : 'assets/mascot_crossroads.jpg')}
+          <div
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transform: isFrozen ? `scale(${1 + freezeSpring * 0.04})` : 'scale(1)',
-              transition: 'transform 0.1s ease-out'
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: 20,
+              zIndex: 3
             }}
-          />
+          >
+            <UILabelBadge
+              color={forkedPalette.danger.darkBase}
+              bg="rgba(217, 98, 83, 0.15)"
+              borderColor="rgba(217, 98, 83, 0.3)"
+              style={{ fontSize: 18, letterSpacing: '0.12em', textTransform: 'uppercase' }}
+            >
+              Dilema Keputusan
+            </UILabelBadge>
 
-          {!isFrozen && (
-            <>
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 36,
-                  left: 36,
-                  backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                  backdropFilter: 'blur(12px)',
-                  padding: '14px 26px',
-                  borderRadius: 20,
-                  border: '1.5px solid rgba(37, 99, 235, 0.25)',
-                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4
-                }}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <MainHookText
+                delayFrames={6}
+                color={forkedPalette.text.darkPrimary}
+                style={{ fontSize: 86, letterSpacing: -2.2 }}
               >
-                <span style={{ fontSize: 18, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: 0.8 }}>
-                  Jalur A
-                </span>
-                <span style={{ fontSize: 26, fontWeight: 800, color: '#0f172a' }}>
-                  Korporat Stabil
-                </span>
-              </div>
+                Terlalu Banyak Opsi.
+              </MainHookText>
 
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 36,
-                  right: 36,
-                  backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                  backdropFilter: 'blur(12px)',
-                  padding: '14px 26px',
-                  borderRadius: 20,
-                  border: '1.5px solid rgba(5, 150, 105, 0.25)',
-                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4
-                }}
+              <MainHookText
+                delayFrames={35}
+                color={forkedPalette.danger.darkBase}
+                style={{ fontSize: 80, letterSpacing: -2.0 }}
               >
-                <span style={{ fontSize: 18, fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: 0.8 }}>
-                  Jalur B
-                </span>
-                <span style={{ fontSize: 26, fontWeight: 800, color: '#0f172a' }}>
-                  Startup & WFH
-                </span>
-              </div>
-            </>
-          )}
+                Minim Kepastian.
+              </MainHookText>
+            </div>
 
-          {isFrozen && (
+            <SupportingText
+              delayFrames={55}
+              animated={true}
+              color={forkedPalette.text.darkMuted}
+              style={{ fontSize: 34, maxWidth: 820, textAlign: 'center', marginTop: 12 }}
+            >
+              Memilih tanpa simulasi adalah spekulasi berisiko tinggi.
+            </SupportingText>
+          </div>
+
+          <div
+            style={{
+              position: 'relative',
+              width: 760,
+              height: 640,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: `scale(${branchScale + (frame > 70 ? tensionPulse : 0)})`,
+              opacity: branchOpacity,
+              zIndex: 2
+            }}
+          >
+            <BranchingPathGraphic
+              size={540}
+              color={forkedPalette.primary.glowStart}
+              animated={true}
+            />
+
             <div
               style={{
                 position: 'absolute',
-                inset: 0,
-                backgroundColor: 'rgba(15, 23, 42, 0.25)',
+                top: 60,
+                left: 60,
+                transform: `scale(${nodeAEntrance})`,
+                opacity: nodeAEntrance,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                padding: 40
+                gap: 8
               }}
             >
-              <div
+              <DecisionNodeGraphic size={56} color={forkedPalette.danger.darkBase} pulse={true} />
+              <span
                 style={{
-                  transform: `scale(${Math.max(0, freezeSpring)}) rotate(${interpolate(
-                    freezeSpring,
-                    [0, 1],
-                    [-6, -2]
-                  )}deg)`,
-                  backgroundColor: '#ef4444',
-                  color: '#ffffff',
-                  padding: '18px 36px',
-                  borderRadius: 24,
-                  fontSize: 34,
-                  fontWeight: 900,
-                  letterSpacing: 1.5,
-                  boxShadow: '0 20px 40px rgba(239, 68, 68, 0.45)',
-                  textAlign: 'center',
-                  marginBottom: 16
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: forkedPalette.danger.darkBase,
+                  backgroundColor: 'rgba(30, 38, 31, 0.8)',
+                  padding: '4px 12px',
+                  borderRadius: 8,
+                  border: `1px solid ${forkedPalette.danger.darkBase}`
                 }}
               >
-                STATUS: OVERTHINKING AKUT
-              </div>
-              <div
-                style={{
-                  backgroundColor: '#ffffff',
-                  color: '#0f172a',
-                  padding: '12px 28px',
-                  borderRadius: 16,
-                  fontSize: 24,
-                  fontWeight: 700,
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
-                }}
-              >
-                Tab browser: 48 | Jam tidur: berkurang
-              </div>
+                Jalur Ragu (34%)
+              </span>
             </div>
-          )}
+
+            <div
+              style={{
+                position: 'absolute',
+                top: 60,
+                right: 60,
+                transform: `scale(${nodeBEntrance})`,
+                opacity: nodeBEntrance,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8
+              }}
+            >
+              <DecisionNodeGraphic size={56} color={forkedPalette.amber.darkBase} pulse={true} />
+              <span
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: forkedPalette.amber.darkBase,
+                  backgroundColor: 'rgba(30, 38, 31, 0.8)',
+                  padding: '4px 12px',
+                  borderRadius: 8,
+                  border: `1px solid ${forkedPalette.amber.darkBase}`
+                }}
+              >
+                Alternatif B (?)
+              </span>
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              opacity: interpolate(frame, [80, 110], [0, 1], { extrapolateRight: 'clamp' }),
+              zIndex: 3
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 22,
+                color: forkedPalette.text.darkSubtle,
+                letterSpacing: '0.08em'
+              }}
+            >
+              BAGAIMANA JIKA ANDA BISA MENGUJINYA LEBIH DULU?
+            </span>
+          </div>
         </div>
-      </div>
-    </div>
+      </CameraRig>
+    </SceneTransition>
   );
 };

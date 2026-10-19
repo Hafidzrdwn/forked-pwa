@@ -1,193 +1,286 @@
 import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import { Check } from 'lucide-react';
+import { forkedPalette, forkedElevations, forkedRadius } from '../theme/forkedTheme';
+import { HeadlineText, UILabelBadge } from '../components/TypographyComponents';
+import { ComparisonBalanceGraphic, ReviewMarkerGraphic } from '../components/ForkedGraphics';
+import { CameraRig } from '../components/CameraRig';
+import { SceneTransition } from '../components/SceneTransition';
+import { FORKED_DEMO_DATA } from '../theme/demoData';
 
 export const PunchlineScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const firstLineEntrance = spring({
+  const cameraScale = interpolate(frame, [0, 120], [0.98, 1.02], {
+    extrapolateRight: 'clamp'
+  });
+
+  const cardAEntrance = spring({
     frame,
     fps,
-    config: { damping: 13, stiffness: 120 }
+    config: { damping: 15, stiffness: 95 }
   });
 
-  const disclaimerEntrance = spring({
-    frame: frame - 14,
+  const cardBEntrance = spring({
+    frame: Math.max(0, frame - 16),
     fps,
-    config: { damping: 14, stiffness: 100 }
+    config: { damping: 15, stiffness: 95 }
   });
 
-  const punchlineEntrance = spring({
-    frame: frame - 40,
+  const reviewStamp = spring({
+    frame: Math.max(0, frame - 50),
     fps,
-    config: { damping: 12, stiffness: 110 }
+    config: { damping: 12, stiffness: 140 }
   });
 
-  const benefitsEntrance = spring({
-    frame: frame - 55,
-    fps,
-    config: { damping: 14, stiffness: 90 }
-  });
-
-  const cameraScale = interpolate(frame, [0, 110], [1, 1.05], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const exitOpacity = interpolate(frame, [108, 120], [1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const exitScale = interpolate(frame, [108, 120], [1, 0.95], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
+  const isReviewed = frame >= 53;
 
   return (
-    <div
-      style={{
-        width: 1080,
-        height: 1920,
-        backgroundColor: '#fbfbf9',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '190px 60px 220px',
-        opacity: exitOpacity,
-        transform: `scale(${exitScale * cameraScale})`,
-        transformOrigin: 'center center',
-        boxSizing: 'border-box'
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage:
-            'radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.05) 1px, transparent 0)',
-          backgroundSize: '44px 44px',
-          pointerEvents: 'none'
-        }}
-      />
-
-      <div
-        style={{
-          textAlign: 'center',
-          transform: `translateY(${interpolate(firstLineEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, firstLineEntrance),
-          marginBottom: 20
-        }}
-      >
+    <SceneTransition type="fade" enterDuration={10} exitDuration={15} totalSceneDuration={120}>
+      <CameraRig scale={cameraScale} style={{ backgroundColor: forkedPalette.canvas.base }}>
         <div
           style={{
-            fontSize: 72,
-            fontWeight: 800,
-            color: '#64748b',
-            fontFamily: 'var(--font-display)',
-            letterSpacing: -1,
-            lineHeight: 1.2
+            width: 1080,
+            height: 1920,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '200px 72px 230px',
+            boxSizing: 'border-box',
+            position: 'relative'
           }}
         >
-          Bukan peramal masa depan.
-        </div>
-      </div>
-
-      <div
-        style={{
-          transform: `scale(${Math.max(0, disclaimerEntrance)})`,
-          opacity: Math.max(0, disclaimerEntrance),
-          backgroundColor: '#f1f5f9',
-          color: '#64748b',
-          fontSize: 26,
-          fontWeight: 700,
-          padding: '12px 32px',
-          borderRadius: 999,
-          marginBottom: 60
-        }}
-      >
-        (Tidak bisa menebak jodoh atau angka keberuntungan)
-      </div>
-
-      <div
-        style={{
-          textAlign: 'center',
-          transform: `scale(${Math.max(0, punchlineEntrance)}) translateY(${interpolate(
-            punchlineEntrance,
-            [0, 1],
-            [40, 0]
-          )}px)`,
-          opacity: Math.max(0, punchlineEntrance),
-          marginBottom: 60
-        }}
-      >
-        <h2
-          style={{
-            fontSize: 90,
-            fontWeight: 900,
-            color: '#0f172a',
-            fontFamily: 'var(--font-display)',
-            letterSpacing: -2,
-            lineHeight: 1.15,
-            margin: 0
-          }}
-        >
-          Cuma cara lebih{' '}
-          <span
+          <div
             style={{
-              color: '#059669',
-              textDecoration: 'underline',
-              textDecorationColor: '#a7f3d0',
-              textUnderlineOffset: 14
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 18,
+              zIndex: 3,
+              textAlign: 'center'
             }}
           >
-            waras
-          </span>
-          <br />
-          buat memilih.
-        </h2>
-      </div>
+            <UILabelBadge
+              color={forkedPalette.primary.base}
+              bg={forkedPalette.primary.soft}
+              style={{ fontSize: 18, letterSpacing: '0.1em', textTransform: 'uppercase' }}
+            >
+              Komparasi Keputusan
+            </UILabelBadge>
 
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 920,
-          backgroundColor: '#ffffff',
-          borderRadius: 36,
-          border: '2.5px solid #e2e8f0',
-          padding: '48px 52px',
-          boxShadow: '0 24px 50px rgba(15, 23, 42, 0.08)',
-          transform: `translateY(${interpolate(benefitsEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, benefitsEntrance),
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 26
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30, fontWeight: 700, color: '#1e293b' }}>
-          <div style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Check size={32} color="#059669" />
-          </div>
-          <span>Bandingkan trade-off secara rasional</span>
-        </div>
+            <HeadlineText
+              delayFrames={4}
+              color={forkedPalette.text.primary}
+              style={{ fontSize: 68, letterSpacing: -1.8, maxWidth: 880 }}
+            >
+              {FORKED_DEMO_DATA.simulation.punchline}
+            </HeadlineText>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30, fontWeight: 700, color: '#1e293b' }}>
-          <div style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Check size={32} color="#059669" />
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 30,
+                color: forkedPalette.text.muted,
+                maxWidth: 820
+              }}
+            >
+              Bandingkan konsekuensi setiap pilihan secara berdampingan.
+            </span>
           </div>
-          <span>Uji asumsi sebelum terlanjur melangkah</span>
-        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, fontSize: 30, fontWeight: 700, color: '#1e293b' }}>
-          <div style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Check size={32} color="#059669" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 28,
+              width: 936,
+              zIndex: 2
+            }}
+          >
+            <ComparisonBalanceGraphic
+              size={120}
+              color={forkedPalette.primary.base}
+              tiltDegrees={10}
+            />
+
+            <div
+              style={{
+                width: '100%',
+                backgroundColor: forkedPalette.surface.base,
+                borderRadius: forkedRadius['2xl'],
+                border: `1px solid ${forkedPalette.border.default}`,
+                padding: '32px 36px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                boxShadow: forkedElevations.subtle,
+                opacity: cardAEntrance,
+                transform: `translate3d(0, ${interpolate(cardAEntrance, [0, 1], [30, 0])}px, 0)`
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span
+                  style={{
+                    fontFamily: "'Manrope', sans-serif",
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: forkedPalette.text.primary
+                  }}
+                >
+                  {FORKED_DEMO_DATA.simulation.scenarios.statusQuo.name}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 18,
+                    color: forkedPalette.text.muted
+                  }}
+                >
+                  {FORKED_DEMO_DATA.simulation.scenarios.statusQuo.tagline}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <span
+                    style={{
+                      fontFamily: "'Manrope', sans-serif",
+                      fontSize: 40,
+                      fontWeight: 800,
+                      color: forkedPalette.danger.base
+                    }}
+                  >
+                    34%
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 16,
+                      color: forkedPalette.text.muted
+                    }}
+                  >
+                    Runway 4 Bulan
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                width: '100%',
+                backgroundColor: forkedPalette.surface.base,
+                borderRadius: forkedRadius['2xl'],
+                border: `2px solid ${forkedPalette.primary.base}`,
+                padding: '36px 40px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                boxShadow: forkedElevations.card,
+                position: 'relative',
+                opacity: cardBEntrance,
+                transform: `translate3d(0, ${interpolate(cardBEntrance, [0, 1], [30, 0])}px, 0)`
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span
+                    style={{
+                      fontFamily: "'Manrope', sans-serif",
+                      fontSize: 28,
+                      fontWeight: 800,
+                      color: forkedPalette.primary.base
+                    }}
+                  >
+                    {FORKED_DEMO_DATA.simulation.scenarios.forkedOptimized.name}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: forkedPalette.primary.base,
+                      backgroundColor: forkedPalette.primary.soft,
+                      padding: '4px 10px',
+                      borderRadius: 9999,
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    Rekomendasi
+                  </span>
+                </div>
+
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 18,
+                    color: forkedPalette.text.muted
+                  }}
+                >
+                  {FORKED_DEMO_DATA.simulation.scenarios.forkedOptimized.tagline}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <span
+                    style={{
+                      fontFamily: "'Manrope', sans-serif",
+                      fontSize: 48,
+                      fontWeight: 800,
+                      color: forkedPalette.primary.base
+                    }}
+                  >
+                    89%
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: forkedPalette.primary.base
+                    }}
+                  >
+                    Runway 14 Bulan
+                  </span>
+                </div>
+
+                {isReviewed && (
+                  <div
+                    style={{
+                      transform: `scale(${reviewStamp})`,
+                      transformOrigin: 'center'
+                    }}
+                  >
+                    <ReviewMarkerGraphic size={54} color={forkedPalette.primary.base} animated={true} />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <span>Tidur tenang tanpa beban penyesalan</span>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              zIndex: 3
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 22,
+                color: forkedPalette.text.muted,
+                letterSpacing: '0.04em'
+              }}
+            >
+              Keputusan terbaik selalu berawal dari skenario teruji.
+            </span>
+          </div>
         </div>
-      </div>
-    </div>
+      </CameraRig>
+    </SceneTransition>
   );
 };

@@ -1,522 +1,234 @@
 import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import { SlidersHorizontal, MousePointer2 } from 'lucide-react';
-import { scoreScenario, formatRupiah } from '../utils/scoring';
+import { forkedPalette, forkedElevations, forkedRadius } from '../theme/forkedTheme';
+import { HeadlineText, UILabelBadge } from '../components/TypographyComponents';
+import { SimulationSlider } from '../components/SimulationSlider';
+import { NumericCounter } from '../components/NumericCounter';
+import { MascotCharacter } from '../components/MascotCharacter';
+import { CameraRig } from '../components/CameraRig';
+import { SceneTransition } from '../components/SceneTransition';
+import { DecisionNodeGraphic } from '../components/ForkedGraphics';
+import { FORKED_DEMO_DATA } from '../theme/demoData';
 
 export const MainFeatureScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const sceneEntrance = spring({
+  const cameraScale = interpolate(frame, [0, 80, 180], [0.98, 1.02, 1.0], {
+    extrapolateRight: 'clamp'
+  });
+
+  const cardSpring = spring({
     frame,
     fps,
-    config: { damping: 14, stiffness: 95 }
+    config: { damping: 16, stiffness: 90 }
   });
 
-  const cardsEntrance = spring({
-    frame: frame - 10,
-    fps,
-    config: { damping: 14, stiffness: 90 }
-  });
+  const cardTranslateY = interpolate(cardSpring, [0, 1], [40, 0]);
 
-  const sliderEntrance = spring({
-    frame: frame - 22,
-    fps,
-    config: { damping: 14, stiffness: 85 }
-  });
-
-  const matrixEntrance = spring({
-    frame: frame - 34,
-    fps,
-    config: { damping: 14, stiffness: 85 }
-  });
-
-  const cameraScale = interpolate(
-    frame,
-    [0, 120, 200, 270],
-    [0.98, 1.01, 1.01, 0.98],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-  );
-
-  const sliderProgress = interpolate(frame, [110, 195], [0, 0.40], {
+  const metricPulse = interpolate(frame, [72, 78, 86], [1, 1.06, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp'
   });
 
-  const trackWidth = 850;
-  const thumbLeft = (sliderProgress / 0.5) * trackWidth;
-
-  const cursorX =
-    frame < 110
-      ? interpolate(frame, [80, 110], [750, 52 + thumbLeft], {
-          extrapolateLeft: 'clamp',
-          extrapolateRight: 'clamp'
-        })
-      : frame <= 195
-      ? 52 + thumbLeft
-      : interpolate(frame, [195, 225], [52 + thumbLeft, 700], {
-          extrapolateLeft: 'clamp',
-          extrapolateRight: 'clamp'
-        });
-
-  const cursorY =
-    frame < 110
-      ? interpolate(frame, [80, 110], [280, 136], {
-          extrapolateLeft: 'clamp',
-          extrapolateRight: 'clamp'
-        })
-      : frame <= 195
-      ? 136
-      : interpolate(frame, [195, 225], [136, 300], {
-          extrapolateLeft: 'clamp',
-          extrapolateRight: 'clamp'
-        });
-
-  const cursorOpacity = interpolate(frame, [80, 95, 215, 230], [0, 1, 1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const cursorScale = interpolate(frame, [105, 112, 194, 200], [1, 0.85, 0.85, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const pathA = {
-    id: 'path-a',
-    name: 'Jalur A: MT BUMN (Surabaya)',
-    monthlyIncome: 12000000,
-    monthlyCost: 6000000,
-    hoursPerWeek: 45,
-    growth: 75,
-    risk: 25
-  };
-
-  const baseCostB = 5000000;
-  const simulatedCostB = Math.round(baseCostB * (1 + sliderProgress));
-
-  const pathB = {
-    id: 'path-b',
-    name: 'Jalur B: Remote Tech Startup',
-    monthlyIncome: 16000000,
-    monthlyCost: simulatedCostB,
-    hoursPerWeek: 35,
-    growth: 85,
-    risk: 40
-  };
-
-  const scoreA = scoreScenario(pathA);
-  const scoreB = scoreScenario(pathB);
-
-  const exitOpacity = interpolate(frame, [285, 300], [1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
-
-  const exitScale = interpolate(frame, [285, 300], [1, 0.95], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
+  const isOptimal = frame >= 75;
 
   return (
-    <div
-      style={{
-        width: 1080,
-        height: 1920,
-        backgroundColor: '#fbfbf9',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '180px 60px 220px',
-        opacity: exitOpacity,
-        transform: `scale(${exitScale * cameraScale})`,
-        transformOrigin: 'center center',
-        boxSizing: 'border-box'
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage:
-            'radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.05) 1px, transparent 0)',
-          backgroundSize: '40px 40px',
-          pointerEvents: 'none'
-        }}
-      />
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          transform: `scale(${Math.max(0, sceneEntrance)}) translateY(${interpolate(
-            sceneEntrance,
-            [0, 1],
-            [30, 0]
-          )}px)`,
-          opacity: Math.max(0, sceneEntrance)
-        }}
-      >
+    <SceneTransition type="fade" enterDuration={10} exitDuration={15} totalSceneDuration={180}>
+      <CameraRig scale={cameraScale} style={{ backgroundColor: forkedPalette.canvas.base }}>
         <div
           style={{
-            display: 'inline-flex',
+            width: 1080,
+            height: 1920,
+            display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 12,
-            padding: '12px 34px',
-            borderRadius: 999,
-            backgroundColor: '#eff6ff',
-            border: '2px solid #bfdbfe',
-            color: '#1d4ed8',
-            fontSize: 24,
-            fontWeight: 800,
-            letterSpacing: 1.5,
-            textTransform: 'uppercase',
-            marginBottom: 16
+            justifyContent: 'space-between',
+            padding: '200px 72px 230px',
+            boxSizing: 'border-box',
+            position: 'relative'
           }}
         >
-          SIMULASI DUA JALUR REALISTIS
-        </div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 16,
+              zIndex: 3,
+              textAlign: 'center'
+            }}
+          >
+            <UILabelBadge
+              color={forkedPalette.primary.base}
+              bg={forkedPalette.primary.soft}
+              style={{ fontSize: 18, letterSpacing: '0.1em', textTransform: 'uppercase' }}
+            >
+              Simulasi Interaktif
+            </UILabelBadge>
 
-        <h2
-          style={{
-            fontSize: 58,
-            lineHeight: 1.15,
-            fontWeight: 800,
-            fontFamily: 'var(--font-display)',
-            color: '#0f172a',
-            margin: 0,
-            letterSpacing: -1.5,
-            textAlign: 'center'
-          }}
-        >
-          Bandingkan Angka, Bukan Firasat
-        </h2>
-      </div>
+            <HeadlineText
+              delayFrames={5}
+              color={forkedPalette.text.primary}
+              style={{ fontSize: 66, letterSpacing: -1.6 }}
+            >
+              Uji Asumsi. Lihat Hasil.
+            </HeadlineText>
 
-      <div
-        style={{
-          width: 960,
-          display: 'flex',
-          gap: 24,
-          transform: `translateY(${interpolate(cardsEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, cardsEntrance)
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            backgroundColor: '#ffffff',
-            borderRadius: 36,
-            border: '2.5px solid #dbeafe',
-            padding: '36px 32px',
-            boxShadow: '0 20px 45px -10px rgba(37, 99, 235, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 18
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span
               style={{
-                backgroundColor: '#eff6ff',
-                color: '#1d4ed8',
-                padding: '8px 20px',
-                borderRadius: 14,
-                fontSize: 22,
-                fontWeight: 800
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 30,
+                color: forkedPalette.text.muted,
+                maxWidth: 820
               }}
             >
-              JALUR A
+              Ubah alokasi modal dan lihat kalkulasi kepastian keputusan secara langsung.
             </span>
-            <span style={{ fontSize: 24, fontWeight: 700, color: '#64748b' }}>
-              BUMN (Surabaya)
-            </span>
-          </div>
-
-          <div style={{ borderBottom: '1.5px solid #f1f5f9', paddingBottom: 14 }}>
-            <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Gaji Pokok</div>
-            <div style={{ fontSize: 38, fontWeight: 800, color: '#0f172a', marginTop: 4 }}>
-              {formatRupiah(pathA.monthlyIncome)}
-              <span style={{ fontSize: 20, color: '#94a3b8', fontWeight: 500 }}> / bulan</span>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Biaya Hidup</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#334155', marginTop: 4 }}>
-                {formatRupiah(pathA.monthlyCost)}
-                <span style={{ fontSize: 18, color: '#94a3b8' }}> / bulan</span>
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Jam Kerja</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#334155', marginTop: 4 }}>
-                45 jam per minggu
-              </div>
-            </div>
           </div>
 
           <div
             style={{
-              backgroundColor: '#f8fafc',
-              padding: '16px 20px',
-              borderRadius: 20,
+              width: 936,
+              backgroundColor: forkedPalette.surface.base,
+              borderRadius: forkedRadius['3xl'],
+              boxShadow: forkedElevations.card,
+              border: `1px solid ${forkedPalette.border.default}`,
+              padding: '48px 52px',
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#475569' }}>Tabungan Bersih:</span>
-            <span style={{ fontSize: 28, fontWeight: 800, color: '#059669' }}>
-              {formatRupiah(pathA.monthlyIncome - pathA.monthlyCost)}
-            </span>
-          </div>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
-            backgroundColor: '#ffffff',
-            borderRadius: 36,
-            border: '2.5px solid #a7f3d0',
-            padding: '36px 32px',
-            boxShadow: '0 20px 45px -10px rgba(16, 185, 129, 0.12)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 18
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span
-              style={{
-                backgroundColor: '#ecfdf5',
-                color: '#047857',
-                padding: '8px 20px',
-                borderRadius: 14,
-                fontSize: 22,
-                fontWeight: 800
-              }}
-            >
-              JALUR B
-            </span>
-            <span style={{ fontSize: 24, fontWeight: 700, color: '#64748b' }}>
-              Startup (Remote)
-            </span>
-          </div>
-
-          <div style={{ borderBottom: '1.5px solid #f1f5f9', paddingBottom: 14 }}>
-            <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Gaji Pokok</div>
-            <div style={{ fontSize: 38, fontWeight: 800, color: '#0f172a', marginTop: 4 }}>
-              {formatRupiah(pathB.monthlyIncome)}
-              <span style={{ fontSize: 20, color: '#94a3b8', fontWeight: 500 }}> / bulan</span>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Biaya Hidup</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: sliderProgress > 0.05 ? '#dc2626' : '#0f172a', marginTop: 4 }}>
-                {formatRupiah(pathB.monthlyCost)}
-                <span style={{ fontSize: 18, color: '#94a3b8' }}> / bulan</span>
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 20, color: '#64748b', fontWeight: 600 }}>Jam Kerja</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: '#334155', marginTop: 4 }}>
-                35 jam per minggu
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: '#ecfdf5',
-              padding: '16px 20px',
-              borderRadius: 20,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#065f46' }}>Tabungan Bersih:</span>
-            <span style={{ fontSize: 28, fontWeight: 800, color: '#059669' }}>
-              {formatRupiah(pathB.monthlyIncome - pathB.monthlyCost)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          width: 960,
-          backgroundColor: '#ffffff',
-          borderRadius: 36,
-          border: '2.5px solid #e2e8f0',
-          padding: '38px 48px',
-          boxShadow: '0 24px 50px -12px rgba(15, 23, 42, 0.1)',
-          position: 'relative',
-          transform: `translateY(${interpolate(sliderEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, sliderEntrance)
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div
-              style={{
-                backgroundColor: '#eff6ff',
-                padding: 12,
-                borderRadius: 16,
-                color: '#2563eb'
-              }}
-            >
-              <SlidersHorizontal size={32} />
-            </div>
-            <div>
-              <div style={{ fontSize: 30, fontWeight: 800, color: '#0f172a' }}>
-                Simulasi Risiko What-If
-              </div>
-              <div style={{ fontSize: 22, color: '#64748b', marginTop: 2 }}>
-                Uji ketahanan jika biaya hidup membengkak
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: sliderProgress > 0.1 ? '#fef2f2' : '#f8fafc',
-              border: `2px solid ${sliderProgress > 0.1 ? '#fecaca' : '#e2e8f0'}`,
-              padding: '10px 24px',
-              borderRadius: 20,
-              fontSize: 24,
-              fontWeight: 800,
-              color: sliderProgress > 0.1 ? '#dc2626' : '#64748b'
-            }}
-          >
-            +{Math.round(sliderProgress * 100)}% Biaya Hidup
-          </div>
-        </div>
-
-        <div style={{ position: 'relative', marginTop: 32, marginBottom: 18 }}>
-          <div
-            style={{
-              width: '100%',
-              height: 26,
-              backgroundColor: '#e2e8f0',
-              borderRadius: 999,
-              overflow: 'hidden'
+              flexDirection: 'column',
+              gap: 36,
+              transform: `translate3d(0, ${cardTranslateY}px, 0)`,
+              zIndex: 2,
+              position: 'relative'
             }}
           >
             <div
               style={{
-                width: `${(sliderProgress / 0.5) * 100}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg, #3b82f6 0%, #ef4444 100%)',
-                borderRadius: 999
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: isOptimal ? forkedPalette.primary.soft : forkedPalette.danger.soft,
+                borderRadius: forkedRadius.xl,
+                padding: '32px 36px',
+                border: `1px solid ${isOptimal ? 'rgba(36, 93, 62, 0.2)' : 'rgba(181, 71, 57, 0.2)'}`,
+                transform: `scale(${metricPulse})`,
+                willChange: 'transform'
               }}
-            />
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 20,
+                    color: forkedPalette.text.muted,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em'
+                  }}
+                >
+                  Probabilitas Keberhasilan
+                </span>
+
+                <NumericCounter
+                  startValue={FORKED_DEMO_DATA.simulation.initialValue}
+                  endValue={FORKED_DEMO_DATA.simulation.targetValue}
+                  startFrame={15}
+                  durationFrames={60}
+                  style={{ fontSize: 96, fontWeight: 800 }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: isOptimal ? forkedPalette.primary.base : forkedPalette.danger.base,
+                    backgroundColor: isOptimal ? 'rgba(36, 93, 62, 0.16)' : 'rgba(181, 71, 57, 0.16)',
+                    padding: '8px 20px',
+                    borderRadius: 9999
+                  }}
+                >
+                  {isOptimal ? FORKED_DEMO_DATA.simulation.targetLabel : FORKED_DEMO_DATA.simulation.initialLabel}
+                </span>
+
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 16,
+                    color: forkedPalette.text.muted
+                  }}
+                >
+                  {isOptimal ? 'Runway Aman: 14 Bulan' : 'Runway Kritis: 4 Bulan'}
+                </span>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                paddingTop: 8
+              }}
+            >
+              <SimulationSlider
+                label={FORKED_DEMO_DATA.simulation.assumptionSliderLabel}
+                startProgress={0.25}
+                endProgress={0.82}
+                dragStartFrame={15}
+                dragDuration={60}
+                width={832}
+                leftLabel="Runway 3 Bulan"
+                rightLabel="Runway 18 Bulan"
+                currentValueText={(p) => `Alokasi: ${Math.round(p * 100)}%`}
+              />
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderTop: `1px solid ${forkedPalette.border.default}`,
+                paddingTop: 24
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <DecisionNodeGraphic size={36} color={forkedPalette.primary.base} pulse={isOptimal} />
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 18,
+                    fontWeight: 600,
+                    color: forkedPalette.text.primary
+                  }}
+                >
+                  Node Optimasi Terverifikasi
+                </span>
+              </div>
+            </div>
           </div>
 
           <div
             style={{
               position: 'absolute',
-              top: -15,
-              left: `calc(${(sliderProgress / 0.5) * 100}% - 28px)`,
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              backgroundColor: '#ffffff',
-              border: '4px solid #2563eb',
-              boxShadow: '0 8px 24px rgba(37, 99, 235, 0.4)'
+              bottom: 110,
+              right: 60,
+              zIndex: 4
             }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, color: '#94a3b8', fontWeight: 600 }}>
-          <span>Kondisi Normal (0%)</span>
-          <span>Inflasi & Gaya Hidup (+50%)</span>
-        </div>
-
-        <div
-          style={{
-            position: 'absolute',
-            left: cursorX,
-            top: cursorY,
-            opacity: cursorOpacity,
-            transform: `scale(${cursorScale})`,
-            pointerEvents: 'none',
-            zIndex: 100,
-            filter: 'drop-shadow(0 12px 20px rgba(0,0,0,0.35))'
-          }}
-        >
-          <MousePointer2 size={48} color="#0f172a" fill="#2563eb" />
-        </div>
-      </div>
-
-      <div
-        style={{
-          width: 960,
-          backgroundColor: '#0f172a',
-          borderRadius: 36,
-          padding: '38px 44px',
-          color: '#ffffff',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 22,
-          boxShadow: '0 30px 60px -15px rgba(15, 23, 42, 0.4)',
-          transform: `translateY(${interpolate(matrixEntrance, [0, 1], [30, 0])}px)`,
-          opacity: Math.max(0, matrixEntrance)
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: 20, color: '#94a3b8', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-              LIVE DECISION SCORE
-            </div>
-            <div style={{ fontSize: 30, fontWeight: 800, marginTop: 4 }}>
-              Skor Kelayakan Trade-Off
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 28 }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 18, color: '#93c5fd', fontWeight: 700 }}>SKOR JALUR A</div>
-              <div style={{ fontSize: 46, fontWeight: 900, color: '#ffffff' }}>
-                {scoreA.total}
-                <span style={{ fontSize: 24, color: '#64748b', fontWeight: 500 }}>/100</span>
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 18, color: '#6ee7b7', fontWeight: 700 }}>SKOR JALUR B</div>
-              <div style={{ fontSize: 46, fontWeight: 900, color: scoreB.total >= scoreA.total ? '#10b981' : '#f59e0b' }}>
-                {scoreB.total}
-                <span style={{ fontSize: 24, color: '#64748b', fontWeight: 500 }}>/100</span>
-              </div>
-            </div>
+          >
+            <MascotCharacter
+              pose="confident"
+              action="react-slider"
+              size={270}
+              flipX={true}
+              actionStartFrame={68}
+            />
           </div>
         </div>
-
-        <div
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            padding: '20px 24px',
-            borderRadius: 20,
-            fontSize: 22,
-            lineHeight: 1.45,
-            color: '#cbd5e1',
-            fontWeight: 600
-          }}
-        >
-          <span style={{ color: '#38bdf8', fontWeight: 800 }}>Insight Forked: </span>
-          {sliderProgress > 0.2
-            ? 'Saat biaya hidup melonjak, stabilitas tabungan Jalur A mulai mengimbangi potensi gaji tinggi Jalur B.'
-            : 'Jalur B unggul pada fleksibilitas waktu kerja dan pertumbuhan karir yang cepat.'}
-        </div>
-      </div>
-    </div>
+      </CameraRig>
+    </SceneTransition>
   );
 };

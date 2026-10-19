@@ -148,16 +148,26 @@ export const forkedRadii = {
   button: 22,
   card: 36,
   cardLarge: 44,
-  pill: 9999
+  pill: 9999,
+  sm: 8,
+  md: 14,
+  lg: 20,
+  xl: 28,
+  '2xl': 36,
+  '3xl': 44
 } as const;
 
 export const forkedShadows = {
   subtle: '0 4px 12px rgba(30, 38, 31, 0.04)',
   card: '0 20px 40px -10px rgba(30, 38, 31, 0.08)',
   elevated: '0 30px 60px -15px rgba(30, 38, 31, 0.12)',
+  floating: '0 24px 48px -12px rgba(36, 93, 62, 0.35)',
   brandGlow: '0 16px 36px -8px rgba(36, 93, 62, 0.35)',
   sliderThumb: '0 4px 12px rgba(36, 93, 62, 0.3)'
 } as const;
+
+export const forkedElevations = forkedShadows;
+export const forkedRadius = forkedRadii;
 
 export const forkedComponents = {
   card: {
