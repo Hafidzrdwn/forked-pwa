@@ -18,7 +18,10 @@ export const id = {
     noticeWeightsSaved: 'Bobot penilaian diperbarui',
     noticeReviewDateSaved: 'Tanggal evaluasi diperbarui',
     noticeBackupExported: 'Cadangan data berhasil disimpan ke file',
-    noticeBackupImported: 'Cadangan data berhasil dipulihkan'
+    noticeBackupImported: 'Cadangan data berhasil dipulihkan',
+    statusExploring: 'Sedang Ditimbang',
+    statusDecided: 'Sudah Ditentukan',
+    statusReviewed: 'Selesai Dievaluasi'
   },
   nav: {
     brandSubtitle: 'RUANG PILIHAN',
@@ -31,6 +34,7 @@ export const id = {
     exportBackup: 'Simpan File Cadangan',
     copyBackup: 'Salin Cadangan (JSON)',
     importBackup: 'Buka File Cadangan',
+    backupAction: 'Kelola Cadangan',
     tagline: 'UNTUK SETIAP LANGKAH PENTING DALAM HIDUPMU.'
   },
   overview: {
@@ -72,6 +76,7 @@ export const id = {
     noMatches: 'Tidak ada keputusan yang cocok dengan kata pencarianmu.',
     addDecision: 'Tambah keputusan baru',
     briefEyebrow: 'CATATAN KEPUTUSAN · DIBUAT PADA {date}',
+    createdOn: 'Dibuat pada {date}',
     noContext: 'Tuliskan sedikit penjelasan agar lebih jelas apa yang sedang kamu timbang.',
     deleteAria: 'Hapus keputusan ini',
     reviewBy: 'Jadwal evaluasi: {date}',
@@ -304,5 +309,28 @@ export const id = {
     installed: 'Aplikasi Terpasang',
     iosTitle: 'Cara Pasang di iPhone / iPad',
     iosInstruction: 'Ketuk ikon Bagikan (Share) di menu bawah Safari, lalu pilih "Tambahkan ke Layar Utama" (Add to Home Screen).'
+  },
+  backupModal: {
+    title: 'Cadangan & Pemulihan Data',
+    subtitle: 'Data Anda tersimpan lokal di perangkat ini. Unduh atau salin data kapan saja untuk cadangan aman atau migrasi antar perangkat.',
+    exportTitle: 'Simpan File Cadangan (.json)',
+    exportDesc: 'Unduh file JSON lengkap berisi semua keputusan, simulasi, dan catatan Anda.',
+    exportBtn: 'Unduh File JSON',
+    copyTitle: 'Salin Data ke Clipboard',
+    copyDesc: 'Salin data JSON mentah untuk ditempelkan atau disimpan langsung ke catatan pribadi.',
+    copyBtn: 'Salin Teks JSON',
+    importTitle: 'Buka / Pulihkan File Cadangan',
+    importDesc: 'Impor berkas JSON cadangan yang sudah pernah diunduh sebelumnya.',
+    importBtn: 'Pilih File Cadangan',
+    copiedNotice: 'Data cadangan JSON berhasil disalin ke clipboard!'
+  },
+  unsupportedBrowser: {
+    title: 'Buka di Browser Utama untuk Pengalaman Optimal',
+    subtitle: 'Browser dalam aplikasi (seperti Instagram atau TikTok) membatasi penyimpanan lokal dan dapat menghapus keputusan Anda secara otomatis.',
+    recommendation: 'Kami menyarankan untuk membuka Forked di Chrome, Safari, atau Firefox agar keputusan tersimpan aman.',
+    copyLink: 'Salin Tautan Web',
+    copied: 'Tautan Berhasil Disalin!',
+    continueAnyway: 'Tetap Lanjutkan (Fitur Terbatas)',
+    stepGuide: 'Atau ketuk menu titik tiga (•••) di pojok atas, lalu pilih "Buka di Browser Eksternal".'
   }
 }

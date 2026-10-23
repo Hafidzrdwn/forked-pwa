@@ -297,7 +297,37 @@ async function runE2ETests() {
     const persistedTitle = await page.locator('text=Peluang Bisnis SaaS vs Kerja Korporat').first().isVisible()
     recordStep('IndexedDB Persistence After Page Reload', persistedTitle, 'Decision preserved perfectly across session refresh')
 
-    // 18. Check Console & Runtime Health
+    // 18. Decision Studio Meta Card Layout Verification
+    const metaContainer = page.locator('#decision-meta-card')
+    const isMetaVisible = await metaContainer.isVisible()
+    const hasStatusPill = await page.locator('span:has-text("Ditimbang"), span:has-text("Exploring"), span:has-text("Ditentukan"), span:has-text("Decided"), span:has-text("Dievaluasi"), span:has-text("Reviewed")').first().isVisible()
+    const hasReviewDate = await metaContainer.locator('span:has-text("evaluasi"), span:has-text("review")').first().isVisible()
+    const hasWeightsBtn = await metaContainer.locator('button:has-text("Atur"), button:has-text("Weights")').first().isVisible()
+    recordStep('Decision Studio Meta Card Layout', isMetaVisible && hasReviewDate && hasWeightsBtn && hasStatusPill, 'Balanced layout with localized status rendered cleanly')
+
+    // 19. Consolidated Backup Button & Modal Test
+    const backupBtn = page.locator('#manage-backup-btn')
+    const backupBtnVisible = await backupBtn.isVisible()
+    recordStep('Consolidated Backup Button Rendered', backupBtnVisible)
+
+    if (backupBtnVisible) {
+      await backupBtn.click()
+      await page.waitForTimeout(300)
+      const backupModal = page.locator('div[role="dialog"][aria-label*="Cadangan"], div[role="dialog"][aria-label*="Backup"]')
+      const modalOpened = await backupModal.isVisible()
+      recordStep('Backup Modal Opened on Click', modalOpened)
+
+      const hasExport = await backupModal.locator('button:has-text("Unduh"), button:has-text("Download")').first().isVisible()
+      const hasCopy = await backupModal.locator('button:has-text("Salin"), button:has-text("Copy")').first().isVisible()
+      recordStep('Backup Modal Actions Available', hasExport && hasCopy, 'Export & Copy actions verified')
+
+      const closeBtn = backupModal.locator('button[aria-label*="Tutup"], button[aria-label*="Close"]').first()
+      await closeBtn.click()
+      await page.waitForTimeout(300)
+      recordStep('Backup Modal Closed Cleanly', !(await backupModal.isVisible()))
+    }
+
+    // 20. Check Console & Runtime Health
     const severeConsoleErrors = consoleLogs.filter(l => l.type === 'error' && !l.text.includes('favicon'))
     recordStep('Zero Unhandled Page Errors', pageErrors.length === 0, `Errors: ${pageErrors.length}`)
     recordStep('Zero Critical Console Errors', severeConsoleErrors.length === 0, `Errors: ${severeConsoleErrors.length}`)

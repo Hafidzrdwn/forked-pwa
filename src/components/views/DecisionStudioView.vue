@@ -12,6 +12,8 @@ import ComparisonMatrix from '../decision/ComparisonMatrix.vue'
 import WhatIfSimulator from '../decision/WhatIfSimulator.vue'
 import AssumptionManager from '../decision/AssumptionManager.vue'
 import IllustrationFork from '../common/IllustrationFork.vue'
+import DecisionWatermarkIllustration from '../common/DecisionWatermarkIllustration.vue'
+import { AddScenarioInputSchema } from '../../schemas/decision.schema'
 
 const props = defineProps<{
   decisions: Decision[]
@@ -39,8 +41,6 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale, interpolate } = useI18n()
-
-import { AddScenarioInputSchema } from '../../schemas/decision.schema'
 
 const showAddPath = ref(false)
 const pathName = ref('')
@@ -167,15 +167,27 @@ function formatDate(value: string) {
       </aside>
 
       <div v-if="activeDecision" class="min-w-0 flex flex-col gap-5">
-        <div class="border border-border rounded-2xl bg-surface p-4 md:p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-3 md:gap-4 shadow-xs">
-          <div class="min-w-0 flex-1">
+        <div class="border border-border rounded-2xl bg-surface p-4 md:p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-3 md:gap-4 shadow-xs relative overflow-hidden">
+          <div class="min-w-0 flex-1 relative z-10">
             <div class="text-[11px] font-semibold text-fg-subtle mb-1">
-              Dibuat pada {{ formatDate(activeDecision.createdAt) }}
+              {{ interpolate(t.studio.createdOn, { date: formatDate(activeDecision.createdAt) }) }}
             </div>
             <h2 class="font-display font-extrabold text-xl md:text-2xl tracking-tight text-fg my-0.5 wrap-break-word">{{ activeDecision.title }}</h2>
             <p class="text-xs md:text-sm text-fg-muted leading-relaxed m-0 mt-1.5">{{ activeDecision.context || t.studio.noContext }}</p>
+
+            <div class="mt-3">
+              <span
+                :class="[
+                  'inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs',
+                  (activeDecision.status || '').toLowerCase() === 'exploring' ? 'bg-amber-soft text-amber' : (activeDecision.status || '').toLowerCase() === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+                ]"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                {{ (activeDecision.status || '').toLowerCase() === 'exploring' ? t.common.statusExploring : (activeDecision.status || '').toLowerCase() === 'decided' ? t.common.statusDecided : t.common.statusReviewed }}
+              </span>
+            </div>
           </div>
-          <div class="flex items-center gap-2 shrink-0 self-end sm:self-start pt-1 sm:pt-0">
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-start pt-1 sm:pt-0 relative z-10">
             <button
               type="button"
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-fg hover:border-primary text-xs font-bold transition-all cursor-pointer shadow-2xs"
@@ -192,28 +204,23 @@ function formatDate(value: string) {
               <Trash2 :size="16" />
             </button>
           </div>
+
+          <!-- Ambient Decision Watermark Illustration (fills bottom-right empty space) -->
+          <DecisionWatermarkIllustration
+            class="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 lg:-bottom-8 lg:-right-6 hidden sm:block sm:w-52 sm:h-38 md:w-68 md:h-48 lg:w-84 lg:h-60 text-primary opacity-[0.10] dark:opacity-[0.18] z-0"
+          />
         </div>
 
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <span class="inline-flex items-center gap-1.5 text-fg font-medium">
-              <CalendarDays :size="15" class="text-primary" />
-              {{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}
-            </span>
-            <span
-              :class="[
-                'text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap',
-                activeDecision.status === 'exploring' ? 'bg-amber-soft text-amber' : activeDecision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
-              ]"
-            >
-              {{ activeDecision.status }}
-            </span>
+        <div id="decision-meta-card" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 p-4 bg-surface border border-border rounded-2xl text-xs md:text-sm text-fg-muted shadow-2xs">
+          <div class="inline-flex items-center gap-2 text-fg font-medium shrink-0 whitespace-nowrap">
+            <CalendarDays :size="16" class="text-primary shrink-0" />
+            <span>{{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}</span>
           </div>
 
-          <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto pt-2 sm:pt-0 border-t border-border/40 sm:border-0">
+          <div class="flex items-center gap-2.5 shrink-0 w-full sm:w-auto pt-2.5 sm:pt-0 border-t border-border/40 sm:border-0">
             <button
               type="button"
-              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-canvas-subtle hover:bg-surface hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface hover:bg-canvas-subtle hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs whitespace-nowrap"
               @click="emit('open-weights')"
             >
               <Scale :size="14" class="text-primary" />
@@ -222,7 +229,7 @@ function formatDate(value: string) {
 
             <button
               type="button"
-              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs whitespace-nowrap"
               @click="emit('open-journal')"
             >
               <span>{{ t.studio.openJournal }}</span>

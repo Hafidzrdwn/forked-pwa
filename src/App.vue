@@ -15,6 +15,7 @@ import ShareStoryModal from './components/modals/ShareStoryModal.vue'
 import ConfirmModal from './components/common/ConfirmModal.vue'
 import ToastContainer from './components/common/ToastContainer.vue'
 import PwaInstallBanner from './components/common/PwaInstallBanner.vue'
+import UnsupportedBrowserNotice from './components/common/UnsupportedBrowserNotice.vue'
 
 const {
   decisions, activeId, searchTerm, busy, notice, activeDecision, filteredDecisions,
@@ -77,7 +78,7 @@ async function handleDeleteActive() {
       @import-file="importBackupFile"
     />
 
-    <main class="md:ml-[252px] min-h-screen bg-canvas transition-colors duration-200">
+    <main class="md:ml-63 min-h-screen bg-canvas transition-colors duration-200">
       <AppTopbar
         :current-nav="nav"
         @toggle-mobile-menu="mobileMenuOpen = !mobileMenuOpen"
@@ -167,5 +168,7 @@ async function handleDeleteActive() {
     <ToastContainer />
 
     <PwaInstallBanner />
+
+    <UnsupportedBrowserNotice />
   </div>
 </template>

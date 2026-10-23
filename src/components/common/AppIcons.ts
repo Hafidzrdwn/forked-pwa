@@ -3,11 +3,13 @@ import { h, type FunctionalComponent } from 'vue'
 export interface IconProps {
   size?: number | string
   class?: string
+  strokeWidth?: number | string
 }
 
 function createIcon(pathFn: () => any[]): FunctionalComponent<IconProps> {
   return (props) => {
     const s = props.size || 20
+    const sw = props.strokeWidth || '2.2'
     return h(
       'svg',
       {
@@ -16,7 +18,7 @@ function createIcon(pathFn: () => any[]): FunctionalComponent<IconProps> {
         viewBox: '0 0 24 24',
         fill: 'none',
         stroke: 'currentColor',
-        strokeWidth: '1.8',
+        strokeWidth: sw,
         strokeLinecap: 'round',
         strokeLinejoin: 'round',
         class: props.class,
@@ -289,4 +291,16 @@ export const Coins = createIcon(() => [
 
 export const Activity = createIcon(() => [
   h('polyline', { points: '22 12 18 12 15 21 9 3 6 12 2 12' })
+])
+
+export const Database = createIcon(() => [
+  h('ellipse', { cx: '12', cy: '5', rx: '9', ry: '3' }),
+  h('path', { d: 'M21 12c0 1.66-4 3-9 3s-9-1.34-9-3' }),
+  h('path', { d: 'M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5' })
+])
+
+export const ExternalLink = createIcon(() => [
+  h('path', { d: 'M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6' }),
+  h('polyline', { points: '15 3 21 3 21 9' }),
+  h('line', { x1: '10', y1: '14', x2: '21', y2: '3' })
 ])

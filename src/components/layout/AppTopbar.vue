@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { Menu } from '../common/AppIcons'
 import LanguageSwitcher from '../common/LanguageSwitcher.vue'
 import ThemeToggle from '../common/ThemeToggle.vue'
-import VisualAvatar from '../common/VisualAvatar.vue'
 import { useI18n } from '../../i18n'
 
 const props = defineProps<{
@@ -45,7 +44,6 @@ const pageTitle = computed(() => {
     <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
       <ThemeToggle />
       <LanguageSwitcher />
-      <VisualAvatar :size="30" name="Decision Maker" class="shrink-0" />
     </div>
   </header>
 </template>

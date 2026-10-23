@@ -38,6 +38,13 @@ const alternativeScenarios = computed<Scenario[]>(() => {
   return format.value === 'feed' ? others.slice(0, 1) : others.slice(0, 2)
 })
 
+/* ------------------------------------------------------------------ */
+/* Canvas helpers                                                      */
+/* ------------------------------------------------------------------ */
+
+const FONT_DISPLAY = 'Manrope, sans-serif'
+const FONT_BODY = '"DM Sans", sans-serif'
+
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath()
   ctx.moveTo(x + r, y)
@@ -108,46 +115,79 @@ function drawBrandLogo(ctx: CanvasRenderingContext2D, x: number, y: number, size
   ctx.restore()
 }
 
-function wrapText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number,
-  maxLines: number = 8
-): number {
-  const words = text.split(' ')
+function setFont(ctx: CanvasRenderingContext2D, weight: number, size: number, family: string) {
+  ctx.font = `${weight} ${size}px ${family}`
+}
+
+/** Potong teks + "…" sampai muat di maxWidth (font harus sudah di-set). */
+function truncateWithEllipsis(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  let s = text
+  while (s.length > 0 && ctx.measureText(`${s}…`).width > maxWidth) s = s.slice(0, -1)
+  return `${s.trimEnd()}…`
+}
+
+/** Pecah teks menjadi baris-baris (maks maxLines), baris terakhir diberi "…" jika terpotong. */
+function computeLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
+  const words = text.trim().split(/\s+/).filter(Boolean)
+  const all: string[] = []
   let line = ''
-  let linesCount = 0
-  let currentY = y
 
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + ' '
-    const metrics = ctx.measureText(testLine)
-    const testWidth = metrics.width
-
-    if (testWidth > maxWidth && n > 0) {
-      linesCount++
-      if (linesCount >= maxLines) {
-        ctx.fillText(line.trim(), x, currentY)
-        return currentY + lineHeight
-      }
-      ctx.fillText(line.trim(), x, currentY)
-      line = words[n] + ' '
-      currentY += lineHeight
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word
+    if (line && ctx.measureText(test).width > maxWidth) {
+      all.push(line)
+      line = word
     } else {
-      line = testLine
+      line = test
     }
   }
+  if (line) all.push(line)
 
-  if (line.trim().length > 0) {
-    ctx.fillText(line.trim(), x, currentY)
-    currentY += lineHeight
+  const lines = all.slice(0, maxLines)
+  if (all.length > maxLines && lines.length > 0) {
+    const last = lines[lines.length - 1]
+    lines[lines.length - 1] = truncateWithEllipsis(ctx, last, maxWidth)
   }
 
-  return currentY
+  // kata tunggal yang terlalu panjang
+  return lines.map(l => (ctx.measureText(l).width > maxWidth ? truncateWithEllipsis(ctx, l, maxWidth) : l))
 }
+
+function drawLines(ctx: CanvasRenderingContext2D, lines: string[], x: number, y: number, lineHeight: number): number {
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight))
+  return y + lines.length * lineHeight
+}
+
+/** Kecilkan font sampai teks muat di maxWidth. Mengembalikan ukuran akhir. */
+function fitFont(
+  ctx: CanvasRenderingContext2D,
+  weight: number,
+  size: number,
+  family: string,
+  text: string,
+  maxWidth: number,
+  minSize: number
+): number {
+  let s = size
+  setFont(ctx, weight, s, family)
+  while (s > minSize && ctx.measureText(text).width > maxWidth) {
+    s -= 2
+    setFont(ctx, weight, s, family)
+  }
+  return s
+}
+
+function hLine(ctx: CanvasRenderingContext2D, x1: number, x2: number, y: number, color: string) {
+  ctx.fillStyle = color
+  ctx.fillRect(x1, y, x2 - x1, 2)
+}
+
+/* ------------------------------------------------------------------ */
+/* Render kartu                                                        */
+/*                                                                     */
+/* Hierarki:  pertanyaan (redup) → jawaban (besar) → skor (aksen)      */
+/*            → 2 metrik utama → pembanding (ringkas) → footer         */
+/* ------------------------------------------------------------------ */
 
 function renderCanvas() {
   const canvas = canvasRef.value
@@ -156,276 +196,285 @@ function renderCanvas() {
   if (!ctx) return
 
   const isStory = format.value === 'story'
+  const v = (story: number, feed: number) => (isStory ? story : feed)
+
   const W = 1080
   const H = isStory ? 1920 : 1080
   canvas.width = W
   canvas.height = H
+  ctx.textBaseline = 'top'
+  ctx.textAlign = 'left'
 
-  const bgGradient = ctx.createLinearGradient(0, 0, W, H)
-  bgGradient.addColorStop(0, '#060a12')
-  bgGradient.addColorStop(0.5, '#0b1220')
-  bgGradient.addColorStop(1, '#050811')
-  ctx.fillStyle = bgGradient
-  ctx.fillRect(0, 0, W, H)
+  const WHITE = '#FFFFFF'
+  const SOFT = 'rgba(255, 255, 255, 0.72)'
+  const MUTED = 'rgba(255, 255, 255, 0.55)'
+  const LINE = 'rgba(255, 255, 255, 0.12)'
+  const ACCENT = '#34D399'
 
-  const radialTop = ctx.createRadialGradient(W - 80, 80, 20, W - 80, 80, 650)
-  radialTop.addColorStop(0, 'rgba(16, 185, 129, 0.22)')
-  radialTop.addColorStop(1, 'rgba(16, 185, 129, 0)')
-  ctx.fillStyle = radialTop
-  ctx.fillRect(0, 0, W, H)
-
-  const radialBottom = ctx.createRadialGradient(80, H - 80, 20, 80, H - 80, 700)
-  radialBottom.addColorStop(0, 'rgba(6, 182, 212, 0.16)')
-  radialBottom.addColorStop(1, 'rgba(6, 182, 212, 0)')
-  ctx.fillStyle = radialBottom
-  ctx.fillRect(0, 0, W, H)
-
-  const pad = isStory ? 56 : 40
-  const cardW = W - pad * 2
-  const cardH = H - pad * 2
-  const cardX = pad
-  const cardY = pad
-
-  roundRect(ctx, cardX, cardY, cardW, cardH, 36)
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.72)'
-  ctx.fill()
-  ctx.lineWidth = 1.5
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
-  ctx.stroke()
-
-  let cursorY = cardY + (isStory ? 64 : 48)
-
-  const brandX = cardX + 44
-  drawBrandLogo(ctx, brandX, cursorY - 20, 46)
-
-  ctx.font = 'bold 26px Manrope, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  ctx.fillText('FORKED', brandX + 58, cursorY + 11)
-
-  ctx.font = 'bold 13px sans-serif'
-  ctx.fillStyle = '#10b981'
-  ctx.fillText(t.value.nav.brandSubtitle, brandX + 180, cursorY + 9)
-
-  const dateFormatted = new Intl.DateTimeFormat(locale.value === 'id' ? 'id-ID' : 'en-US', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  }).format(new Date(`${props.decision.createdAt}T12:00:00`))
-  ctx.font = 'bold 14px sans-serif'
-  const dateW = ctx.measureText(dateFormatted).width + 32
-  const dateX = cardX + cardW - dateW - 44
-  roundRect(ctx, dateX, cursorY - 18, dateW, 38, 19)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.07)'
-  ctx.fill()
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
-  ctx.fillText(dateFormatted, dateX + 16, cursorY + 6)
-
-  cursorY += isStory ? 92 : 64
-
-  ctx.font = 'bold 15px sans-serif'
-  ctx.fillStyle = '#10b981'
-  ctx.fillText(t.value.shareModal.eyebrow, cardX + 44, cursorY)
-
-  cursorY += 36
-  const isLongTitle = props.decision.title.length > 55
-  ctx.font = isStory
-    ? isLongTitle ? 'extrabold 36px Manrope, sans-serif' : 'extrabold 42px Manrope, sans-serif'
-    : isLongTitle ? 'extrabold 26px Manrope, sans-serif' : 'extrabold 30px Manrope, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  cursorY = wrapText(
-    ctx,
-    props.decision.title,
-    cardX + 44,
-    cursorY,
-    cardW - 88,
-    isStory ? (isLongTitle ? 48 : 54) : (isLongTitle ? 36 : 40),
-    isStory ? 3 : 2
-  )
-
-  if (props.decision.context) {
-    cursorY += 6
-    const ctxLen = props.decision.context.length
-    ctx.font = isStory
-      ? (ctxLen > 180 ? 'italic 16px sans-serif' : ctxLen > 90 ? 'italic 17px sans-serif' : 'italic 18px sans-serif')
-      : (ctxLen > 180 ? 'italic 14px sans-serif' : ctxLen > 90 ? 'italic 15px sans-serif' : 'italic 16px sans-serif')
-    const ctxLineHeight = isStory
-      ? (ctxLen > 180 ? 24 : 26)
-      : (ctxLen > 180 ? 21 : 23)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
-    cursorY = wrapText(ctx, `"${props.decision.context}"`, cardX + 44, cursorY, cardW - 88, ctxLineHeight, 6)
-  }
-
-  cursorY += isStory ? 34 : 20
-
+  const isId = locale.value === 'id'
   const chosen = chosenScenario.value
   const chosenScore = scoreScenario(chosen, props.decision.weights)
   const chosenNet = chosen.monthlyIncome - chosen.monthlyCost
+  const isChosen = !!props.decision.selectedScenarioId
+  const alts = alternativeScenarios.value
+  const hasAlt = alts.length > 0
 
-  const heroBoxH = isStory ? 315 : 200
-  const heroBoxX = cardX + 44
-  const heroBoxW = cardW - 88
+  // ---- Background: satu warna solid + satu cahaya halus ----
+  ctx.fillStyle = '#0a0e0c'
+  ctx.fillRect(0, 0, W, H)
 
-  roundRect(ctx, heroBoxX, cursorY, heroBoxW, heroBoxH, 24)
-  const heroGradient = ctx.createLinearGradient(heroBoxX, cursorY, heroBoxX + heroBoxW, cursorY + heroBoxH)
-  heroGradient.addColorStop(0, 'rgba(16, 185, 129, 0.16)')
-  heroGradient.addColorStop(1, 'rgba(6, 182, 212, 0.08)')
-  ctx.fillStyle = heroGradient
+  const glow = ctx.createRadialGradient(W, 0, 0, W, 0, isStory ? 1100 : 760)
+  glow.addColorStop(0, 'rgba(52, 211, 153, 0.15)')
+  glow.addColorStop(1, 'rgba(52, 211, 153, 0)')
+  ctx.fillStyle = glow
+  ctx.fillRect(0, 0, W, H)
+
+  // ---- Grid dasar ----
+  // Story: sisakan area aman atas/bawah agar tidak tertutup UI Instagram.
+  const padX = v(88, 64)
+  const contentW = W - padX * 2
+  const right = padX + contentW
+  let y = v(120, 60)
+
+  // ---- 1. Header: logo + nama brand (kiri), tanggal (kanan) ----
+  const logo = v(60, 48)
+  drawBrandLogo(ctx, padX, y, logo)
+
+  ctx.textBaseline = 'middle'
+  setFont(ctx, 800, v(36, 28), FONT_DISPLAY)
+  ctx.fillStyle = WHITE
+  ctx.fillText('FORKED', padX + logo + v(20, 16), y + logo / 2 + 1)
+
+  const dateFormatted = new Intl.DateTimeFormat(isId ? 'id-ID' : 'en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(`${props.decision.createdAt}T12:00:00`))
+
+  setFont(ctx, 600, v(26, 20), FONT_BODY)
+  ctx.fillStyle = MUTED
+  ctx.textAlign = 'right'
+  ctx.fillText(dateFormatted, right, y + logo / 2 + 1)
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+
+  y += logo + v(100, 56)
+
+  // ---- 2. Pertanyaan keputusan (redup, ukuran sedang) ----
+  const titleLong = props.decision.title.length > v(60, 50)
+  const titleSize = titleLong ? v(44, 32) : v(52, 38)
+  const titleLH = Math.round(titleSize * 1.18)
+  setFont(ctx, 700, titleSize, FONT_DISPLAY)
+  ctx.fillStyle = SOFT
+  const titleLines = computeLines(ctx, props.decision.title, contentW, v(3, 2))
+  y = drawLines(ctx, titleLines, padX, y, titleLH)
+
+  const contextText = (props.decision.context ?? '').trim()
+  if (contextText) {
+    const ctxMaxH = v(240, 110)
+    const ctxMinSize = v(24, 18)
+    let ctxSize = v(30, 22)
+    let ctxLines: string[] = []
+
+    for (; ;) {
+      setFont(ctx, 500, ctxSize, FONT_BODY)
+      ctxLines = computeLines(ctx, contextText, contentW, Infinity)
+      if (ctxLines.length * Math.round(ctxSize * 1.4) <= ctxMaxH || ctxSize <= ctxMinSize) break
+      ctxSize -= 2
+    }
+
+    y += v(20, 12)
+    ctx.fillStyle = MUTED
+    y = drawLines(ctx, ctxLines, padX, y, Math.round(ctxSize * 1.4))
+  }
+  y += v(56, 28)
+
+  // ---- 3. Footer (posisi dihitung dulu agar konten mengisi sisa ruang) ----
+  const footerH = v(56, 44)
+  const footerY = H - v(150, 48) - footerH
+  const contentBottom = footerY - v(56, 28)
+
+  // ---- 4. Ukuran blok pembanding ----
+  const altRowH = v(96, 72)
+  const altHeaderH = v(48, 36)
+  const altGap = v(48, 28)
+  const altSectionH = hasAlt ? altHeaderH + alts.length * altRowH : 0
+
+  // ---- 5. Hero: jawaban terpilih ----
+  const heroTop = y
+  const heroBottom = contentBottom - altSectionH - (hasAlt ? altGap : 0)
+
+  const badgeH = v(32, 26)
+
+  const nameSize = v(76, 44)
+  const nameLH = v(88, 52)
+  setFont(ctx, 800, nameSize, FONT_DISPLAY)
+  const nameLines = computeLines(ctx, chosen.name, contentW, v(3, 2))
+  const nameH = nameLines.length * nameLH
+
+  const scoreLabelSize = v(24, 20)
+  const scoreNumSize = v(150, 88)
+  const scoreNumBox = Math.round(scoreNumSize * 0.82)
+  const barH = v(12, 8)
+  const scoreH = scoreLabelSize + v(14, 10) + scoreNumBox + v(24, 14) + barH
+
+  const metricsH = v(122, 86)
+
+  const blocksTotal = badgeH + nameH + scoreH + metricsH
+  const gapMin = v(28, 16)
+  const gapMax = v(64, 40)
+
+  const heroH = Math.max(heroBottom - heroTop, blocksTotal + gapMin * 3)
+  const gap = Math.min(gapMax, (heroH - blocksTotal) / 3)
+  const offset = Math.max(0, (heroH - blocksTotal - gap * 3) / 2)
+
+  let cy = heroTop + offset
+
+  // 5a. Status (titik + teks, tanpa pill)
+  const statusText = isChosen ? t.value.shareModal.badgeChosen : t.value.shareModal.badgeExploring
+  const dot = v(14, 11)
+  ctx.fillStyle = isChosen ? ACCENT : MUTED
+  ctx.beginPath()
+  ctx.arc(padX + dot / 2, cy + badgeH / 2, dot / 2, 0, Math.PI * 2)
   ctx.fill()
-  ctx.lineWidth = 2
-  ctx.strokeStyle = '#10b981'
-  ctx.stroke()
 
-  const badgeX = heroBoxX + 24
-  const badgeY = cursorY + 32
-  const badgeText = `★  ${props.decision.selectedScenarioId ? t.value.shareModal.badgeChosen : t.value.shareModal.badgeExploring}`
-  ctx.font = 'bold 13px sans-serif'
-  const badgeWidth = ctx.measureText(badgeText).width + 26
-  roundRect(ctx, badgeX, badgeY - 14, badgeWidth, 30, 15)
-  ctx.fillStyle = '#10b981'
+  ctx.textBaseline = 'middle'
+  setFont(ctx, 700, v(26, 20), FONT_BODY)
+  ctx.fillStyle = isChosen ? ACCENT : MUTED
+  ctx.fillText(statusText, padX + dot + v(14, 10), cy + badgeH / 2 + 1)
+  ctx.textBaseline = 'top'
+  cy += badgeH + gap
+
+  // 5b. Nama pilihan (elemen teks terbesar)
+  setFont(ctx, 800, nameSize, FONT_DISPLAY)
+  ctx.fillStyle = WHITE
+  drawLines(ctx, nameLines, padX, cy, nameLH)
+  cy += nameH + gap
+
+  // 5c. Skor kecocokan (satu-satunya elemen beraksen)
+  setFont(ctx, 600, scoreLabelSize, FONT_BODY)
+  ctx.fillStyle = MUTED
+  ctx.fillText(isId ? 'Skor kecocokan' : 'Fit score', padX, cy)
+
+  const numTop = cy + scoreLabelSize + v(14, 10)
+  const numBaseline = numTop + scoreNumSize * 0.78
+  const scoreNum = `${chosenScore.total}`
+
+  ctx.textBaseline = 'alphabetic'
+  setFont(ctx, 800, scoreNumSize, FONT_DISPLAY)
+  ctx.fillStyle = ACCENT
+  ctx.fillText(scoreNum, padX, numBaseline)
+  const scoreNumW = ctx.measureText(scoreNum).width
+
+  setFont(ctx, 700, v(40, 26), FONT_DISPLAY)
+  ctx.fillStyle = MUTED
+  ctx.fillText('/100', padX + scoreNumW + v(12, 8), numBaseline)
+  ctx.textBaseline = 'top'
+
+  const barY = numTop + scoreNumBox + v(24, 14)
+  const pct = Math.max(0, Math.min(100, chosenScore.total)) / 100
+  roundRect(ctx, padX, barY, contentW, barH, barH / 2)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.10)'
   ctx.fill()
-  ctx.fillStyle = '#060a12'
-  ctx.fillText(badgeText, badgeX + 13, badgeY + 6)
 
-  const scoreText = `${chosenScore.total}/100 ${t.value.shareModal.badgeScore}`
-  ctx.font = 'bold 18px sans-serif'
-  ctx.fillStyle = '#10b981'
-  const scoreWidth = ctx.measureText(scoreText).width
-  ctx.fillText(scoreText, heroBoxX + heroBoxW - scoreWidth - 24, badgeY + 6)
+  const fillW = Math.max(barH, contentW * pct)
+  const barGrad = ctx.createLinearGradient(padX, 0, padX + fillW, 0)
+  barGrad.addColorStop(0, '#34D399')
+  barGrad.addColorStop(1, '#A7F3D0')
+  roundRect(ctx, padX, barY, fillW, barH, barH / 2)
+  ctx.fillStyle = barGrad
+  ctx.fill()
 
-  ctx.font = isStory ? 'extrabold 30px Manrope, sans-serif' : 'extrabold 22px Manrope, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  const maxPathTitleW = heroBoxW - 48
-  wrapText(ctx, chosen.name, heroBoxX + 24, cursorY + (isStory ? 104 : 76), maxPathTitleW, isStory ? 36 : 28, isStory ? 2 : 1)
+  cy += scoreH + gap
 
-  const metricsY = cursorY + (isStory ? 194 : 126)
-  const pillGap = 12
-  const pillW = (heroBoxW - 48 - pillGap * 2) / 3
-  const pillH = isStory ? 74 : 48
+  // 5d. Dua metrik utama (tanpa kotak, dipisah garis tipis)
+  hLine(ctx, padX, right, cy, LINE)
 
-  const metricsData = [
-    { label: t.value.shareModal.badgeScore, val: `${chosenScore.total} ${t.value.common.pts}` },
-    { label: t.value.shareModal.badgeNet, val: formatRupiah(chosenNet) },
-    { label: t.value.shareModal.badgeTime, val: `${chosen.hoursPerWeek} ${t.value.common.hrs}` }
+  const colW = contentW / 2
+  const colPad = v(36, 24)
+  const metricTop = cy + v(32, 20)
+  const labelSize = v(24, 20)
+  const valueTop = metricTop + labelSize + v(14, 10)
+
+  const netVal = formatRupiah(chosenNet)
+  const timeVal = `${chosen.hoursPerWeek} ${t.value.common.hrs} / ${isId ? 'mgg' : 'wk'}`
+  const metrics = [
+    { label: t.value.shareModal.badgeNet, val: netVal, x: padX, maxW: colW - colPad, color: chosenNet < 0 ? '#F87171' : WHITE },
+    { label: t.value.shareModal.badgeTime, val: timeVal, x: padX + colW + colPad, maxW: colW - colPad, color: WHITE }
   ]
 
-  for (let i = 0; i < 3; i++) {
-    const px = heroBoxX + 24 + i * (pillW + pillGap)
-    roundRect(ctx, px, metricsY, pillW, pillH, 14)
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
-    ctx.fill()
+  for (const m of metrics) {
+    setFont(ctx, 600, labelSize, FONT_BODY)
+    ctx.fillStyle = MUTED
+    ctx.fillText(m.label, m.x, metricTop)
 
-    ctx.font = '11px sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)'
-    ctx.fillText(metricsData[i].label, px + 14, metricsY + (isStory ? 26 : 18))
-
-    const valStr = metricsData[i].val
-    ctx.font = valStr.length > 12
-      ? 'bold 14px sans-serif'
-      : isStory ? 'bold 18px sans-serif' : 'bold 15px sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(valStr, px + 14, metricsY + (isStory ? 54 : 37))
+    fitFont(ctx, 800, v(52, 36), FONT_DISPLAY, m.val, m.maxW, v(30, 22))
+    ctx.fillStyle = m.color
+    ctx.fillText(m.val, m.x, valueTop)
   }
 
-  cursorY += heroBoxH + (isStory ? 36 : 20)
+  ctx.fillStyle = LINE
+  ctx.fillRect(padX + colW, metricTop, 2, cy + metricsH - metricTop)
 
-  if (alternativeScenarios.value.length > 0) {
-    ctx.beginPath()
-    ctx.moveTo(cardX + 44, cursorY + 10)
-    ctx.lineTo(cardX + cardW / 2 - 35, cursorY + 10)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.stroke()
+  // ---- 6. Pembanding: hanya nama + skor ----
+  if (hasAlt) {
+    let ay = heroTop + heroH + altGap
 
-    roundRect(ctx, cardX + cardW / 2 - 25, cursorY - 3, 50, 26, 13)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
-    ctx.fill()
-    ctx.font = 'bold 11px sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    ctx.fillText(t.value.shareModal.versus, cardX + cardW / 2 - 9, cursorY + 14)
+    setFont(ctx, 600, v(24, 20), FONT_BODY)
+    ctx.fillStyle = MUTED
+    ctx.fillText(isId ? 'Dibandingkan opsi lain' : 'Compared with alternatives', padX, ay)
+    ay += altHeaderH
 
-    ctx.beginPath()
-    ctx.moveTo(cardX + cardW / 2 + 35, cursorY + 10)
-    ctx.lineTo(cardX + cardW - 44, cursorY + 10)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-    ctx.lineWidth = 1
-    ctx.stroke()
+    for (const alt of alts) {
+      const altScore = scoreScenario(alt, props.decision.weights).total
+      hLine(ctx, padX, right, ay, LINE)
 
-    cursorY += 32
+      const midY = ay + altRowH / 2 + 1
+      ctx.textBaseline = 'middle'
 
-    for (const alt of alternativeScenarios.value) {
-      const altScore = scoreScenario(alt, props.decision.weights)
-      const altNet = alt.monthlyIncome - alt.monthlyCost
-      const altH = isStory ? 86 : 64
+      // skor di kanan: "72" + "/100"
+      setFont(ctx, 700, v(22, 16), FONT_DISPLAY)
+      const subW = ctx.measureText('/100').width
+      setFont(ctx, 800, v(40, 28), FONT_DISPLAY)
+      const numStr = `${altScore}`
+      const numW = ctx.measureText(numStr).width
+      const scoreLeft = right - subW - numW - v(8, 6)
 
-      roundRect(ctx, cardX + 44, cursorY, cardW - 88, altH, 16)
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
-      ctx.fill()
-      ctx.lineWidth = 1
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)'
-      ctx.stroke()
+      ctx.fillStyle = WHITE
+      ctx.fillText(numStr, scoreLeft, midY)
+      setFont(ctx, 700, v(22, 16), FONT_DISPLAY)
+      ctx.fillStyle = MUTED
+      ctx.fillText('/100', right - subW, midY)
 
-      const altScoreText = `${altScore.total}/100`
-      ctx.font = 'bold 17px sans-serif'
-      const altScoreW = ctx.measureText(altScoreText).width
-      const altScoreX = cardX + cardW - 44 - 24 - altScoreW
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-      ctx.fillText(altScoreText, altScoreX, cursorY + (isStory ? 50 : 38))
+      // nama di kiri
+      setFont(ctx, 700, v(32, 24), FONT_DISPLAY)
+      ctx.fillStyle = SOFT
+      const [altName] = computeLines(ctx, alt.name, scoreLeft - padX - v(32, 20), 1)
+      ctx.fillText(altName ?? '', padX, midY)
 
-      const maxAltNameW = altScoreX - (cardX + 44 + 24) - 16
-      ctx.font = 'bold 17px Manrope, sans-serif'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
-      wrapText(ctx, alt.name, cardX + 44 + 24, cursorY + (isStory ? 36 : 28), maxAltNameW, isStory ? 24 : 20, 1)
-
-      ctx.font = '13.5px sans-serif'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-      ctx.fillText(`${formatRupiah(altNet)} · ${alt.hoursPerWeek} ${t.value.common.hrs}`, cardX + 44 + 24, cursorY + (isStory ? 66 : 50))
-
-      cursorY += altH + 12
+      ctx.textBaseline = 'top'
+      ay += altRowH
     }
   }
 
-  const ctaH = isStory ? 180 : 120
-  const ctaY = cardY + cardH - ctaH - (isStory ? 36 : 20)
-  const ctaX = cardX + 44
-  const ctaW = cardW - 88
+  // ---- 7. Footer: tanpa kotak, hanya garis tipis ----
+  hLine(ctx, padX, right, footerY - v(28, 14), LINE)
 
-  roundRect(ctx, ctaX, ctaY, ctaW, ctaH, 20)
-  const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaW, ctaY + ctaH)
-  ctaGradient.addColorStop(0, 'rgba(16, 185, 129, 0.12)')
-  ctaGradient.addColorStop(1, 'rgba(15, 23, 42, 0.85)')
-  ctx.fillStyle = ctaGradient
-  ctx.fill()
-  ctx.lineWidth = 1.5
-  ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)'
-  ctx.stroke()
+  const fMid = footerY + footerH / 2 + 1
+  const fLogo = v(40, 32)
+  drawBrandLogo(ctx, padX, footerY + footerH / 2 - fLogo / 2, fLogo)
 
-  ctx.font = 'bold 15px Manrope, sans-serif'
-  const btnText = t.value.shareModal.ctaUrl
-  const btnW = ctx.measureText(btnText).width + 36
-  const btnH = isStory ? 44 : 38
-  const btnX = ctaX + ctaW - btnW - 24
-  const btnY = ctaY + (ctaH - btnH) / 2
-  roundRect(ctx, btnX, btnY, btnW, btnH, 12)
-  ctx.fillStyle = '#10b981'
-  ctx.fill()
-  ctx.font = 'bold 15px Manrope, sans-serif'
-  ctx.fillStyle = '#060a12'
-  ctx.fillText(btnText, btnX + 18, btnY + (btnH / 2) + 5)
+  ctx.textBaseline = 'middle'
+  setFont(ctx, 800, v(26, 20), FONT_DISPLAY)
+  ctx.fillStyle = WHITE
+  ctx.fillText('FORKED', padX + fLogo + v(16, 12), fMid)
 
-  const maxCtaTextW = btnX - ctaX - 40
-  ctx.font = isStory ? 'bold 21px Manrope, sans-serif' : 'bold 17px Manrope, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  ctx.fillText(t.value.shareModal.ctaTitle, ctaX + 24, ctaY + (isStory ? 52 : 44))
-
-  ctx.font = isStory ? '15px sans-serif' : '13px sans-serif'
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  wrapText(ctx, t.value.shareModal.ctaSubtitle, ctaX + 24, ctaY + (isStory ? 88 : 72), maxCtaTextW, isStory ? 22 : 18, 2)
-
-  if (isStory) {
-    ctx.font = '12px sans-serif'
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'
-    ctx.fillText('100% Client-side · Tanpa Akun · Data Milikmu', ctaX + 24, ctaY + 138)
-  }
+  setFont(ctx, 700, v(24, 18), FONT_BODY)
+  ctx.fillStyle = MUTED
+  ctx.textAlign = 'right'
+  ctx.fillText('forked.hafidzrdwn.dev', right, fMid)
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
 }
 
 async function downloadImage() {
@@ -570,6 +619,9 @@ watch(format, () => {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
+  if (typeof document !== 'undefined' && document.fonts) {
+    document.fonts.ready.then(() => renderCanvas())
+  }
   nextTick(() => renderCanvas())
 })
 
@@ -579,61 +631,44 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="share-modal-title"
-    @click.self="emit('close')"
-  >
-    <div class="w-full max-w-2xl max-h-[92vh] flex flex-col bg-surface border border-border rounded-2xl shadow-2xl text-fg overflow-hidden">
+  <div class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6" role="dialog"
+    aria-modal="true" aria-labelledby="share-modal-title" @click.self="emit('close')">
+    <div
+      class="w-full max-w-2xl max-h-[92vh] flex flex-col bg-surface border border-border rounded-2xl shadow-2xl text-fg overflow-hidden">
       <div class="p-4 md:p-5 border-b border-border flex items-center justify-between gap-4">
         <div>
           <h2 id="share-modal-title" class="font-display font-bold text-lg md:text-xl text-fg m-0">
             {{ t.shareModal.title }}
           </h2>
         </div>
-        <button
-          type="button"
+        <button type="button"
           class="w-8 h-8 rounded-xl border border-border bg-surface text-fg-muted hover:text-fg hover:bg-canvas-subtle grid place-items-center transition-colors cursor-pointer"
-          :aria-label="t.common.close"
-          @click="emit('close')"
-        >
+          :aria-label="t.common.close" @click="emit('close')">
           <X :size="17" />
         </button>
       </div>
 
       <div class="p-4 md:p-5 overflow-y-auto flex-1 flex flex-col items-center">
         <div class="inline-flex items-center gap-1.5 p-1 bg-canvas-subtle border border-border rounded-xl mb-4">
-          <button
-            type="button"
-            :class="[
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
-              format === 'story' ? 'bg-primary text-white shadow-2xs' : 'text-fg-muted hover:text-fg'
-            ]"
-            @click="format = 'story'"
-          >
+          <button type="button" :class="[
+            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+            format === 'story' ? 'bg-primary text-white shadow-2xs' : 'text-fg-muted hover:text-fg'
+          ]" @click="format = 'story'">
             <Smartphone :size="13" />
             {{ t.shareModal.formatStory }}
           </button>
-          <button
-            type="button"
-            :class="[
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
-              format === 'feed' ? 'bg-primary text-white shadow-2xs' : 'text-fg-muted hover:text-fg'
-            ]"
-            @click="format = 'feed'"
-          >
+          <button type="button" :class="[
+            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+            format === 'feed' ? 'bg-primary text-white shadow-2xs' : 'text-fg-muted hover:text-fg'
+          ]" @click="format = 'feed'">
             <Square :size="13" />
             {{ t.shareModal.formatFeed }}
           </button>
         </div>
 
         <div class="w-full flex justify-center py-2 bg-canvas-subtle/50 rounded-2xl border border-border p-3">
-          <canvas
-            ref="canvasRef"
-            class="max-h-[50vh] w-auto max-w-full rounded-xl shadow-2xl border border-border/80 object-contain"
-          />
+          <canvas ref="canvasRef"
+            class="max-h-[50vh] w-auto max-w-full rounded-xl shadow-2xl border border-border/80 object-contain" />
         </div>
 
         <p class="text-xs text-fg-muted text-center mt-3 max-w-md">
@@ -642,30 +677,24 @@ onUnmounted(() => {
       </div>
 
       <div class="p-4 md:p-5 border-t border-border bg-canvas-subtle flex flex-wrap items-center justify-between gap-3">
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex items-center gap-1.5 text-xs font-bold text-fg-muted hover:text-fg cursor-pointer transition-colors"
-          @click="copyTextSummary"
-        >
+          @click="copyTextSummary">
           <Check v-if="copied" :size="14" class="text-primary" />
           <Copy v-else :size="14" />
           {{ copied ? t.shareModal.copiedNotice : t.shareModal.copySummary }}
         </button>
 
         <div class="flex items-center gap-2 ml-auto">
-          <button
-            type="button"
+          <button type="button"
             class="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-2 text-xs font-bold text-fg hover:bg-canvas transition-colors cursor-pointer shadow-xs"
-            @click="shareNative"
-          >
+            @click="shareNative">
             <Share2 :size="14" />
             {{ t.shareModal.shareNative }}
           </button>
-          <button
-            type="button"
+          <button type="button"
             class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary-dark transition-colors cursor-pointer shadow-xs"
-            @click="downloadImage"
-          >
+            @click="downloadImage">
             <Check v-if="downloaded" :size="14" />
             <Download v-else :size="14" />
             {{ downloaded ? t.shareModal.downloadedNotice : t.shareModal.downloadPng }}

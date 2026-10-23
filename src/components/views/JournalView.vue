@@ -123,10 +123,10 @@ const isOverdue = (dateStr: string) => {
             <span
               :class="[
                 'text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap',
-                decision.status === 'exploring' ? 'bg-amber-soft text-amber' : decision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+                (decision.status || '').toLowerCase() === 'exploring' ? 'bg-amber-soft text-amber' : (decision.status || '').toLowerCase() === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
               ]"
             >
-              {{ decision.status }}
+              {{ (decision.status || '').toLowerCase() === 'exploring' ? t.common.statusExploring : (decision.status || '').toLowerCase() === 'decided' ? t.common.statusDecided : t.common.statusReviewed }}
             </span>
           </div>
         </div>

@@ -18,7 +18,10 @@ export const en = {
     noticeWeightsSaved: 'Scoring weights updated',
     noticeReviewDateSaved: 'Review date updated',
     noticeBackupExported: 'Backup exported successfully',
-    noticeBackupImported: 'Backup restored successfully'
+    noticeBackupImported: 'Backup restored successfully',
+    statusExploring: 'Exploring',
+    statusDecided: 'Decided',
+    statusReviewed: 'Reviewed'
   },
   nav: {
     brandSubtitle: 'DECISION STUDIO',
@@ -31,6 +34,7 @@ export const en = {
     exportBackup: 'Export Backup',
     copyBackup: 'Copy Backup (JSON)',
     importBackup: 'Import Backup',
+    backupAction: 'Manage Backups',
     tagline: 'MADE FOR THE MOMENTS THAT MATTER.'
   },
   overview: {
@@ -72,6 +76,7 @@ export const en = {
     noMatches: 'No decisions match your search.',
     addDecision: 'Add a decision',
     briefEyebrow: 'DECISION BRIEF · CREATED {date}',
+    createdOn: 'Created on {date}',
     noContext: 'Add context to clarify what is at stake.',
     deleteAria: 'Delete decision',
     reviewBy: 'Review by {date}',
@@ -304,5 +309,28 @@ export const en = {
     installed: 'App Installed',
     iosTitle: 'How to Install on iPhone / iPad',
     iosInstruction: 'Tap the Share button at the bottom of Safari, then select "Add to Home Screen".'
+  },
+  backupModal: {
+    title: 'Data Backup & Restore',
+    subtitle: 'Your decision data is stored entirely locally on this device. You can download or copy JSON data anytime for safe keeping or cross-device transfer.',
+    exportTitle: 'Save Backup File (.json)',
+    exportDesc: 'Download the complete raw JSON file containing all your decisions, simulations, and notes.',
+    exportBtn: 'Download JSON File',
+    copyTitle: 'Copy Data to Clipboard',
+    copyDesc: 'Copy the raw JSON data to clipboard for easy pasting or archiving.',
+    copyBtn: 'Copy JSON Text',
+    importTitle: 'Open / Restore Backup File',
+    importDesc: 'Restore your decisions from a previously saved JSON backup file.',
+    importBtn: 'Select Backup File',
+    copiedNotice: 'Backup JSON data copied to clipboard!'
+  },
+  unsupportedBrowser: {
+    title: 'Open in External Browser for Best Experience',
+    subtitle: 'In-app webviews (like Instagram, TikTok) or older browsers restrict local storage and may erase your decisions when closed.',
+    recommendation: 'We recommend opening Forked in Chrome, Safari, or Firefox to ensure all decisions are safely preserved.',
+    copyLink: 'Copy Web Link',
+    copied: 'Link Copied to Clipboard!',
+    continueAnyway: 'Continue Anyway (Limited Storage)',
+    stepGuide: 'Or tap the three dots (•••) menu at the top corner, then tap "Open in External Browser".'
   }
 }

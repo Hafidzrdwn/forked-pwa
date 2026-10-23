@@ -6,13 +6,13 @@ const { locale, setLocale } = useI18n()
 </script>
 
 <template>
-  <div class="inline-flex items-center gap-1 bg-surface border border-border rounded-full px-2.5 py-1 text-xs font-bold select-none transition-colors" role="group" aria-label="Pilih Bahasa / Choose Language">
-    <Globe :size="13" class="text-fg-subtle mr-0.5" />
+  <div class="inline-flex items-center gap-1.5 bg-surface border border-border rounded-full px-3 py-1.5 text-xs font-bold select-none transition-colors shadow-2xs" role="group" aria-label="Pilih Bahasa / Choose Language">
+    <Globe :size="15" class="text-fg-muted shrink-0" stroke-width="2.3" />
     <button
       type="button"
       :class="[
-        'px-1.5 py-0.5 rounded-md text-xs font-semibold cursor-pointer transition-colors',
-        locale === 'id' ? 'bg-primary-soft text-primary font-bold' : 'text-fg-muted hover:text-fg hover:bg-canvas-subtle'
+        'px-2 py-0.5 rounded-md text-xs cursor-pointer transition-colors',
+        locale === 'id' ? 'bg-primary-soft text-primary font-extrabold shadow-2xs' : 'text-fg-muted hover:text-fg hover:bg-canvas-subtle font-semibold'
       ]"
       :aria-pressed="locale === 'id'"
       aria-label="Bahasa Indonesia"
@@ -20,7 +20,7 @@ const { locale, setLocale } = useI18n()
     >
       ID
     </button>
-    <span class="text-fg-subtle text-[11px]">/</span>
+    <span class="text-fg-muted/60 text-xs font-semibold">/</span>
     <button
       type="button"
       :class="[

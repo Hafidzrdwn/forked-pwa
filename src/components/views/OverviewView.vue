@@ -52,7 +52,7 @@ const isOverdue = (dateStr: string) => {
         class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap self-start md:self-auto"
         @click="emit('new-decision')"
       >
-        <Plus :size="17" /> {{ t.overview.newDecision }}
+        <Plus :size="18" stroke-width="2.5" /> {{ t.overview.newDecision }}
       </button>
     </div>
 
@@ -60,8 +60,8 @@ const isOverdue = (dateStr: string) => {
       <article class="bg-surface border border-border rounded-2xl p-4 md:p-6 min-h-30 md:min-h-33 transition-all hover:border-border-hover shadow-xs">
         <div class="flex items-center justify-between text-fg-muted text-xs md:text-[13px] font-semibold">
           <span>{{ t.overview.statsMapped }}</span>
-          <span class="w-8 h-8 md:w-9 md:h-9 grid place-items-center rounded-xl bg-primary-soft text-primary border border-border">
-            <GitBranch :size="16" />
+          <span class="w-9 h-9 md:w-10 md:h-10 grid place-items-center rounded-xl bg-primary-soft text-primary border border-primary/25 shadow-2xs">
+            <GitBranch :size="18" stroke-width="2.4" />
           </span>
         </div>
         <div class="font-display font-extrabold text-2xl md:text-3xl tracking-tight my-1.5 md:my-2 text-fg tabular-nums">
@@ -73,8 +73,8 @@ const isOverdue = (dateStr: string) => {
       <article class="bg-surface border border-border rounded-2xl p-4 md:p-6 min-h-30 md:min-h-33 transition-all hover:border-border-hover shadow-xs">
         <div class="flex items-center justify-between text-fg-muted text-xs md:text-[13px] font-semibold">
           <span>{{ t.overview.statsExploring }}</span>
-          <span class="w-8 h-8 md:w-9 md:h-9 grid place-items-center rounded-xl bg-amber-soft text-amber border border-border">
-            <Activity :size="16" />
+          <span class="w-9 h-9 md:w-10 md:h-10 grid place-items-center rounded-xl bg-amber-soft text-amber border border-amber/25 shadow-2xs">
+            <Activity :size="18" stroke-width="2.4" />
           </span>
         </div>
         <div class="font-display font-extrabold text-2xl md:text-3xl tracking-tight my-1.5 md:my-2 text-fg tabular-nums">
@@ -86,8 +86,8 @@ const isOverdue = (dateStr: string) => {
       <article class="bg-surface border border-border rounded-2xl p-4 md:p-6 min-h-30 md:min-h-33 transition-all hover:border-border-hover shadow-xs">
         <div class="flex items-center justify-between text-fg-muted text-xs md:text-[13px] font-semibold">
           <span>{{ t.overview.statsReviewed }}</span>
-          <span class="w-8 h-8 md:w-9 md:h-9 grid place-items-center rounded-xl bg-blue-soft text-blue border border-border">
-            <Check :size="16" />
+          <span class="w-9 h-9 md:w-10 md:h-10 grid place-items-center rounded-xl bg-blue-soft text-blue border border-blue/25 shadow-2xs">
+            <Check :size="18" stroke-width="2.5" />
           </span>
         </div>
         <div class="font-display font-extrabold text-2xl md:text-3xl tracking-tight my-1.5 md:my-2 text-fg tabular-nums">
@@ -140,10 +140,10 @@ const isOverdue = (dateStr: string) => {
             <span
               :class="[
                 'text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap',
-                decision.status === 'exploring' ? 'bg-amber-soft text-amber' : decision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+                (decision.status || '').toLowerCase() === 'exploring' ? 'bg-amber-soft text-amber' : (decision.status || '').toLowerCase() === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
               ]"
             >
-              {{ decision.status }}
+              {{ (decision.status || '').toLowerCase() === 'exploring' ? t.common.statusExploring : (decision.status || '').toLowerCase() === 'decided' ? t.common.statusDecided : t.common.statusReviewed }}
             </span>
             <ArrowRight class="text-fg-subtle group-hover:text-fg group-hover:translate-x-0.5 transition-all shrink-0" :size="15" />
           </div>
