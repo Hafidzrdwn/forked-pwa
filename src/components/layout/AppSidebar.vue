@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import {
   LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, Copy, FileUp, X, Smartphone
-} from 'lucide-vue-next'
+} from '../common/AppIcons'
 import BrandLogo from '../common/BrandLogo.vue'
 import { useI18n } from '../../i18n'
 import { usePwa } from '../../composables/usePwa'
@@ -55,7 +55,7 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 
   <aside
     :class="[
-      'fixed inset-y-0 left-0 w-[252px] p-5 bg-surface border-r border-border flex flex-col z-40 transition-transform duration-200 ease-in-out md:translate-x-0 overflow-y-auto overscroll-contain',
+      'fixed inset-y-0 left-0 w-63 p-5 bg-surface border-r border-border flex flex-col z-40 transition-transform duration-200 ease-in-out md:translate-x-0 overflow-y-auto overscroll-contain',
       props.mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
     ]"
     aria-label="Sidebar navigation"

@@ -2,8 +2,8 @@
 import { ref, computed } from 'vue'
 import {
   Plus, Search, Trash2, CalendarDays, ArrowRight, GitBranch,
-  SlidersHorizontal, Scale, ShieldAlert, AlertCircle, Share2
-} from 'lucide-vue-next'
+  Scale, ShieldAlert, AlertCircle, Share2
+} from '../common/AppIcons'
 import type { Decision, Scenario, AssumptionKind } from '../../types'
 import { useI18n } from '../../i18n'
 import { formatRupiahInput, parseRupiahInput } from '../../services/scoring'
@@ -97,17 +97,16 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <section class="max-w-[1240px] mx-auto px-4 md:px-8 py-8 md:py-10" aria-label="Decision studio">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-7">
+  <section class="max-w-310 mx-auto px-4 md:px-8 py-7 md:py-10" aria-label="Decision studio">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
       <div>
-        <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-2.5">{{ t.studio.eyebrow }}</div>
-        <h1 class="font-display font-extrabold text-3xl md:text-4xl tracking-tight text-fg">
+        <h1 class="font-display font-extrabold text-2xl md:text-4xl tracking-tight text-fg">
           {{ t.studio.title }}<span class="text-primary">.</span>
         </h1>
-        <p class="text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-2">{{ t.studio.subtitle }}</p>
+        <p class="text-sm md:text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-1.5">{{ t.studio.subtitle }}</p>
       </div>
       <button
-        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap"
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap self-start md:self-auto"
         @click="emit('new-decision')"
       >
         <Plus :size="17" /> {{ t.studio.newDecision }}
@@ -115,7 +114,7 @@ function formatDate(value: string) {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-6 items-start">
-      <aside class="border border-border bg-surface rounded-2xl p-3.5 lg:sticky lg:top-[85px] shadow-xs" aria-label="Decision selector">
+      <aside class="border border-border bg-surface rounded-2xl p-3.5 lg:sticky lg:top-21.25 shadow-xs" aria-label="Decision selector">
         <div class="flex items-center gap-2 bg-canvas-subtle border border-border rounded-xl px-3 h-10 text-fg-subtle mb-3">
           <Search :size="16" />
           <input
@@ -168,15 +167,15 @@ function formatDate(value: string) {
       </aside>
 
       <div v-if="activeDecision" class="min-w-0 flex flex-col gap-5">
-        <div class="border border-border rounded-2xl bg-surface p-5 md:p-6 flex items-start justify-between gap-4 shadow-xs">
-          <div>
-            <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-1">
-              {{ interpolate(t.studio.briefEyebrow, { date: formatDate(activeDecision.createdAt).toUpperCase() }) }}
+        <div class="border border-border rounded-2xl bg-surface p-4 md:p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-3 md:gap-4 shadow-xs">
+          <div class="min-w-0 flex-1">
+            <div class="text-[11px] font-semibold text-fg-subtle mb-1">
+              Dibuat pada {{ formatDate(activeDecision.createdAt) }}
             </div>
-            <h2 class="font-display font-extrabold text-2xl tracking-tight text-fg my-1">{{ activeDecision.title }}</h2>
-            <p class="text-sm text-fg-muted leading-relaxed m-0 mt-2">{{ activeDecision.context || t.studio.noContext }}</p>
+            <h2 class="font-display font-extrabold text-xl md:text-2xl tracking-tight text-fg my-0.5 wrap-break-word">{{ activeDecision.title }}</h2>
+            <p class="text-xs md:text-sm text-fg-muted leading-relaxed m-0 mt-1.5">{{ activeDecision.context || t.studio.noContext }}</p>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-start pt-1 sm:pt-0">
             <button
               type="button"
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-fg hover:border-primary text-xs font-bold transition-all cursor-pointer shadow-2xs"
@@ -186,24 +185,24 @@ function formatDate(value: string) {
             </button>
             <button
               type="button"
-              class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:bg-danger-soft grid place-items-center transition-colors cursor-pointer shrink-0"
+              class="w-8 h-8 md:w-9 md:h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:bg-danger-soft grid place-items-center transition-colors cursor-pointer shrink-0"
               :aria-label="t.studio.deleteAria"
               @click="emit('delete-active')"
             >
-              <Trash2 :size="17" />
+              <Trash2 :size="16" />
             </button>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 p-3 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
-          <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 px-4 bg-surface border border-border rounded-xl text-xs md:text-sm text-fg-muted shadow-xs">
+          <div class="flex items-center gap-2.5 flex-wrap">
             <span class="inline-flex items-center gap-1.5 text-fg font-medium">
               <CalendarDays :size="15" class="text-primary" />
               {{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}
             </span>
             <span
               :class="[
-                'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
+                'text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap',
                 activeDecision.status === 'exploring' ? 'bg-amber-soft text-amber' : activeDecision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
               ]"
             >
@@ -211,10 +210,10 @@ function formatDate(value: string) {
             </span>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto pt-2 sm:pt-0 border-t border-border/40 sm:border-0">
             <button
               type="button"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-canvas-subtle hover:bg-surface hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs"
+              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-canvas-subtle hover:bg-surface hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs whitespace-nowrap"
               @click="emit('open-weights')"
             >
               <Scale :size="14" class="text-primary" />
@@ -223,7 +222,7 @@ function formatDate(value: string) {
 
             <button
               type="button"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs"
+              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs whitespace-nowrap"
               @click="emit('open-journal')"
             >
               <span>{{ t.studio.openJournal }}</span>
@@ -232,21 +231,21 @@ function formatDate(value: string) {
           </div>
         </div>
 
-        <div class="flex items-center justify-between gap-4 mt-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mt-2">
           <div>
-            <h3 class="font-display font-bold text-lg tracking-tight text-fg m-0">{{ t.studio.explorePathsTitle }}</h3>
-            <p class="text-xs text-fg-muted mt-1">{{ t.studio.explorePathsDesc }}</p>
+            <h3 class="font-display font-bold text-base md:text-lg tracking-tight text-fg m-0">{{ t.studio.explorePathsTitle }}</h3>
+            <p class="text-xs text-fg-muted mt-0.5">{{ t.studio.explorePathsDesc }}</p>
           </div>
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-fg hover:bg-canvas-subtle transition-colors cursor-pointer shadow-xs"
+            class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-fg hover:bg-canvas-subtle transition-colors cursor-pointer shadow-xs self-start sm:self-auto"
             @click="showAddPath = !showAddPath"
           >
             <Plus :size="15" /> {{ t.studio.addPath }}
           </button>
         </div>
 
-        <form v-if="showAddPath" class="bg-canvas-subtle border border-border rounded-2xl p-5 my-2 shadow-xs" @submit.prevent="submitAddPath">
+        <form v-if="showAddPath" class="bg-canvas-subtle border border-border rounded-2xl p-4 md:p-5 my-2 shadow-xs" @submit.prevent="submitAddPath">
           <label class="block text-xs font-bold text-fg mb-3.5">
             {{ t.addPathForm.title }}
             <input
@@ -321,6 +320,7 @@ function formatDate(value: string) {
               </div>
               <input v-model.number="pathGrowth" type="range" min="0" max="100" class="w-full" />
             </label>
+
             <label class="block text-xs font-bold text-fg">
               <div class="flex justify-between items-center mb-1.5">
                 <span>{{ t.addPathForm.risk }}</span>
@@ -383,15 +383,18 @@ function formatDate(value: string) {
           @remove-assumption="emit('remove-assumption', $event)"
         />
 
-        <div class="flex items-center justify-between text-xs text-fg-subtle pt-2">
-          <span><ShieldAlert :size="14" class="inline mr-1" /> {{ t.studio.disclaimer }}</span>
-          <button type="button" class="inline-flex items-center gap-1 text-primary font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('open-journal')">
-            {{ t.studio.openJournal }} <ArrowRight :size="15" />
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-fg-subtle pt-3 border-t border-border/40">
+          <p class="leading-relaxed m-0 text-fg-muted flex-1">
+            <ShieldAlert :size="14" class="inline mr-1 text-primary shrink-0 -mt-0.5" />
+            {{ t.studio.disclaimer }}
+          </p>
+          <button type="button" class="inline-flex items-center gap-1.5 text-primary font-bold hover:text-primary-dark transition-colors cursor-pointer shrink-0" @click="emit('open-journal')">
+            <span>{{ t.studio.openJournal }}</span> <ArrowRight :size="14" />
           </button>
         </div>
       </div>
 
-      <div v-else class="border border-border bg-surface rounded-2xl p-10 text-center flex flex-col items-center shadow-xs">
+      <div v-else class="border border-border bg-surface rounded-2xl p-8 md:p-10 text-center flex flex-col items-center shadow-xs">
         <IllustrationFork :width="140" :height="110" />
         <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.studio.emptyPickerTitle }}</h3>
         <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.studio.emptyPickerDesc }}</p>

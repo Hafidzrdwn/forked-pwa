@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, nextTick, watch } from 'vue'
-import { Check, Target, Wallet, Clock3, TrendingUp, ShieldAlert, X, Pencil } from 'lucide-vue-next'
+import { Check, Target, Wallet, Clock3, TrendingUp, ShieldAlert, X, Pencil } from '../common/AppIcons'
 import type { Scenario, ScoringWeights } from '../../types'
 import { scoreScenario, formatRupiah, formatRupiahInput, parseRupiahInput } from '../../services/scoring'
 import { useI18n } from '../../i18n'

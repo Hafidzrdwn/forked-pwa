@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { BookOpen, GitBranch, ArrowRight, CalendarDays, AlertTriangle } from 'lucide-vue-next'
+import { BookOpen, GitBranch, ArrowRight, CalendarDays, AlertTriangle } from '../common/AppIcons'
 import type { Decision, DecisionStatus } from '../../types'
 import { useI18n } from '../../i18n'
 import IllustrationFork from '../common/IllustrationFork.vue'
@@ -40,17 +40,16 @@ const isOverdue = (dateStr: string) => {
 </script>
 
 <template>
-  <section class="max-w-[1240px] mx-auto px-4 md:px-8 py-8 md:py-10" aria-label="Decision journal view">
+  <section class="max-w-310 mx-auto px-4 md:px-8 py-7 md:py-10" aria-label="Decision journal view">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-7">
       <div>
-        <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-2.5">{{ t.journalView.eyebrow }}</div>
-        <h1 class="font-display font-extrabold text-3xl md:text-4xl tracking-tight text-fg">
+        <h1 class="font-display font-extrabold text-2xl md:text-4xl tracking-tight text-fg">
           {{ t.journalView.title }}<span class="text-primary">.</span>
         </h1>
-        <p class="text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-2">{{ t.journalView.subtitle }}</p>
+        <p class="text-sm md:text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-1.5">{{ t.journalView.subtitle }}</p>
       </div>
       <button
-        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap"
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap self-start md:self-auto"
         @click="emit('new-decision')"
       >
         <GitBranch :size="16" /> {{ t.journalView.newDecision }}
@@ -109,21 +108,21 @@ const isOverdue = (dateStr: string) => {
     </div>
 
     <div v-if="filteredList.length" class="grid gap-4">
-      <article v-for="decision in filteredList" :key="decision.id" class="bg-surface border border-border rounded-2xl p-5 md:p-6 shadow-xs">
-        <div class="flex items-start justify-between gap-4 mb-3.5">
-          <div>
-            <span class="text-[11px] font-bold tracking-wider uppercase text-fg-subtle">
-              {{ decision.status.toUpperCase() }} · {{ formatDate(decision.createdAt) }}
+      <article v-for="decision in filteredList" :key="decision.id" class="bg-surface border border-border rounded-2xl p-4 md:p-6 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 mb-3.5">
+          <div class="min-w-0 flex-1">
+            <span class="text-[11px] font-semibold text-fg-subtle">
+              {{ formatDate(decision.createdAt) }}
             </span>
-            <h3 class="font-display font-bold text-lg tracking-tight text-fg my-1">{{ decision.title }}</h3>
+            <h3 class="font-display font-bold text-base md:text-lg tracking-tight text-fg my-0.5 wrap-break-word">{{ decision.title }}</h3>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 self-start shrink-0">
             <span v-if="isOverdue(decision.reviewDate) && decision.status !== 'reviewed'" class="inline-flex items-center gap-1 text-danger bg-danger-soft border border-danger/20 rounded-md px-2 py-0.5 text-[11px] font-bold">
               <AlertTriangle :size="12" /> {{ t.journalView.overdueWarning }}
             </span>
             <span
               :class="[
-                'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
+                'text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap',
                 decision.status === 'exploring' ? 'bg-amber-soft text-amber' : decision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
               ]"
             >
@@ -132,22 +131,22 @@ const isOverdue = (dateStr: string) => {
           </div>
         </div>
 
-        <p class="text-sm text-fg-muted leading-relaxed m-0">{{ decision.context || t.studio.noContext }}</p>
+        <p class="text-xs md:text-sm text-fg-muted leading-relaxed m-0">{{ decision.context || t.studio.noContext }}</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-canvas-subtle rounded-xl my-4 text-xs">
           <div>
-            <span class="text-fg-subtle block mb-1">{{ t.journalView.chosenPath }}</span>
-            <strong class="font-bold text-fg text-sm">
+            <span class="text-fg-subtle block mb-1 text-[11px]">{{ t.journalView.chosenPath }}</span>
+            <strong class="font-bold text-fg text-xs md:text-sm wrap-break-word">
               {{ decision.scenarios.find(s => s.id === decision.selectedScenarioId)?.name || '-' }}
             </strong>
           </div>
           <div>
-            <span class="text-fg-subtle block mb-1">{{ t.journalView.reviewDate }}</span>
-            <strong class="font-bold text-fg text-sm">{{ formatDate(decision.reviewDate) }}</strong>
+            <span class="text-fg-subtle block mb-1 text-[11px]">{{ t.journalView.reviewDate }}</span>
+            <strong class="font-bold text-fg text-xs md:text-sm">{{ formatDate(decision.reviewDate) }}</strong>
           </div>
           <div>
-            <span class="text-fg-subtle block mb-1">{{ t.journalView.pathsCompared }}</span>
-            <strong class="font-bold text-fg text-sm">{{ decision.scenarios.length }}</strong>
+            <span class="text-fg-subtle block mb-1 text-[11px]">{{ t.journalView.pathsCompared }}</span>
+            <strong class="font-bold text-fg text-xs md:text-sm">{{ decision.scenarios.length }}</strong>
           </div>
         </div>
 
@@ -156,16 +155,16 @@ const isOverdue = (dateStr: string) => {
           class="p-4 bg-canvas-subtle border-l-4 border-primary rounded-r-xl my-3 text-xs leading-relaxed space-y-1.5"
         >
           <span class="text-[10px] font-bold tracking-wider uppercase text-primary block mb-1">{{ t.journalView.notesHeader }}</span>
-          <p v-if="decision.journal.reason" class="m-0">
+          <p v-if="decision.journal.reason" class="m-0 wrap-break-word">
             <strong class="text-fg">{{ t.journalView.why }}:</strong> <span class="text-fg-muted">{{ decision.journal.reason }}</span>
           </p>
-          <p v-if="decision.journal.expectedOutcome" class="m-0">
+          <p v-if="decision.journal.expectedOutcome" class="m-0 wrap-break-word">
             <strong class="text-fg">{{ t.journalView.expected }}:</strong> <span class="text-fg-muted">{{ decision.journal.expectedOutcome }}</span>
           </p>
-          <p v-if="decision.journal.actualOutcome" class="m-0">
+          <p v-if="decision.journal.actualOutcome" class="m-0 wrap-break-word">
             <strong class="text-fg">{{ t.journalView.actual }}:</strong> <span class="text-fg-muted">{{ decision.journal.actualOutcome }}</span>
           </p>
-          <p v-if="decision.journal.reflection" class="m-0">
+          <p v-if="decision.journal.reflection" class="m-0 wrap-break-word">
             <strong class="text-fg">{{ t.journalView.reflection }}:</strong> <span class="text-fg-muted">{{ decision.journal.reflection }}</span>
           </p>
         </div>
@@ -175,13 +174,13 @@ const isOverdue = (dateStr: string) => {
             {{ t.journalView.openDecision }}
           </button>
           <button class="inline-flex items-center gap-1 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer" @click="emit('edit-journal', decision.id)">
-            {{ t.journalView.editJournal }} <ArrowRight :size="14" />
+            <span>{{ t.journalView.editJournal }}</span> <ArrowRight :size="14" />
           </button>
         </div>
       </article>
     </div>
 
-    <div v-else class="bg-surface border border-border rounded-2xl p-10 text-center flex flex-col items-center shadow-xs">
+    <div v-else class="bg-surface border border-border rounded-2xl p-8 md:p-10 text-center flex flex-col items-center shadow-xs">
       <IllustrationFork :width="130" :height="100" />
       <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.journalView.emptyTitle }}</h3>
       <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.journalView.emptyDesc }}</p>

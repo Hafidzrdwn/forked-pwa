@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Globe } from 'lucide-vue-next'
+import { Globe } from './AppIcons'
 import { useI18n } from '../../i18n'
 
 const { locale, setLocale } = useI18n()

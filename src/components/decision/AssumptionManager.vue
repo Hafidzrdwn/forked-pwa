@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Plus, CircleHelp, Trash2, AlertCircle } from 'lucide-vue-next'
+import { Plus, CircleHelp, Trash2, AlertCircle } from '../common/AppIcons'
 import type { AssumptionKind, Scenario } from '../../types'
 import { useI18n } from '../../i18n'
 
@@ -69,15 +69,15 @@ function submitAssumption() {
 </script>
 
 <template>
-  <section class="bg-surface border border-border rounded-2xl p-5 md:p-6 mt-5 shadow-xs" aria-labelledby="assumptions-heading">
-    <div class="flex items-center justify-between gap-4 mb-3">
+  <section class="bg-surface border border-border rounded-2xl p-4 md:p-6 mt-5 shadow-xs" aria-labelledby="assumptions-heading">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5">
       <div>
-        <h3 id="assumptions-heading" class="font-display font-bold text-lg text-fg m-0">{{ t.assumptions.heading }}</h3>
+        <h3 id="assumptions-heading" class="font-display font-bold text-base md:text-lg text-fg m-0">{{ t.assumptions.heading }}</h3>
         <p class="text-xs text-fg-muted mt-1">{{ t.assumptions.desc }}</p>
       </div>
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-fg hover:bg-canvas-subtle transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+        class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-bold text-fg hover:bg-canvas-subtle transition-colors cursor-pointer shadow-xs disabled:opacity-50 self-start sm:self-auto shrink-0"
         :disabled="!currentScenario"
         @click="showForm = !showForm"
       >
@@ -109,7 +109,7 @@ function submitAssumption() {
 
     <div v-if="currentScenario" class="flex items-center gap-2.5 flex-wrap p-3 bg-canvas-subtle rounded-xl my-3 border border-border text-xs">
       <span class="text-[11px] font-bold uppercase tracking-wider text-fg-subtle">{{ t.assumptions.pathTab }}</span>
-      <strong class="font-bold text-fg">{{ currentScenario.name }}</strong>
+      <strong class="font-bold text-fg wrap-break-word">{{ currentScenario.name }}</strong>
       <span class="text-fg-subtle ml-auto">
         {{ interpolate(t.assumptions.itemsCount, { n: currentScenario.assumptions.length }) }}
       </span>
@@ -183,12 +183,12 @@ function submitAssumption() {
         <input
           type="checkbox"
           :checked="item.checked"
-          class="w-4 h-4 rounded mt-0.5 accent-primary cursor-pointer"
+          class="w-4 h-4 rounded mt-0.5 accent-primary cursor-pointer shrink-0"
           aria-label="Tandai terbukti"
           @change="emit('toggle-assumption', { scenarioId: currentScenario.id, assumptionId: item.id })"
         />
 
-        <div :class="['flex-1', item.checked ? 'line-through text-fg-muted opacity-70' : 'text-fg']">
+        <div :class="['flex-1 min-w-0', item.checked ? 'line-through text-fg-muted opacity-70' : 'text-fg']">
           <div class="flex items-center gap-2 mb-1 flex-wrap">
             <span
               :class="[
@@ -198,7 +198,7 @@ function submitAssumption() {
             >
               {{ item.kind || 'assumption' }}
             </span>
-            <span class="font-semibold text-fg">{{ item.text }}</span>
+            <span class="font-semibold text-fg wrap-break-word">{{ item.text }}</span>
           </div>
           <small class="text-fg-subtle text-[11px] block">
             {{ item.checked ? t.assumptions.statusVerified : interpolate(t.assumptions.confidenceLabel, { n: item.confidence }) }}
@@ -207,7 +207,7 @@ function submitAssumption() {
 
         <span
           :class="[
-            'text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0',
+            'text-[11px] font-bold px-2 py-0.5 rounded-md shrink-0 tabular-nums',
             item.confidence < 50 ? 'bg-danger-soft text-danger' : item.confidence < 75 ? 'bg-amber-soft text-amber' : 'bg-primary-soft text-primary'
           ]"
         >

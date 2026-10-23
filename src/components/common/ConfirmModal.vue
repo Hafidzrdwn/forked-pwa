@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import { AlertTriangle, AlertCircle, X } from 'lucide-vue-next'
+import { AlertTriangle, AlertCircle, X } from './AppIcons'
 import { useConfirm } from '../../composables/useConfirm'
 
 const { state, handleConfirm, handleCancel } = useConfirm()

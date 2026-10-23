@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
-  Compass, Plus, GitBranch, Activity, Check, ArrowRight,
+  Plus, GitBranch, Activity, Check, ArrowRight,
   CircleHelp, CalendarDays, ShieldAlert, AlertTriangle
-} from 'lucide-vue-next'
+} from '../common/AppIcons'
 import type { Decision } from '../../types'
 import { useI18n } from '../../i18n'
 import IllustrationFork from '../common/IllustrationFork.vue'
@@ -40,76 +40,73 @@ const isOverdue = (dateStr: string) => {
 </script>
 
 <template>
-  <section class="max-w-[1240px] mx-auto px-4 md:px-8 py-8 md:py-10" aria-label="Overview">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+  <section class="max-w-310 mx-auto px-4 md:px-8 py-7 md:py-10" aria-label="Overview">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
       <div>
-        <div class="flex items-center gap-1.5 text-primary text-[11px] font-bold tracking-wider uppercase mb-3">
-          <Compass :size="15" /> {{ t.overview.heroEyebrow }}
-        </div>
         <h1 class="font-display font-extrabold text-3xl md:text-5xl tracking-tight text-fg leading-tight">
           {{ t.overview.heroTitle }}<br /><span class="text-fg-muted">{{ t.overview.heroSpan }}</span>
         </h1>
-        <p class="text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-3">{{ t.overview.heroDesc }}</p>
+        <p class="text-sm md:text-[14.5px] leading-relaxed text-fg-muted max-w-xl mt-2.5">{{ t.overview.heroDesc }}</p>
       </div>
       <button
-        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap"
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer whitespace-nowrap self-start md:self-auto"
         @click="emit('new-decision')"
       >
         <Plus :size="17" /> {{ t.overview.newDecision }}
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-9">
-      <article class="bg-surface border border-border rounded-2xl p-5 md:p-6 min-h-[132px] transition-all hover:border-border-hover hover:-translate-y-0.5 shadow-xs">
-        <div class="flex items-center justify-between text-fg-muted text-[13px] font-semibold">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 md:gap-4 mb-8">
+      <article class="bg-surface border border-border rounded-2xl p-4 md:p-6 min-h-30 md:min-h-33 transition-all hover:border-border-hover shadow-xs">
+        <div class="flex items-center justify-between text-fg-muted text-xs md:text-[13px] font-semibold">
           <span>{{ t.overview.statsMapped }}</span>
-          <span class="w-9 h-9 grid place-items-center rounded-xl bg-primary-soft text-primary border border-border">
-            <GitBranch :size="17" />
+          <span class="w-8 h-8 md:w-9 md:h-9 grid place-items-center rounded-xl bg-primary-soft text-primary border border-border">
+            <GitBranch :size="16" />
           </span>
         </div>
-        <div class="font-display font-extrabold text-3xl tracking-tight my-2 text-fg tabular-nums">
+        <div class="font-display font-extrabold text-2xl md:text-3xl tracking-tight my-1.5 md:my-2 text-fg tabular-nums">
           {{ totalDecisions.toString().padStart(2, '0') }}
         </div>
-        <div class="text-xs text-fg-subtle">{{ t.overview.statsMappedSub }}</div>
+        <div class="text-[11px] md:text-xs text-fg-subtle">{{ t.overview.statsMappedSub }}</div>
       </article>
 
-      <article class="bg-surface border border-border rounded-2xl p-5 md:p-6 min-h-[132px] transition-all hover:border-border-hover hover:-translate-y-0.5 shadow-xs">
-        <div class="flex items-center justify-between text-fg-muted text-[13px] font-semibold">
+      <article class="bg-surface border border-border rounded-2xl p-4 md:p-6 min-h-30 md:min-h-33 transition-all hover:border-border-hover shadow-xs">
+        <div class="flex items-center justify-between text-fg-muted text-xs md:text-[13px] font-semibold">
           <span>{{ t.overview.statsExploring }}</span>
-          <span class="w-9 h-9 grid place-items-center rounded-xl bg-amber-soft text-amber border border-border">
-            <Activity :size="17" />
+          <span class="w-8 h-8 md:w-9 md:h-9 grid place-items-center rounded-xl bg-amber-soft text-amber border border-border">
+            <Activity :size="16" />
           </span>
         </div>
-        <div class="font-display font-extrabold text-3xl tracking-tight my-2 text-fg tabular-nums">
+        <div class="font-display font-extrabold text-2xl md:text-3xl tracking-tight my-1.5 md:my-2 text-fg tabular-nums">
           {{ openDecisions.toString().padStart(2, '0') }}
         </div>
-        <div class="text-xs text-fg-subtle">{{ t.overview.statsExploringSub }}</div>
+        <div class="text-[11px] md:text-xs text-fg-subtle">{{ t.overview.statsExploringSub }}</div>
       </article>
 
-      <article class="bg-surface border border-border rounded-2xl p-5 md:p-6 min-h-[132px] transition-all hover:border-border-hover hover:-translate-y-0.5 shadow-xs">
-        <div class="flex items-center justify-between text-fg-muted text-[13px] font-semibold">
+      <article class="bg-surface border border-border rounded-2xl p-4 md:p-6 min-h-30 md:min-h-33 transition-all hover:border-border-hover shadow-xs">
+        <div class="flex items-center justify-between text-fg-muted text-xs md:text-[13px] font-semibold">
           <span>{{ t.overview.statsReviewed }}</span>
-          <span class="w-9 h-9 grid place-items-center rounded-xl bg-blue-soft text-blue border border-border">
-            <Check :size="17" />
+          <span class="w-8 h-8 md:w-9 md:h-9 grid place-items-center rounded-xl bg-blue-soft text-blue border border-border">
+            <Check :size="16" />
           </span>
         </div>
-        <div class="font-display font-extrabold text-3xl tracking-tight my-2 text-fg tabular-nums">
+        <div class="font-display font-extrabold text-2xl md:text-3xl tracking-tight my-1.5 md:my-2 text-fg tabular-nums">
           {{ reviewedDecisions.toString().padStart(2, '0') }}
         </div>
-        <div class="text-xs text-fg-subtle">{{ t.overview.statsReviewedSub }}</div>
+        <div class="text-[11px] md:text-xs text-fg-subtle">{{ t.overview.statsReviewedSub }}</div>
       </article>
     </div>
 
-    <div class="flex items-center justify-between gap-4 mb-4">
+    <div class="flex items-center justify-between gap-4 mb-3.5">
       <div>
-        <h2 class="font-display font-bold text-xl tracking-tight text-fg m-0">{{ t.overview.pickupTitle }}</h2>
-        <p class="text-xs text-fg-muted mt-1">{{ t.overview.pickupDesc }}</p>
+        <h2 class="font-display font-bold text-lg md:text-xl tracking-tight text-fg m-0">{{ t.overview.pickupTitle }}</h2>
+        <p class="text-xs text-fg-muted mt-0.5">{{ t.overview.pickupDesc }}</p>
       </div>
       <button
-        class="inline-flex items-center gap-1.5 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer"
+        class="inline-flex items-center gap-1.5 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer shrink-0"
         @click="emit('navigate', 'decisions')"
       >
-        {{ t.overview.allDecisions }} <ArrowRight :size="15" />
+        <span>{{ t.overview.allDecisions }}</span> <ArrowRight :size="14" />
       </button>
     </div>
 
@@ -117,37 +114,44 @@ const isOverdue = (dateStr: string) => {
       <button
         v-for="(decision, i) in decisions.slice(0, 3)"
         :key="decision.id"
-        class="w-full flex items-center gap-4 p-4 md:p-5 text-left bg-surface hover:bg-canvas-subtle transition-colors cursor-pointer text-fg"
+        class="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-4 md:p-5 text-left bg-surface hover:bg-canvas-subtle transition-colors cursor-pointer text-fg group"
         @click="emit('open-decision', decision.id)"
       >
-        <span class="font-display font-bold text-xs text-fg-subtle w-6">{{ String(i + 1).padStart(2, '0') }}</span>
-        <span class="grid gap-1 min-w-0 flex-1">
-          <strong class="text-sm font-bold truncate text-fg">{{ decision.title }}</strong>
-          <small class="text-xs text-fg-muted truncate">{{ decision.context || t.studio.noContext }}</small>
-        </span>
-        <span class="flex items-center gap-1.5 text-fg-muted text-xs whitespace-nowrap">
-          <span class="text-primary"><GitBranch :size="14" /></span>
-          {{ interpolate(t.overview.pathsCount, { n: decision.scenarios.length }) }}
-        </span>
-        <span
-          v-if="isOverdue(decision.reviewDate) && decision.status !== 'reviewed'"
-          class="inline-flex items-center gap-1 text-danger bg-danger-soft border border-danger/20 rounded-md px-2 py-0.5 text-[11px] font-bold"
-        >
-          <AlertTriangle :size="11" /> {{ t.common.overdue }}
-        </span>
-        <span
-          :class="[
-            'text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap',
-            decision.status === 'exploring' ? 'bg-amber-soft text-amber' : decision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
-          ]"
-        >
-          {{ decision.status }}
-        </span>
-        <ArrowRight class="text-fg-subtle" :size="17" />
+        <div class="flex items-start gap-3 min-w-0 flex-1">
+          <span class="font-display font-bold text-xs text-fg-subtle pt-0.5 shrink-0 w-5 sm:w-6">{{ String(i + 1).padStart(2, '0') }}</span>
+          <div class="min-w-0 flex-1">
+            <strong class="text-sm md:text-[15px] font-bold text-fg block wrap-break-word line-clamp-2 leading-snug group-hover:text-primary transition-colors">{{ decision.title }}</strong>
+            <p class="text-xs text-fg-muted mt-1 line-clamp-2 leading-relaxed m-0">{{ decision.context || t.studio.noContext }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between sm:justify-end gap-3 pl-8 sm:pl-0 shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t border-border/40 sm:border-0">
+          <span class="flex items-center gap-1.5 text-fg-muted text-xs whitespace-nowrap">
+            <span class="text-primary"><GitBranch :size="13" /></span>
+            {{ interpolate(t.overview.pathsCount, { n: decision.scenarios.length }) }}
+          </span>
+          <span
+            v-if="isOverdue(decision.reviewDate) && decision.status !== 'reviewed'"
+            class="inline-flex items-center gap-1 text-danger bg-danger-soft border border-danger/20 rounded-md px-2 py-0.5 text-[11px] font-bold"
+          >
+            <AlertTriangle :size="11" /> {{ t.common.overdue }}
+          </span>
+          <div class="flex items-center gap-2.5">
+            <span
+              :class="[
+                'text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap',
+                decision.status === 'exploring' ? 'bg-amber-soft text-amber' : decision.status === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+              ]"
+            >
+              {{ decision.status }}
+            </span>
+            <ArrowRight class="text-fg-subtle group-hover:text-fg group-hover:translate-x-0.5 transition-all shrink-0" :size="15" />
+          </div>
+        </div>
       </button>
     </div>
 
-    <div v-else class="bg-surface border border-border rounded-2xl p-10 text-center flex flex-col items-center shadow-xs">
+    <div v-else class="bg-surface border border-border rounded-2xl p-8 md:p-10 text-center flex flex-col items-center shadow-xs">
       <IllustrationFork :width="130" :height="100" />
       <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.overview.emptyTitle }}</h3>
       <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.overview.emptyDesc }}</p>
@@ -160,30 +164,25 @@ const isOverdue = (dateStr: string) => {
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-4 mt-7">
-      <article class="border border-border rounded-2xl p-5 bg-surface-elevated flex gap-4 shadow-xs">
-        <div class="w-10 h-10 rounded-xl bg-primary-soft text-primary grid place-items-center shrink-0">
-          <CircleHelp :size="19" />
+      <article class="border border-border rounded-2xl p-4 md:p-5 bg-surface-elevated flex gap-3.5 shadow-xs">
+        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary-soft text-primary grid place-items-center shrink-0">
+          <CircleHelp :size="18" />
         </div>
         <div>
-          <span class="flex items-center gap-1 text-primary text-[11px] font-bold tracking-wider uppercase mb-1.5">
-            {{ t.overview.betterQuestionEyebrow }}
-          </span>
-          <h3 class="font-display font-bold text-base text-fg my-1">{{ t.overview.betterQuestionTitle }}</h3>
-          <p class="text-xs leading-relaxed text-fg-muted m-0">{{ t.overview.betterQuestionDesc }}</p>
+          <h3 class="font-display font-bold text-sm md:text-base text-fg m-0">{{ t.overview.betterQuestionTitle }}</h3>
+          <p class="text-xs leading-relaxed text-fg-muted m-0 mt-1">{{ t.overview.betterQuestionDesc }}</p>
         </div>
       </article>
 
-      <article class="border border-border rounded-2xl p-5 bg-surface-elevated flex flex-col justify-between shadow-xs">
-        <div class="flex items-center justify-between text-primary mb-2">
-          <span class="flex items-center gap-1 text-primary text-[11px] font-bold tracking-wider uppercase">
-            {{ t.overview.nextReviewEyebrow }}
-          </span>
-          <CalendarDays :size="17" />
+      <article class="border border-border rounded-2xl p-4 md:p-5 bg-surface-elevated flex flex-col justify-between shadow-xs">
+        <div class="flex items-center justify-between text-primary mb-1.5">
+          <span class="text-xs font-bold text-fg">Jadwal Evaluasi Terdekat</span>
+          <CalendarDays :size="16" />
         </div>
         <template v-if="nextReview">
           <div>
-            <h3 class="font-display font-bold text-base text-fg my-1">{{ nextReview.title }}</h3>
-            <p class="text-xs leading-relaxed text-fg-muted m-0">
+            <h3 class="font-display font-bold text-sm md:text-base text-fg m-0">{{ nextReview.title }}</h3>
+            <p class="text-xs leading-relaxed text-fg-muted m-0 mt-1">
               {{ interpolate(t.overview.reviewBy, { date: formatDate(nextReview.reviewDate) }) }}
               <span v-if="isOverdue(nextReview.reviewDate)" class="text-danger font-bold ml-1.5">
                 {{ t.overview.nextReviewPastDue }}
@@ -191,23 +190,23 @@ const isOverdue = (dateStr: string) => {
             </p>
           </div>
           <button
-            class="inline-flex items-center gap-1.5 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer mt-3.5"
+            class="inline-flex items-center gap-1.5 text-primary text-xs font-bold hover:text-primary-dark transition-colors cursor-pointer mt-3"
             @click="emit('open-decision', nextReview.id)"
           >
-            {{ t.overview.openDecision }} <ArrowRight :size="15" />
+            <span>{{ t.overview.openDecision }}</span> <ArrowRight :size="14" />
           </button>
         </template>
         <template v-else>
           <div>
-            <h3 class="font-display font-bold text-base text-fg my-1">{{ t.overview.noNextReviewTitle }}</h3>
-            <p class="text-xs leading-relaxed text-fg-muted m-0">{{ t.overview.noNextReviewDesc }}</p>
+            <h3 class="font-display font-bold text-sm md:text-base text-fg m-0">{{ t.overview.noNextReviewTitle }}</h3>
+            <p class="text-xs leading-relaxed text-fg-muted m-0 mt-1">{{ t.overview.noNextReviewDesc }}</p>
           </div>
         </template>
       </article>
     </div>
 
     <div class="flex items-start gap-2.5 text-fg-subtle text-xs leading-relaxed mt-7">
-      <ShieldAlert :size="15" class="shrink-0 mt-0.5 text-fg-subtle" />
+      <ShieldAlert :size="14" class="shrink-0 mt-0.5 text-fg-subtle" />
       <span>{{ t.overview.disclaimer }}</span>
     </div>
   </section>

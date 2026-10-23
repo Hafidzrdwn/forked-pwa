@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-vue-next'
+import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from './AppIcons'
 import { useToast } from '../../composables/useToast'
 
 const { toasts, dismiss } = useToast()
@@ -23,7 +23,7 @@ const { toasts, dismiss } = useToast()
 
         <div class="flex flex-col gap-0.5 flex-1 min-w-0">
           <strong v-if="toast.title" class="text-xs font-bold text-fg">{{ toast.title }}</strong>
-          <span class="text-xs text-fg-muted break-words leading-relaxed">{{ toast.message }}</span>
+          <span class="text-xs text-fg-muted wrap-break-word leading-relaxed">{{ toast.message }}</span>
         </div>
 
         <button

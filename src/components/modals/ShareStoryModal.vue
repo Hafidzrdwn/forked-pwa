@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { X, Download, Share2, Copy, Check, Smartphone, Square, Sparkles } from 'lucide-vue-next'
+import { X, Download, Share2, Copy, Check, Smartphone, Square } from '../common/AppIcons'
 import type { Decision, Scenario } from '../../types'
 import { scoreScenario, formatRupiah } from '../../services/scoring'
 import { useI18n } from '../../i18n'
@@ -589,10 +589,6 @@ onUnmounted(() => {
     <div class="w-full max-w-2xl max-h-[92vh] flex flex-col bg-surface border border-border rounded-2xl shadow-2xl text-fg overflow-hidden">
       <div class="p-4 md:p-5 border-b border-border flex items-center justify-between gap-4">
         <div>
-          <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-1 flex items-center gap-1.5">
-            <Sparkles :size="13" />
-            {{ t.shareModal.eyebrow }}
-          </div>
           <h2 id="share-modal-title" class="font-display font-bold text-lg md:text-xl text-fg m-0">
             {{ t.shareModal.title }}
           </h2>

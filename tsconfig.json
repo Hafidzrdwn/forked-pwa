@@ -12,8 +12,15 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "jsx": "preserve",
+    "jsxImportSource": "vue",
     "noEmit": true,
-    "strict": true
+    "strict": true,
+    "plugins": [
+      {
+        "name": "@vue/typescript-plugin",
+        "languages": ["vue"]
+      }
+    ]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "vite.config.ts"]
 }

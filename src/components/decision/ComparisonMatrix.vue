@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Scale, Check, Award, ArrowRight, ShieldCheck, Zap, Clock, Coins } from 'lucide-vue-next'
+import { Scale, Check, Award, ArrowRight, ShieldCheck, Zap, Clock, Coins } from '../common/AppIcons'
 import type { Scenario, ScoringWeights } from '../../types'
 import { scoreScenario, formatRupiah } from '../../services/scoring'
 import { useI18n } from '../../i18n'
@@ -67,20 +67,19 @@ const matrixRows = computed<MatrixRow[]>(() => {
 </script>
 
 <template>
-  <section v-if="matrixRows.length >= 2" class="bg-surface border border-border rounded-2xl p-5 md:p-6 shadow-xs" aria-labelledby="matrix-heading">
-    <div class="flex items-start justify-between gap-4 mb-4">
+  <section v-if="matrixRows.length >= 2" class="bg-surface border border-border rounded-2xl p-4 md:p-6 shadow-xs overflow-hidden" aria-labelledby="matrix-heading">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
       <div>
-        <div class="text-[11px] font-bold tracking-wider uppercase text-primary mb-1.5">{{ t.matrix.eyebrow }}</div>
-        <h3 id="matrix-heading" class="font-display font-bold text-lg text-fg m-0">{{ t.matrix.title }}</h3>
+        <h3 id="matrix-heading" class="font-display font-bold text-base md:text-lg text-fg m-0">{{ t.matrix.title }}</h3>
         <p class="text-xs text-fg-muted mt-1 max-w-lg leading-relaxed">{{ t.matrix.desc }}</p>
       </div>
-      <span class="w-9 h-9 rounded-xl bg-primary-soft text-primary grid place-items-center shrink-0">
-        <Scale :size="19" />
+      <span class="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-primary-soft text-primary grid place-items-center self-start sm:self-auto shrink-0">
+        <Scale :size="17" />
       </span>
     </div>
 
-    <div class="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
-      <table class="w-full text-left text-xs border-collapse min-w-[620px]">
+    <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+      <table class="w-full text-left text-xs border-collapse min-w-155">
         <thead>
           <tr class="border-b border-border text-[11px] font-bold uppercase tracking-wider text-fg-subtle">
             <th class="py-3 px-3">{{ t.matrix.colPath }}</th>
@@ -112,14 +111,14 @@ const matrixRows = computed<MatrixRow[]>(() => {
                 >
                   {{ String.fromCharCode(65 + idx) }}
                 </span>
-                <span class="font-bold text-fg text-xs leading-snug break-words min-w-[140px] max-w-[240px]">{{ row.scenario.name }}</span>
+                <span class="font-bold text-fg text-xs leading-snug wrap-break-word min-w-35 max-w-60">{{ row.scenario.name }}</span>
               </div>
             </td>
 
             <td class="py-3.5 px-3 text-center">
               <span
                 :class="[
-                  'inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-black tracking-tight',
+                  'inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-black tracking-tight tabular-nums',
                   row.totalScore >= 75 ? 'bg-primary-soft text-primary' : row.totalScore >= 50 ? 'bg-amber-soft text-amber' : 'bg-canvas-subtle text-fg-muted'
                 ]"
               >
@@ -127,20 +126,20 @@ const matrixRows = computed<MatrixRow[]>(() => {
               </span>
             </td>
 
-            <td class="py-3.5 px-3 text-right font-bold" :class="row.netIncome < 0 ? 'text-danger' : 'text-fg'">
+            <td class="py-3.5 px-3 text-right font-bold tabular-nums" :class="row.netIncome < 0 ? 'text-danger' : 'text-fg'">
               {{ formatRupiah(row.netIncome) }}
             </td>
 
-            <td class="py-3.5 px-3 text-center text-fg">
+            <td class="py-3.5 px-3 text-center text-fg tabular-nums">
               {{ row.hours }} {{ t.common.hrs }}
             </td>
 
-            <td class="py-3.5 px-3 text-center">
+            <td class="py-3.5 px-3 text-center tabular-nums">
               <span class="font-bold text-fg">{{ row.growth }}</span>
               <span class="text-[10px] text-fg-subtle">/100</span>
             </td>
 
-            <td class="py-3.5 px-3 text-center">
+            <td class="py-3.5 px-3 text-center tabular-nums">
               <span class="font-bold" :class="row.risk > 60 ? 'text-danger' : 'text-fg'">{{ row.risk }}</span>
               <span class="text-[10px] text-fg-subtle">/100</span>
             </td>

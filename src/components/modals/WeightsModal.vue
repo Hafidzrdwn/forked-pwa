@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { X, Check, RotateCcw, Scale, Info, Sparkles, AlertCircle } from 'lucide-vue-next'
+import { X, Check, RotateCcw, Info, SlidersHorizontal, AlertCircle } from '../common/AppIcons'
 import type { ScoringWeights } from '../../types'
 import { DEFAULT_WEIGHTS, normalizeWeights } from '../../services/scoring'
 import { useI18n } from '../../i18n'
@@ -84,9 +84,6 @@ onUnmounted(() => {
     <div class="w-full max-w-xl max-h-[90vh] overflow-y-auto bg-surface border border-border rounded-2xl p-6 shadow-2xl text-fg">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <div class="flex items-center gap-1.5 text-[11px] font-bold tracking-wider uppercase text-primary mb-1">
-            <Scale :size="14" /> {{ t.weightsModal.eyebrow }}
-          </div>
           <h2 id="weights-modal-title" class="font-display font-extrabold text-2xl tracking-tight text-fg my-1">{{ t.weightsModal.title }}</h2>
         </div>
         <button type="button" class="w-9 h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-fg hover:bg-canvas-subtle grid place-items-center transition-colors cursor-pointer" :aria-label="t.common.close" @click="emit('close')">
@@ -236,7 +233,7 @@ onUnmounted(() => {
           class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold bg-primary-soft text-primary hover:bg-primary/20 transition-colors cursor-pointer"
           @click="autoBalance"
         >
-          <Sparkles :size="13" /> {{ t.weightsModal.autoBalance }}
+          <SlidersHorizontal :size="13" /> {{ t.weightsModal.autoBalance }}
         </button>
       </div>
 

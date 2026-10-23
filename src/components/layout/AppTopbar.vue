@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Menu } from 'lucide-vue-next'
+import { Menu } from '../common/AppIcons'
 import LanguageSwitcher from '../common/LanguageSwitcher.vue'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import VisualAvatar from '../common/VisualAvatar.vue'
@@ -24,28 +24,28 @@ const pageTitle = computed(() => {
 </script>
 
 <template>
-  <header class="h-[68px] border-b border-border flex items-center justify-between px-4 md:px-8 bg-surface sticky top-0 z-20 transition-colors">
-    <div class="flex items-center gap-3">
+  <header class="h-15 md:h-17 border-b border-border flex items-center justify-between px-3 md:px-8 bg-surface sticky top-0 z-20 transition-colors">
+    <div class="flex items-center gap-2.5 min-w-0">
       <button
         type="button"
-        class="md:hidden p-2 rounded-lg text-fg hover:bg-canvas-subtle transition-colors cursor-pointer"
+        class="md:hidden p-2 rounded-xl text-fg hover:bg-canvas-subtle transition-colors cursor-pointer shrink-0"
         aria-label="Buka menu navigasi"
         @click="emit('toggle-mobile-menu')"
       >
-        <Menu :size="20" />
+        <Menu :size="19" />
       </button>
 
-      <div class="flex items-center gap-2 text-[13px] text-fg-muted font-medium">
-        <span>{{ t.nav.workspace }}</span>
-        <span class="text-fg-subtle">/</span>
-        <strong class="font-bold text-fg">{{ pageTitle }}</strong>
+      <div class="flex items-center gap-2 text-xs md:text-[13px] text-fg-muted font-medium min-w-0">
+        <span class="hidden sm:inline-block shrink-0">{{ t.nav.workspace }}</span>
+        <span class="hidden sm:inline-block text-fg-subtle shrink-0">/</span>
+        <strong class="font-bold text-fg truncate text-sm md:text-base">{{ pageTitle }}</strong>
       </div>
     </div>
 
-    <div class="flex items-center gap-2.5">
+    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
       <ThemeToggle />
       <LanguageSwitcher />
-      <VisualAvatar :size="32" name="Decision Maker" />
+      <VisualAvatar :size="30" name="Decision Maker" class="shrink-0" />
     </div>
   </header>
 </template>
