@@ -248,20 +248,8 @@ export const useDecisionStore = defineStore('decision', () => {
     busy.value = true
     try {
       const stored = await idbGetAllDecisions()
-      const hasInitialized = typeof window !== 'undefined' && localStorage.getItem('forked_initialized')
-
       if (stored.length) {
         decisions.value = stored
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('forked_initialized', 'true')
-        }
-      } else if (!hasInitialized) {
-        const seeds = createSampleSeeds()
-        decisions.value = seeds
-        await persistAll()
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('forked_initialized', 'true')
-        }
       } else {
         decisions.value = []
       }

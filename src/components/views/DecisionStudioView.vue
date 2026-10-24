@@ -266,8 +266,8 @@ function formatDate(value: string) {
                 :aria-label="t.studio.editDecision"
                 @click="emit('edit-active')"
               >
-                <Pencil :size="15" class="text-primary shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                <Pencil :size="15" class="text-primary dark:text-white shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none text-fg dark:text-white">
                   {{ t.studio.editDecision }}
                 </span>
               </button>
@@ -279,8 +279,8 @@ function formatDate(value: string) {
                 :aria-label="t.studio.duplicateDecision"
                 @click="emit('duplicate-decision', activeDecision.id)"
               >
-                <Copy :size="15" class="text-primary shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                <Copy :size="15" class="text-primary dark:text-white shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none text-fg dark:text-white">
                   {{ t.studio.duplicateDecision }}
                 </span>
               </button>
@@ -292,8 +292,8 @@ function formatDate(value: string) {
                 :aria-label="t.studio.shareBtn"
                 @click="emit('open-share')"
               >
-                <Share2 :size="15" class="text-primary shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                <Share2 :size="15" class="text-primary dark:text-white shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none text-fg dark:text-white">
                   {{ t.studio.shareBtn }}
                 </span>
               </button>
