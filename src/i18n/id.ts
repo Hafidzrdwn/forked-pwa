@@ -35,6 +35,9 @@ export const id = {
     copyBackup: 'Salin Cadangan (JSON)',
     importBackup: 'Buka File Cadangan',
     backupAction: 'Kelola Cadangan',
+    privacyPolicy: 'Kebijakan Privasi',
+    termsOfUse: 'Ketentuan Layanan',
+    backToStudio: 'Kembali ke Studio',
     tagline: 'UNTUK SETIAP LANGKAH PENTING DALAM HIDUPMU.'
   },
   overview: {
@@ -332,5 +335,94 @@ export const id = {
     copied: 'Tautan Berhasil Disalin!',
     continueAnyway: 'Tetap Lanjutkan (Fitur Terbatas)',
     stepGuide: 'Atau ketuk menu titik tiga (•••) di pojok atas, lalu pilih "Buka di Browser Eksternal".'
+  },
+  privacy: {
+    badge: 'Kedaulatan Data Lokal',
+    title: 'Kebijakan Privasi',
+    subtitle: 'Prinsip perlindungan privasi mutlak berbasis arsitektur Local-First tanpa server luar.',
+    updatedAt: 'Pembaruan Terakhir: Oktober 2026',
+    introTitle: 'Keputusan Hidupmu Adalah Privasi Mutlakmu',
+    introDesc: 'Forked dibangun atas dasar keyakinan teguh bahwa pertimbangan karier, keuangan, dan masa depan seseorang tidak boleh menjadi komoditas data, bahan pelatihan AI pihak ketiga, atau konsumsi server cloud.',
+    backBtn: 'Kembali ke Studio',
+    sections: [
+      {
+        id: 'storage',
+        title: '1. Penyimpanan 100% di Perangkat (IndexedDB)',
+        content: 'Seluruh input keputusan, skenario jalan alternatif, angka keuangan, asumsi, hingga catatan refleksi jurnal tersimpan eksklusif di penyimpanan peramban lokal perangkat Anda (IndexedDB). Tidak ada data yang dikirim atau diunggah ke peladen (server) kami.'
+      },
+      {
+        id: 'no-auth',
+        title: '2. Tanpa Akun, Sandi, & Identitas Pribadi',
+        content: 'Anda dapat menggunakan seluruh fitur Forked secara penuh tanpa perlu mendaftar, tanpa alamat email, dan tanpa nomor ponsel. Kami tidak mengumpulkan pengenal perangkat, sidik jari peramban (fingerprinting), maupun data demografis.'
+      },
+      {
+        id: 'no-trackers',
+        title: '3. Nol Pelacak Pihak Ketiga (Zero Telemetry)',
+        content: 'Forked tidak memuat skrip pelacak analitik pihak ketiga (seperti Google Analytics atau Meta Pixel), tidak menanamkan cookie pelacak iklan, dan tidak membagikan data kepada broker data manapun.'
+      },
+      {
+        id: 'canvas-render',
+        title: '4. Render Gambar Cerita di Sisi Klien (On-Device)',
+        content: 'Saat Anda menggunakan fitur "Bagi Cerita" (Story 9:16 atau Feed 1:1), kartu gambar di-render secara langsung pada kartu grafis peramban Anda melalui HTML Canvas. Proses ini terjadi 100% lokal di perangkat Anda tanpa menyentuh server pemrosesan gambar.'
+      },
+      {
+        id: 'data-ownership',
+        title: '5. Kedaulatan & Kontrol Penuh Pengguna',
+        content: 'Anda memiliki kendali tak terbatas atas data Anda. Anda dapat mengekspor seluruh basis data ke dalam format terbuka (.json) kapan saja untuk pencadangan aman, serta menghapus riwayat keputusan dengan satu klik yang langsung membersihkan IndexedDB lokal tanpa meninggalkan jejak.'
+      },
+      {
+        id: 'offline-pwa',
+        title: '6. Kesiapan Penuh Offline (PWA)',
+        content: 'Sebagai Progressive Web App (PWA), Forked dapat dipasang di desktop atau smartphone dan tetap berfungsi normal meski tanpa sambungan internet sama sekali.'
+      }
+    ],
+    summaryBoxTitle: 'Ringkasan Inti',
+    summaryBoxPoints: [
+      'Nihil database backend atau cloud storage.',
+      'Data tersimpan di IndexedDB browser Anda.',
+      'Bebas ekspor, salin, dan hapus data kapan saja.'
+    ]
+  },
+  terms: {
+    badge: 'Transparansi & Tanggung Jawab',
+    title: 'Ketentuan Layanan',
+    subtitle: 'Pedoman penggunaan etis, pemahaman simulasi heuristik, dan batasan tanggung jawab.',
+    updatedAt: 'Pembaruan Terakhir: Oktober 2026',
+    introTitle: 'Simulator Keputusan, Bukan Ramalan Masa Depan',
+    introDesc: 'Forked diciptakan sebagai teman berpikir kritis untuk membantu mengurai trade-off dan asumsi tersembunyi, bukan sebagai penentu takdir atau vonis keputusan akhir.',
+    backBtn: 'Kembali ke Studio',
+    sections: [
+      {
+        id: 'heuristic-nature',
+        title: '1. Sifat Bantuan Skor Heuristik',
+        content: 'Skor kecocokan (0-100), bobot prioritas, serta simulasi What-If adalah hasil perhitungan matematika heuristik terbuka berdasarkan estimasi dan asumsi yang Anda masukkan sendiri. Skor ini dirancang sebagai cermin pemikiran rasional, bukan kepastian mutlak atau jaminan keberhasilan jalan hidup yang dipilih.'
+      },
+      {
+        id: 'no-professional-advice',
+        title: '2. Bukan Pengganti Nasihat Finansial, Hukum, atau Medis',
+        content: 'Informasi dan simulasi dalam aplikasi ini ditujukan semata-mata untuk eksplorasi pribadi dan edukasi mandiri. Penggunaan simulasi Forked tidak dapat dianggap sebagai nasihat perencana keuangan berlisensi, konsultasi hukum, atau nasihat medis profesional. Segala keputusan riil tetap menjadi diskresi penuh pengguna.'
+      },
+      {
+        id: 'user-backup-responsibility',
+        title: '3. Tanggung Jawab Pencadangan Mandiri',
+        content: 'Karena kami tidak menyimpan salinan data di cloud/server kami demi melindungi privasi Anda, Anda bertanggung jawab penuh untuk mengunduh atau menyalin berkas cadangan JSON secara teratur. Kami tidak dapat memulihkan data yang hilang jika peramban Anda dibersihkan secara paksa, cache terhapus oleh OS, atau perangkat rusak.'
+      },
+      {
+        id: 'ethical-use',
+        title: '4. Penggunaan Etis & Integritas Data',
+        content: 'Anda setuju untuk menggunakan aplikasi ini untuk keperluan yang sah dan menghormati hak privasi pihak lain jika membagikan tangkapan layar atau visual cerita keputusan ke media publik.'
+      },
+      {
+        id: 'as-is-license',
+        title: '5. Lisensi & Klausul "Sebagaimana Adanya" (As-Is)',
+        content: 'Forked disediakan secara bebas dan terbuka dalam kondisi "sebagaimana adanya" (as-is) tanpa jaminan tersurat maupun tersirat mengenai ketiadaan bug peramban atau kompatibilitas peramban pihak ketiga yang tidak didukung (seperti in-app browser media sosial).'
+      }
+    ],
+    summaryBoxTitle: 'Prinsip Utama',
+    summaryBoxPoints: [
+      'Skor adalah alat bantu refleksi, bukan vonis mutlak.',
+      'Data tidak disimpan di server, simpan file cadangan Anda.',
+      'Gunakan sebagai teman berpikir objektif dan terukur.'
+    ]
   }
 }

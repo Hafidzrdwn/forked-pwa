@@ -97,9 +97,27 @@ export const CalendarDays = createIcon(() => [
   h('line', { x1: '3', y1: '10', x2: '21', y2: '10' })
 ])
 
+export const ArrowLeft = createIcon(() => [
+  h('line', { x1: '19', y1: '12', x2: '5', y2: '12' }),
+  h('polyline', { points: '12 19 5 12 12 5' })
+])
+
 export const ArrowRight = createIcon(() => [
   h('line', { x1: '5', y1: '12', x2: '19', y2: '12' }),
   h('polyline', { points: '13 6 19 12 13 18' })
+])
+
+export const Lock = createIcon(() => [
+  h('rect', { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' }),
+  h('path', { d: 'M7 11V7a5 5 0 0110 0v4' })
+])
+
+export const FileText = createIcon(() => [
+  h('path', { d: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z' }),
+  h('polyline', { points: '14 2 14 8 20 8' }),
+  h('line', { x1: '16', y1: '13', x2: '8', y2: '13' }),
+  h('line', { x1: '16', y1: '17', x2: '8', y2: '17' }),
+  h('polyline', { points: '10 9 9 9 8 9' })
 ])
 
 export const ArrowUpRight = createIcon(() => [

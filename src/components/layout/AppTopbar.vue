@@ -4,9 +4,10 @@ import { Menu } from '../common/AppIcons'
 import LanguageSwitcher from '../common/LanguageSwitcher.vue'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import { useI18n } from '../../i18n'
+import type { NavigationTab } from '../../types'
 
 const props = defineProps<{
-  currentNav: 'overview' | 'decisions' | 'journal'
+  currentNav: NavigationTab
 }>()
 
 const emit = defineEmits<{
@@ -18,6 +19,8 @@ const { t } = useI18n()
 const pageTitle = computed(() => {
   if (props.currentNav === 'overview') return t.value.nav.overview
   if (props.currentNav === 'journal') return t.value.nav.journal
+  if (props.currentNav === 'privacy') return t.value.nav.privacyPolicy
+  if (props.currentNav === 'terms') return t.value.nav.termsOfUse
   return t.value.studio.title
 })
 </script>

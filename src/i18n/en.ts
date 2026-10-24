@@ -35,6 +35,9 @@ export const en = {
     copyBackup: 'Copy Backup (JSON)',
     importBackup: 'Import Backup',
     backupAction: 'Manage Backups',
+    privacyPolicy: 'Privacy Policy',
+    termsOfUse: 'Terms of Use',
+    backToStudio: 'Back to Studio',
     tagline: 'MADE FOR THE MOMENTS THAT MATTER.'
   },
   overview: {
@@ -332,5 +335,94 @@ export const en = {
     copied: 'Link Copied to Clipboard!',
     continueAnyway: 'Continue Anyway (Limited Storage)',
     stepGuide: 'Or tap the three dots (•••) menu at the top corner, then tap "Open in External Browser".'
+  },
+  privacy: {
+    badge: 'Local Data Sovereignty',
+    title: 'Privacy Policy',
+    subtitle: 'Absolute privacy protection based on a zero-server, Local-First architecture.',
+    updatedAt: 'Last Updated: October 2026',
+    introTitle: 'Your Life Choices Are Strictly Your Privacy',
+    introDesc: 'Forked was built on the core belief that your personal career, financial, and life crossroads should never become data commodities, third-party AI training corpora, or cloud telemetry.',
+    backBtn: 'Back to Studio',
+    sections: [
+      {
+        id: 'storage',
+        title: '1. 100% On-Device Storage (IndexedDB)',
+        content: 'All your decision inputs, alternative paths, financial figures, assumption checks, and journal entries are stored exclusively in your local browser storage (IndexedDB). No personal data is ever transmitted or uploaded to our servers or third parties.'
+      },
+      {
+        id: 'no-auth',
+        title: '2. No Accounts, Passwords, or Personal Identity',
+        content: 'You can use all Forked features fully without creating an account, without providing an email address, and without phone numbers. We do not gather device identifiers, browser fingerprints, or demographic profiles.'
+      },
+      {
+        id: 'no-trackers',
+        title: '3. Zero Third-Party Telemetry & Trackers',
+        content: 'Forked includes zero external tracking scripts (such as Google Analytics or Meta Pixel), no advertising tracking cookies, and never shares any interaction data with data brokers.'
+      },
+      {
+        id: 'canvas-render',
+        title: '4. Client-Side Image Rendering (Canvas)',
+        content: 'When you use the "Share Story" feature (9:16 Story or 1:1 Feed cards), card graphics are generated on-the-fly directly inside your browser via HTML Canvas. This rendering occurs 100% on your device without any external graphics processing server.'
+      },
+      {
+        id: 'data-ownership',
+        title: '5. Full User Sovereignty & Control',
+        content: 'You retain complete ownership of your data. You can export your full database to an open standard JSON format at any time for backup, and you can delete your decisions with a single click, instantly purging local records with zero residual traces.'
+      },
+      {
+        id: 'offline-pwa',
+        title: '6. Complete Offline Functionality (PWA)',
+        content: 'As a Progressive Web App (PWA), Forked can be installed onto your desktop or mobile device and operates flawlessly without an active internet connection.'
+      }
+    ],
+    summaryBoxTitle: 'Core Privacy Summary',
+    summaryBoxPoints: [
+      'Zero backend database or cloud storage.',
+      'Data is securely sandboxed in your browser IndexedDB.',
+      'Freely export, copy, or purge your data anytime.'
+    ]
+  },
+  terms: {
+    badge: 'Transparency & Responsibility',
+    title: 'Terms of Use',
+    subtitle: 'Guidelines for ethical usage, heuristic simulations, and liability boundaries.',
+    updatedAt: 'Last Updated: October 2026',
+    introTitle: 'A Thinking Simulator, Not a Crystal Ball',
+    introDesc: 'Forked is created as a structured thinking companion to help make trade-offs and hidden assumptions visible, not as a fate predictor or authoritative verdict.',
+    backBtn: 'Back to Studio',
+    sections: [
+      {
+        id: 'heuristic-nature',
+        title: '1. Nature of Heuristic Scoring',
+        content: 'The fit scores (0-100), criterion weights, and What-If simulations are transparent mathematical heuristic computations derived entirely from your own estimated inputs. These scores serve as a cognitive mirror, not an absolute guarantee of future real-world outcomes.'
+      },
+      {
+        id: 'no-professional-advice',
+        title: '2. Not Financial, Legal, or Medical Advice',
+        content: 'All tools and simulations provided are strictly for self-reflection and personal planning purposes. Nothing within Forked constitutes certified financial planning, legal counsel, or professional medical advice. All real-world actions remain your sole responsibility.'
+      },
+      {
+        id: 'user-backup-responsibility',
+        title: '3. User Responsibility for Data Backups',
+        content: 'Because we intentionally do not hold copies of your data on cloud servers to safeguard your privacy, you are responsible for downloading or copying JSON backups periodically. We cannot restore decisions lost due to aggressive browser cache purges or device loss.'
+      },
+      {
+        id: 'ethical-use',
+        title: '4. Ethical Use & Sharing Integrity',
+        content: 'You agree to use this application lawfully and respect the privacy rights of others when sharing decision summary cards or snapshots across social channels.'
+      },
+      {
+        id: 'as-is-license',
+        title: '5. "As-Is" License & Limitation of Liability',
+        content: 'Forked is provided free and open on an "as-is" basis, without express or implied warranties regarding continuous browser compatibility or data persistence in unsupported in-app web views.'
+      }
+    ],
+    summaryBoxTitle: 'Key Takeaways',
+    summaryBoxPoints: [
+      'Scores are reflective guides, not absolute verdicts.',
+      'No data is stored on remote servers; maintain your backups.',
+      'Use Forked as an objective tool for clear trade-off analysis.'
+    ]
   }
 }

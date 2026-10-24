@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useDecisions } from './composables/useDecisions'
 import { useConfirm } from './composables/useConfirm'
 import { useI18n } from './i18n'
@@ -8,6 +8,8 @@ import AppTopbar from './components/layout/AppTopbar.vue'
 import OverviewView from './components/views/OverviewView.vue'
 import DecisionStudioView from './components/views/DecisionStudioView.vue'
 import JournalView from './components/views/JournalView.vue'
+import PrivacyPolicyView from './components/views/PrivacyPolicyView.vue'
+import TermsOfUseView from './components/views/TermsOfUseView.vue'
 import CreateDecisionModal from './components/modals/CreateDecisionModal.vue'
 import WeightsModal from './components/modals/WeightsModal.vue'
 import JournalModal from './components/modals/JournalModal.vue'
@@ -16,6 +18,7 @@ import ConfirmModal from './components/common/ConfirmModal.vue'
 import ToastContainer from './components/common/ToastContainer.vue'
 import PwaInstallBanner from './components/common/PwaInstallBanner.vue'
 import UnsupportedBrowserNotice from './components/common/UnsupportedBrowserNotice.vue'
+import type { NavigationTab } from './types'
 
 const {
   decisions, activeId, searchTerm, busy, notice, activeDecision, filteredDecisions,
@@ -28,12 +31,20 @@ const {
 const { confirm: confirmDialog } = useConfirm()
 const { t } = useI18n()
 
-const nav = ref<'overview' | 'decisions' | 'journal'>('overview')
+const nav = ref<NavigationTab>('overview')
 const showCreate = ref(false)
 const showWeights = ref(false)
 const showJournal = ref(false)
 const showShare = ref(false)
 const mobileMenuOpen = ref(false)
+
+watch(nav, () => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+})
+
+function onPageBeforeEnter() {
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+}
 
 onMounted(() => {
   load()
@@ -89,47 +100,66 @@ async function handleDeleteActive() {
       </div>
 
       <template v-else>
-        <OverviewView
-          v-if="nav === 'overview'"
-          :decisions="decisions"
-          :total-decisions="totalDecisions"
-          :open-decisions="openDecisions"
-          :reviewed-decisions="reviewedDecisions"
-          :next-review="nextReview"
-          @new-decision="showCreate = true"
-          @open-decision="openDecision"
-          @navigate="nav = $event"
-        />
+        <Transition name="page-fade-blur" mode="out-in" @before-enter="onPageBeforeEnter">
+          <OverviewView
+            v-if="nav === 'overview'"
+            key="overview"
+            :decisions="decisions"
+            :total-decisions="totalDecisions"
+            :open-decisions="openDecisions"
+            :reviewed-decisions="reviewedDecisions"
+            :next-review="nextReview"
+            @new-decision="showCreate = true"
+            @open-decision="openDecision"
+            @navigate="nav = $event"
+          />
 
-        <DecisionStudioView
-          v-else-if="nav === 'decisions'"
-          v-model:search-term="searchTerm"
-          :decisions="decisions"
-          :active-id="activeId"
-          :active-decision="activeDecision"
-          :filtered-decisions="filteredDecisions"
-          @select-decision="activeId = $event"
-          @new-decision="showCreate = true"
-          @delete-active="handleDeleteActive"
-          @open-weights="showWeights = true"
-          @open-journal="showJournal = true"
-          @open-share="showShare = true"
-          @add-scenario="addScenarioToActive($event.name, $event.income, $event.cost, $event.hours, $event.growth, $event.risk)"
-          @remove-scenario="removeScenarioFromActive($event)"
-          @choose-scenario="chooseScenario($event)"
-          @update-scenario="updateScenario($event)"
-          @add-assumption="addAssumptionToScenario($event.scenarioId, $event.text, $event.confidence, $event.kind)"
-          @toggle-assumption="toggleAssumption($event.scenarioId, $event.assumptionId)"
-          @remove-assumption="removeAssumption($event.scenarioId, $event.assumptionId)"
-        />
+          <DecisionStudioView
+            v-else-if="nav === 'decisions'"
+            key="decisions"
+            v-model:search-term="searchTerm"
+            :decisions="decisions"
+            :active-id="activeId"
+            :active-decision="activeDecision"
+            :filtered-decisions="filteredDecisions"
+            @select-decision="activeId = $event"
+            @new-decision="showCreate = true"
+            @delete-active="handleDeleteActive"
+            @open-weights="showWeights = true"
+            @open-journal="showJournal = true"
+            @open-share="showShare = true"
+            @add-scenario="addScenarioToActive($event.name, $event.income, $event.cost, $event.hours, $event.growth, $event.risk)"
+            @remove-scenario="removeScenarioFromActive($event)"
+            @choose-scenario="chooseScenario($event)"
+            @update-scenario="updateScenario($event)"
+            @add-assumption="addAssumptionToScenario($event.scenarioId, $event.text, $event.confidence, $event.kind)"
+            @toggle-assumption="toggleAssumption($event.scenarioId, $event.assumptionId)"
+            @remove-assumption="removeAssumption($event.scenarioId, $event.assumptionId)"
+          />
 
-        <JournalView
-          v-else-if="nav === 'journal'"
-          :decisions="decisions"
-          @open-decision="openDecision"
-          @edit-journal="activeId = $event; showJournal = true"
-          @new-decision="showCreate = true"
-        />
+          <JournalView
+            v-else-if="nav === 'journal'"
+            key="journal"
+            :decisions="decisions"
+            @open-decision="openDecision"
+            @edit-journal="activeId = $event; showJournal = true"
+            @new-decision="showCreate = true"
+          />
+
+          <PrivacyPolicyView
+            v-else-if="nav === 'privacy'"
+            key="privacy"
+            @back="nav = 'overview'"
+            @export="exportBackup"
+          />
+
+          <TermsOfUseView
+            v-else-if="nav === 'terms'"
+            key="terms"
+            @back="nav = 'overview'"
+            @navigate="nav = $event"
+          />
+        </Transition>
       </template>
     </main>
 

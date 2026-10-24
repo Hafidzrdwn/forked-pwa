@@ -6,12 +6,13 @@ import {
 import BrandLogo from '../common/BrandLogo.vue'
 import { useI18n } from '../../i18n'
 import { usePwa } from '../../composables/usePwa'
+import type { NavigationTab } from '../../types'
 
 const { canInstall, isInstalled, promptInstall } = usePwa()
 
 const props = withDefaults(
   defineProps<{
-    currentNav: 'overview' | 'decisions' | 'journal'
+    currentNav: NavigationTab
     totalDecisions: number
     mobileOpen?: boolean
   }>(),
@@ -21,7 +22,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'navigate', nav: 'overview' | 'decisions' | 'journal'): void
+  (e: 'navigate', nav: NavigationTab): void
   (e: 'export'): void
   (e: 'copy-backup'): void
   (e: 'import-file', file: File): void
@@ -446,7 +447,32 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
         @change="handleFileChange"
       />
 
-      <div class="text-[11px] tracking-wider text-fg-subtle px-2 pt-3 uppercase font-semibold">{{ t.nav.tagline }}</div>
+      <!-- Legal Links -->
+      <div class="flex items-center gap-2 px-2 pt-2.5 text-[11px] text-fg-subtle">
+        <button
+          type="button"
+          :class="[
+            'hover:text-fg transition-colors cursor-pointer underline-offset-2',
+            currentNav === 'privacy' ? 'text-primary font-bold underline' : ''
+          ]"
+          @click="emit('navigate', 'privacy'); emit('close-mobile-menu')"
+        >
+          {{ t.nav.privacyPolicy }}
+        </button>
+        <span>·</span>
+        <button
+          type="button"
+          :class="[
+            'hover:text-fg transition-colors cursor-pointer underline-offset-2',
+            currentNav === 'terms' ? 'text-primary font-bold underline' : ''
+          ]"
+          @click="emit('navigate', 'terms'); emit('close-mobile-menu')"
+        >
+          {{ t.nav.termsOfUse }}
+        </button>
+      </div>
+
+      <div class="text-[11px] tracking-wider text-fg-subtle px-2 pt-2 uppercase font-semibold">{{ t.nav.tagline }}</div>
     </div>
   </aside>
 </template>
