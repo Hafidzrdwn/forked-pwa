@@ -11,6 +11,7 @@ import JournalView from './components/views/JournalView.vue'
 import PrivacyPolicyView from './components/views/PrivacyPolicyView.vue'
 import TermsOfUseView from './components/views/TermsOfUseView.vue'
 import CreateDecisionModal from './components/modals/CreateDecisionModal.vue'
+import EditDecisionModal from './components/modals/EditDecisionModal.vue'
 import WeightsModal from './components/modals/WeightsModal.vue'
 import JournalModal from './components/modals/JournalModal.vue'
 import ShareStoryModal from './components/modals/ShareStoryModal.vue'
@@ -23,16 +24,18 @@ import type { NavigationTab } from './types'
 const {
   decisions, activeId, searchTerm, busy, notice, activeDecision, filteredDecisions,
   totalDecisions, openDecisions, reviewedDecisions, nextReview,
-  load, createDecision, deleteActiveDecision, addScenarioToActive, removeScenarioFromActive,
+  load, loadSampleTemplates, createDecision, updateDecisionDetails, duplicateDecision,
+  deleteActiveDecision, deleteMultipleDecisions, addScenarioToActive, removeScenarioFromActive,
   chooseScenario, updateScenario, addAssumptionToScenario, toggleAssumption, removeAssumption,
   saveJournal, updateDecisionWeights, updateReviewDate, exportBackup, copyBackupToClipboard, importBackupFile
 } = useDecisions()
 
 const { confirm: confirmDialog } = useConfirm()
-const { t } = useI18n()
+const { t, interpolate } = useI18n()
 
 const nav = ref<NavigationTab>('overview')
 const showCreate = ref(false)
+const showEdit = ref(false)
 const showWeights = ref(false)
 const showJournal = ref(false)
 const showShare = ref(false)
@@ -74,6 +77,20 @@ async function handleDeleteActive() {
   deleteActiveDecision()
   nav.value = 'overview'
 }
+
+async function handleDeleteMultiple(ids: string[]) {
+  if (!ids.length) return
+  const count = ids.length
+  const confirmed = await confirmDialog({
+    title: interpolate(t.value.studio.confirmDeleteMultipleTitle, { n: count }),
+    message: interpolate(t.value.studio.confirmDeleteMultipleMsg, { n: count }),
+    confirmText: interpolate(t.value.studio.deleteSelected, { n: count }),
+    cancelText: t.value.common.cancel,
+    danger: true
+  })
+  if (!confirmed) return
+  await deleteMultipleDecisions(ids)
+}
 </script>
 
 <template>
@@ -110,6 +127,7 @@ async function handleDeleteActive() {
             :reviewed-decisions="reviewedDecisions"
             :next-review="nextReview"
             @new-decision="showCreate = true"
+            @load-samples="loadSampleTemplates"
             @open-decision="openDecision"
             @navigate="nav = $event"
           />
@@ -124,7 +142,11 @@ async function handleDeleteActive() {
             :filtered-decisions="filteredDecisions"
             @select-decision="activeId = $event"
             @new-decision="showCreate = true"
+            @load-samples="loadSampleTemplates"
+            @edit-active="showEdit = true"
+            @duplicate-decision="duplicateDecision"
             @delete-active="handleDeleteActive"
+            @delete-multiple="handleDeleteMultiple"
             @open-weights="showWeights = true"
             @open-journal="showJournal = true"
             @open-share="showShare = true"
@@ -167,6 +189,13 @@ async function handleDeleteActive() {
       v-if="showCreate"
       @create="handleCreateDecision"
       @close="showCreate = false"
+    />
+
+    <EditDecisionModal
+      v-if="showEdit && activeDecision"
+      :decision="activeDecision"
+      @save="updateDecisionDetails(activeDecision.id, $event.title, $event.context); showEdit = false"
+      @close="showEdit = false"
     />
 
     <WeightsModal

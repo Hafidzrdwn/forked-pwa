@@ -322,3 +322,17 @@ export const ExternalLink = createIcon(() => [
   h('polyline', { points: '15 3 21 3 21 9' }),
   h('line', { x1: '10', y1: '14', x2: '21', y2: '3' })
 ])
+
+export const Sparkles = createIcon(() => [
+  h('path', { d: 'M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z' }),
+  h('path', { d: 'M5 3v4' }),
+  h('path', { d: 'M3 5h4' }),
+  h('path', { d: 'M19 17v4' }),
+  h('path', { d: 'M17 19h4' })
+])
+
+export const CheckSquare = createIcon(() => [
+  h('polyline', { points: '9 11 12 14 22 4' }),
+  h('path', { d: 'M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11' })
+])
+

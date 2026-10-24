@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   Plus, GitBranch, Activity, Check, ArrowRight,
-  CircleHelp, CalendarDays, ShieldAlert, AlertTriangle
+  CircleHelp, CalendarDays, ShieldAlert, AlertTriangle, Sparkles
 } from '../common/AppIcons'
 import type { Decision } from '../../types'
 import { useI18n } from '../../i18n'
@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'new-decision'): void
+  (e: 'load-samples'): void
   (e: 'open-decision', id: string): void
   (e: 'navigate', tab: 'decisions' | 'journal'): void
 }>()
@@ -155,12 +156,21 @@ const isOverdue = (dateStr: string) => {
       <IllustrationFork :width="130" :height="100" />
       <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.overview.emptyTitle }}</h3>
       <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.overview.emptyDesc }}</p>
-      <button
-        class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
-        @click="emit('new-decision')"
-      >
-        <Plus :size="16" /> {{ t.overview.mapFirstDecision }}
-      </button>
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <button
+          class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
+          @click="emit('new-decision')"
+        >
+          <Plus :size="16" /> {{ t.overview.mapFirstDecision }}
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-fg-muted hover:text-fg hover:bg-canvas-subtle border border-border transition-all cursor-pointer"
+          @click="emit('load-samples')"
+        >
+          <Sparkles :size="15" /> {{ t.overview.loadSampleAction }}
+        </button>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-4 mt-7">

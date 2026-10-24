@@ -91,10 +91,10 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4">
         <label class="block text-xs font-bold text-fg">
           {{ t.journalModal.stageLabel }}
-          <select v-model="status" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3 py-2 text-xs outline-none focus:border-primary">
-            <option value="exploring">{{ t.journalModal.stageExploring }}</option>
-            <option value="decided">{{ t.journalModal.stageDecided }}</option>
-            <option value="reviewed">{{ t.journalModal.stageReviewed }}</option>
+          <select v-model="status" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3 py-2 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer transition-all">
+            <option class="bg-surface text-fg py-1" value="exploring">{{ t.journalModal.stageExploring }}</option>
+            <option class="bg-surface text-fg py-1" value="decided">{{ t.journalModal.stageDecided }}</option>
+            <option class="bg-surface text-fg py-1" value="reviewed">{{ t.journalModal.stageReviewed }}</option>
           </select>
         </label>
 

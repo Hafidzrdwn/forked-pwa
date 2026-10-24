@@ -66,6 +66,12 @@ function submitAssumption() {
   kind.value = 'assumption'
   showForm.value = false
 }
+
+function getKindLabel(k?: string) {
+  if (k === 'fact') return t.value.assumptions.badgeFact
+  if (k === 'estimate') return t.value.assumptions.badgeEstimate
+  return t.value.assumptions.badgeAssumption
+}
 </script>
 
 <template>
@@ -138,10 +144,10 @@ function submitAssumption() {
         <div class="flex flex-col gap-3">
           <label class="block text-xs font-bold text-fg">
             {{ t.assumptions.typeLabel }}
-            <select v-model="kind" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3 py-2 text-xs outline-none focus:border-primary">
-              <option value="assumption">{{ t.assumptions.typeAssumption }}</option>
-              <option value="estimate">{{ t.assumptions.typeEstimate }}</option>
-              <option value="fact">{{ t.assumptions.typeFact }}</option>
+            <select v-model="kind" class="w-full mt-1.5 border border-border rounded-xl bg-surface text-fg px-3 py-2 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer transition-all">
+              <option class="bg-surface text-fg py-1" value="assumption">{{ t.assumptions.typeAssumption }}</option>
+              <option class="bg-surface text-fg py-1" value="estimate">{{ t.assumptions.typeEstimate }}</option>
+              <option class="bg-surface text-fg py-1" value="fact">{{ t.assumptions.typeFact }}</option>
             </select>
           </label>
 
@@ -196,7 +202,7 @@ function submitAssumption() {
                 item.kind === 'fact' ? 'bg-blue-soft text-blue' : item.kind === 'estimate' ? 'bg-amber-soft text-amber' : 'bg-canvas-subtle text-fg-muted border border-border'
               ]"
             >
-              {{ item.kind || 'assumption' }}
+              {{ getKindLabel(item.kind) }}
             </span>
             <span class="font-semibold text-fg wrap-break-word">{{ item.text }}</span>
           </div>

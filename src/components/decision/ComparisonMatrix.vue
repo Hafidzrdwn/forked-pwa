@@ -79,7 +79,7 @@ const matrixRows = computed<MatrixRow[]>(() => {
     </div>
 
     <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-      <table class="w-full text-left text-xs border-collapse min-w-155">
+      <table class="w-full text-left text-xs border-collapse min-w-175">
         <thead>
           <tr class="border-b border-border text-[11px] font-bold uppercase tracking-wider text-fg-subtle">
             <th class="py-3 px-3">{{ t.matrix.colPath }}</th>
@@ -89,7 +89,7 @@ const matrixRows = computed<MatrixRow[]>(() => {
             <th class="py-3 px-3 text-center">{{ t.matrix.colGrowth }}</th>
             <th class="py-3 px-3 text-center">{{ t.matrix.colRisk }}</th>
             <th class="py-3 px-3">{{ t.matrix.colHighlight }}</th>
-            <th class="py-3 px-3 text-right">{{ t.matrix.colAction }}</th>
+            <th class="py-3 px-3 text-right whitespace-nowrap">{{ t.matrix.colAction }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-border">
@@ -179,20 +179,21 @@ const matrixRows = computed<MatrixRow[]>(() => {
               </div>
             </td>
 
-            <td class="py-3.5 px-3 text-right">
+            <td class="py-3.5 px-3 text-right whitespace-nowrap">
               <span
                 v-if="selectedScenarioId === row.scenario.id"
-                class="inline-flex items-center gap-1 text-[11px] font-bold text-primary px-2.5 py-1 rounded-lg bg-primary-soft"
+                class="inline-flex items-center gap-1 text-[11px] font-bold text-primary px-3 py-1.5 rounded-lg bg-primary-soft whitespace-nowrap shrink-0"
               >
                 <Check :size="13" /> {{ t.matrix.selectedBadge }}
               </span>
               <button
                 v-else
                 type="button"
-                class="inline-flex items-center gap-1 text-[11px] font-bold text-fg-muted hover:text-fg hover:bg-canvas-subtle border border-border px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                class="inline-flex items-center justify-end gap-1.5 text-[11px] font-bold text-fg-muted hover:text-fg hover:bg-canvas-subtle border border-border px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap shrink-0 shadow-2xs active:scale-95"
                 @click="emit('choose-scenario', row.scenario.id)"
               >
-                {{ t.matrix.selectAction }} <ArrowRight :size="11" />
+                <span>{{ t.matrix.selectAction }}</span>
+                <ArrowRight :size="12" />
               </button>
             </td>
           </tr>

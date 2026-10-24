@@ -25,8 +25,12 @@ export function useDecisions() {
 
     flash: store.flash,
     load: store.load,
+    loadSampleTemplates: store.loadSampleTemplates,
     createDecision: store.createDecision,
+    updateDecisionDetails: store.updateDecisionDetails,
+    duplicateDecision: store.duplicateDecision,
     deleteActiveDecision: store.deleteActiveDecision,
+    deleteMultipleDecisions: store.deleteMultipleDecisions,
     addScenarioToActive: store.addScenarioToActive,
     removeScenarioFromActive: store.removeScenarioFromActive,
     chooseScenario: store.chooseScenario,

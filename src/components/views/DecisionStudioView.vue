@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import {
   Plus, Search, Trash2, CalendarDays, ArrowRight, GitBranch,
-  Scale, ShieldAlert, AlertCircle, Share2
+  Scale, ShieldAlert, AlertCircle, Share2, Pencil, Copy, Check, Sparkles
 } from '../common/AppIcons'
 import type { Decision, Scenario, AssumptionKind } from '../../types'
 import { useI18n } from '../../i18n'
@@ -27,7 +27,11 @@ const emit = defineEmits<{
   (e: 'update:searchTerm', val: string): void
   (e: 'select-decision', id: string): void
   (e: 'new-decision'): void
+  (e: 'load-samples'): void
+  (e: 'edit-active'): void
+  (e: 'duplicate-decision', id: string): void
   (e: 'delete-active'): void
+  (e: 'delete-multiple', ids: string[]): void
   (e: 'open-weights'): void
   (e: 'open-journal'): void
   (e: 'open-share'): void
@@ -41,6 +45,32 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale, interpolate } = useI18n()
+
+const multiSelectMode = ref(false)
+const selectedIds = ref<string[]>([])
+
+function toggleMultiSelectMode() {
+  multiSelectMode.value = !multiSelectMode.value
+  if (!multiSelectMode.value) {
+    selectedIds.value = []
+  }
+}
+
+function toggleSelectItem(id: string) {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedIds.value.splice(idx, 1)
+  } else {
+    selectedIds.value.push(id)
+  }
+}
+
+function handleDeleteSelected() {
+  if (!selectedIds.value.length) return
+  emit('delete-multiple', [...selectedIds.value])
+  selectedIds.value = []
+  multiSelectMode.value = false
+}
 
 const showAddPath = ref(false)
 const pathName = ref('')
@@ -125,19 +155,47 @@ function formatDate(value: string) {
           />
         </div>
 
+        <div v-if="filteredDecisions.length > 1 || multiSelectMode" class="flex items-center justify-between gap-2 mb-2 px-1">
+          <span class="text-[10.5px] font-bold text-fg-subtle uppercase tracking-wider">
+            {{ multiSelectMode ? interpolate(t.studio.selectedCount, { n: selectedIds.length }) : t.overview.allDecisions }}
+          </span>
+          <button
+            type="button"
+            class="text-[11px] font-bold text-primary hover:text-primary-dark transition-colors cursor-pointer"
+            @click="toggleMultiSelectMode"
+          >
+            {{ multiSelectMode ? t.studio.cancelSelect : t.studio.selectMultiple }}
+          </button>
+        </div>
+
         <button
           v-for="decision in filteredDecisions"
           :key="decision.id"
           type="button"
           :class="[
             'w-full flex items-center gap-2.5 p-2.5 rounded-xl text-left transition-all cursor-pointer mb-1',
-            decision.id === activeId
-              ? 'bg-primary-soft text-primary font-bold shadow-2xs'
-              : 'hover:bg-canvas-subtle text-fg'
+            multiSelectMode && selectedIds.includes(decision.id)
+              ? 'bg-primary-soft/60 border border-primary/40 text-primary shadow-2xs'
+              : !multiSelectMode && decision.id === activeId
+                ? 'bg-primary-soft text-primary font-bold shadow-2xs'
+                : 'hover:bg-canvas-subtle text-fg border border-transparent'
           ]"
-          @click="emit('select-decision', decision.id)"
+          @click="multiSelectMode ? toggleSelectItem(decision.id) : emit('select-decision', decision.id)"
         >
+          <div
+            v-if="multiSelectMode"
+            :class="[
+              'w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all',
+              selectedIds.includes(decision.id)
+                ? 'bg-primary border-primary text-white'
+                : 'border-border bg-surface'
+            ]"
+          >
+            <Check v-if="selectedIds.includes(decision.id)" :size="13" stroke-width="3" />
+          </div>
+
           <span
+            v-else
             :class="[
               'w-8 h-8 rounded-lg grid place-items-center shrink-0 text-sm',
               decision.id === activeId ? 'bg-surface text-primary shadow-xs' : 'bg-canvas-subtle text-fg-muted'
@@ -153,11 +211,22 @@ function formatDate(value: string) {
           </span>
         </button>
 
+        <button
+          v-if="multiSelectMode && selectedIds.length > 0"
+          type="button"
+          class="w-full flex items-center justify-center gap-1.5 p-2 rounded-xl bg-danger-soft text-danger border border-danger/25 hover:bg-danger hover:text-white text-xs font-bold transition-all cursor-pointer mt-2 shadow-xs"
+          @click="handleDeleteSelected"
+        >
+          <Trash2 :size="14" />
+          {{ interpolate(t.studio.deleteSelected, { n: selectedIds.length }) }}
+        </button>
+
         <div v-if="!filteredDecisions.length" class="p-4 text-center text-xs text-fg-muted">
           {{ t.studio.noMatches }}
         </div>
 
         <button
+          v-if="!multiSelectMode"
           type="button"
           class="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border border-dashed border-border text-fg-muted hover:text-fg hover:border-primary text-xs font-bold transition-colors cursor-pointer mt-2"
           @click="emit('new-decision')"
@@ -167,42 +236,81 @@ function formatDate(value: string) {
       </aside>
 
       <div v-if="activeDecision" class="min-w-0 flex flex-col gap-5">
-        <div class="border border-border rounded-2xl bg-surface p-4 md:p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-3 md:gap-4 shadow-xs relative overflow-hidden">
-          <div class="min-w-0 flex-1 relative z-10">
-            <div class="text-[11px] font-semibold text-fg-subtle mb-1">
-              {{ interpolate(t.studio.createdOn, { date: formatDate(activeDecision.createdAt) }) }}
-            </div>
-            <h2 class="font-display font-extrabold text-xl md:text-2xl tracking-tight text-fg my-0.5 wrap-break-word">{{ activeDecision.title }}</h2>
-            <p class="text-xs md:text-sm text-fg-muted leading-relaxed m-0 mt-1.5">{{ activeDecision.context || t.studio.noContext }}</p>
+        <div class="border border-border rounded-2xl bg-surface p-4 md:p-6 shadow-xs relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 md:gap-4 relative z-10">
+            <div class="min-w-0 flex-1 pr-0 sm:pr-3">
+              <div class="text-[11px] font-semibold text-fg-subtle mb-1">
+                {{ interpolate(t.studio.createdOn, { date: formatDate(activeDecision.createdAt) }) }}
+              </div>
+              <h2 class="font-display font-extrabold text-xl md:text-2xl tracking-tight text-fg my-0.5 leading-snug wrap-break-word">{{ activeDecision.title }}</h2>
+              <p class="text-xs md:text-sm text-fg-muted leading-relaxed m-0 mt-1.5">{{ activeDecision.context || t.studio.noContext }}</p>
 
-            <div class="mt-3">
-              <span
-                :class="[
-                  'inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs',
-                  (activeDecision.status || '').toLowerCase() === 'exploring' ? 'bg-amber-soft text-amber' : (activeDecision.status || '').toLowerCase() === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
-                ]"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                {{ (activeDecision.status || '').toLowerCase() === 'exploring' ? t.common.statusExploring : (activeDecision.status || '').toLowerCase() === 'decided' ? t.common.statusDecided : t.common.statusReviewed }}
-              </span>
+              <div class="mt-3">
+                <span
+                  :class="[
+                    'inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs',
+                    (activeDecision.status || '').toLowerCase() === 'exploring' ? 'bg-amber-soft text-amber' : (activeDecision.status || '').toLowerCase() === 'decided' ? 'bg-primary-soft text-primary' : 'bg-blue-soft text-blue'
+                  ]"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                  {{ (activeDecision.status || '').toLowerCase() === 'exploring' ? t.common.statusExploring : (activeDecision.status || '').toLowerCase() === 'decided' ? t.common.statusDecided : t.common.statusReviewed }}
+                </span>
+              </div>
             </div>
-          </div>
-          <div class="flex items-center gap-2 shrink-0 self-end sm:self-start pt-1 sm:pt-0 relative z-10">
-            <button
-              type="button"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-fg hover:border-primary text-xs font-bold transition-all cursor-pointer shadow-2xs"
-              @click="emit('open-share')"
-            >
-              <Share2 :size="14" class="text-primary" /> {{ t.studio.shareBtn }}
-            </button>
-            <button
-              type="button"
-              class="w-8 h-8 md:w-9 md:h-9 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:bg-danger-soft grid place-items-center transition-colors cursor-pointer shrink-0"
-              :aria-label="t.studio.deleteAria"
-              @click="emit('delete-active')"
-            >
-              <Trash2 :size="16" />
-            </button>
+
+            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-start pt-1 sm:pt-0">
+              <button
+                type="button"
+                class="group relative inline-flex items-center h-9 min-w-9 max-w-9 hover:max-w-56 focus-visible:max-w-56 px-2.5 hover:pr-3 focus-visible:pr-3 rounded-xl border border-border bg-surface text-fg hover:border-primary hover:bg-canvas-subtle focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300 ease-out cursor-pointer shadow-2xs shrink-0 overflow-hidden"
+                :title="t.studio.editDecision"
+                :aria-label="t.studio.editDecision"
+                @click="emit('edit-active')"
+              >
+                <Pencil :size="15" class="text-primary shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                  {{ t.studio.editDecision }}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                class="group relative inline-flex items-center h-9 min-w-9 max-w-9 hover:max-w-56 focus-visible:max-w-56 px-2.5 hover:pr-3 focus-visible:pr-3 rounded-xl border border-border bg-surface text-fg hover:border-primary hover:bg-canvas-subtle focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300 ease-out cursor-pointer shadow-2xs shrink-0 overflow-hidden"
+                :title="t.studio.duplicateDecision"
+                :aria-label="t.studio.duplicateDecision"
+                @click="emit('duplicate-decision', activeDecision.id)"
+              >
+                <Copy :size="15" class="text-primary shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                  {{ t.studio.duplicateDecision }}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                class="group relative inline-flex items-center h-9 min-w-9 max-w-9 hover:max-w-56 focus-visible:max-w-56 px-2.5 hover:pr-3 focus-visible:pr-3 rounded-xl border border-border bg-surface text-fg hover:border-primary hover:bg-canvas-subtle focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300 ease-out cursor-pointer shadow-2xs shrink-0 overflow-hidden"
+                :title="t.studio.shareBtn"
+                :aria-label="t.studio.shareBtn"
+                @click="emit('open-share')"
+              >
+                <Share2 :size="15" class="text-primary shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-44 group-focus-visible:max-w-44 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                  {{ t.studio.shareBtn }}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                class="group relative inline-flex items-center h-9 min-w-9 max-w-9 hover:max-w-40 focus-visible:max-w-40 px-2.5 hover:pr-3 focus-visible:pr-3 rounded-xl border border-border bg-surface text-fg-muted hover:text-danger hover:border-danger/40 hover:bg-danger-soft focus-visible:border-danger focus-visible:ring-2 focus-visible:ring-danger/20 transition-all duration-300 ease-out cursor-pointer shadow-2xs shrink-0 overflow-hidden"
+                :title="t.studio.deleteAria"
+                :aria-label="t.studio.deleteAria"
+                @click="emit('delete-active')"
+              >
+                <Trash2 :size="15" class="shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <span class="max-w-0 opacity-0 whitespace-nowrap overflow-hidden transition-all duration-300 ease-out group-hover:max-w-28 group-focus-visible:max-w-28 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:ml-1.5 group-focus-visible:ml-1.5 text-xs font-bold leading-none">
+                  {{ t.common.delete }}
+                </span>
+              </button>
+            </div>
           </div>
 
           <!-- Ambient Decision Watermark Illustration (fills bottom-right empty space) -->
@@ -405,12 +513,21 @@ function formatDate(value: string) {
         <IllustrationFork :width="140" :height="110" />
         <h3 class="font-display font-bold text-lg text-fg mt-4 mb-2">{{ t.studio.emptyPickerTitle }}</h3>
         <p class="text-sm text-fg-muted max-w-md mb-5 leading-relaxed">{{ t.studio.emptyPickerDesc }}</p>
-        <button
-          class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
-          @click="emit('new-decision')"
-        >
-          <Plus :size="16" /> {{ t.studio.newDecision }}
-        </button>
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <button
+            class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold bg-primary text-white shadow-sm hover:bg-primary-dark transition-all cursor-pointer"
+            @click="emit('new-decision')"
+          >
+            <Plus :size="16" /> {{ t.studio.newDecision }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-fg-muted hover:text-fg hover:bg-canvas-subtle border border-border transition-all cursor-pointer"
+            @click="emit('load-samples')"
+          >
+            <Sparkles :size="15" /> {{ t.overview.loadSampleAction }}
+          </button>
+        </div>
       </div>
     </div>
   </section>

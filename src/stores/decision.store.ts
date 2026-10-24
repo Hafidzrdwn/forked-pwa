@@ -161,83 +161,109 @@ export const useDecisionStore = defineStore('decision', () => {
     }
   }
 
+  function createSampleSeeds(): Decision[] {
+    const seed1 = makeDecision(
+      'Pindah ke Bali atau Tetap di Jakarta?',
+      'Tawaran kerja remote dengan gaji sama, tapi biaya hidup dan jaringan pertemanan berubah.'
+    )
+    seed1.scenarios[0].name = 'Jalur A : Tetap di Jakarta (Aman & Stabil)'
+    seed1.scenarios[0].monthlyIncome = 15000000
+    seed1.scenarios[0].monthlyCost = 8000000
+    seed1.scenarios[0].hoursPerWeek = 40
+    seed1.scenarios[0].growth = 60
+    seed1.scenarios[0].risk = 25
+    seed1.scenarios[0].assumptions = [
+      {
+        id: uid(),
+        text: 'Biaya sewa kos di Jakarta stabil selama 1 tahun',
+        confidence: 85,
+        checked: true,
+        kind: 'fact'
+      },
+      {
+        id: uid(),
+        text: 'Peluang promosi di kantor saat ini terbuka dalam 6 bulan',
+        confidence: 50,
+        checked: false,
+        kind: 'estimate'
+      }
+    ]
+
+    seed1.scenarios[1].name = 'Jalur B : Pindah ke Bali (Gaya Hidup & Bertumbuh)'
+    seed1.scenarios[1].monthlyIncome = 15000000
+    seed1.scenarios[1].monthlyCost = 10500000
+    seed1.scenarios[1].hoursPerWeek = 35
+    seed1.scenarios[1].growth = 80
+    seed1.scenarios[1].risk = 55
+    seed1.scenarios[1].assumptions = [
+      {
+        id: uid(),
+        text: 'Bisa fokus hidup sehat dan olahraga di pagi hari',
+        confidence: 75,
+        checked: false,
+        kind: 'assumption'
+      },
+      {
+        id: uid(),
+        text: 'Koneksi internet di tempat tinggal Bali cukup stabil untuk video call',
+        confidence: 65,
+        checked: false,
+        kind: 'assumption'
+      }
+    ]
+
+    const seed2 = makeDecision(
+      'Magang atau fokus freelance?',
+      'Pilihan antara pengalaman terstruktur di korporat atau fleksibilitas membangun klien mandiri.'
+    )
+    seed2.scenarios[0].name = 'Jalur A : Magang di Tech Company'
+    seed2.scenarios[0].monthlyIncome = 4000000
+    seed2.scenarios[0].monthlyCost = 2500000
+    seed2.scenarios[0].hoursPerWeek = 45
+    seed2.scenarios[0].growth = 85
+    seed2.scenarios[0].risk = 20
+
+    seed2.scenarios[1].name = 'Jalur B : Full-time Freelancer'
+    seed2.scenarios[1].monthlyIncome = 7000000
+    seed2.scenarios[1].monthlyCost = 2000000
+    seed2.scenarios[1].hoursPerWeek = 30
+    seed2.scenarios[1].growth = 70
+    seed2.scenarios[1].risk = 60
+
+    return [seed1, seed2]
+  }
+
+  async function loadSampleTemplates(): Promise<void> {
+    const seeds = createSampleSeeds()
+    decisions.value = [...decisions.value, ...seeds]
+    activeId.value = seeds[0].id
+    await persistAll()
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('forked_initialized', 'true')
+    }
+    flash('2 contoh keputusan berhasil dimuat', 'success')
+  }
+
   async function load(): Promise<void> {
     busy.value = true
     try {
       const stored = await idbGetAllDecisions()
+      const hasInitialized = typeof window !== 'undefined' && localStorage.getItem('forked_initialized')
+
       if (stored.length) {
         decisions.value = stored
-      } else {
-        const seed1 = makeDecision(
-          'Pindah ke Bali atau Tetap di Jakarta?',
-          'Tawaran kerja remote dengan gaji sama, tapi biaya hidup dan jaringan pertemanan berubah.'
-        )
-        seed1.scenarios[0].name = 'Jalur A : Tetap di Jakarta (Aman & Stabil)'
-        seed1.scenarios[0].monthlyIncome = 15000000
-        seed1.scenarios[0].monthlyCost = 8000000
-        seed1.scenarios[0].hoursPerWeek = 40
-        seed1.scenarios[0].growth = 60
-        seed1.scenarios[0].risk = 25
-        seed1.scenarios[0].assumptions = [
-          {
-            id: uid(),
-            text: 'Biaya sewa kos di Jakarta stabil selama 1 tahun',
-            confidence: 85,
-            checked: true,
-            kind: 'fact'
-          },
-          {
-            id: uid(),
-            text: 'Peluang promosi di kantor saat ini terbuka dalam 6 bulan',
-            confidence: 50,
-            checked: false,
-            kind: 'estimate'
-          }
-        ]
-
-        seed1.scenarios[1].name = 'Jalur B : Pindah ke Bali (Gaya Hidup & Bertumbuh)'
-        seed1.scenarios[1].monthlyIncome = 15000000
-        seed1.scenarios[1].monthlyCost = 10500000
-        seed1.scenarios[1].hoursPerWeek = 35
-        seed1.scenarios[1].growth = 80
-        seed1.scenarios[1].risk = 55
-        seed1.scenarios[1].assumptions = [
-          {
-            id: uid(),
-            text: 'Bisa fokus hidup sehat dan olahraga di pagi hari',
-            confidence: 75,
-            checked: false,
-            kind: 'assumption'
-          },
-          {
-            id: uid(),
-            text: 'Koneksi internet di tempat tinggal Bali cukup stabil untuk video call',
-            confidence: 65,
-            checked: false,
-            kind: 'assumption'
-          }
-        ]
-
-        const seed2 = makeDecision(
-          'Magang atau fokus freelance?',
-          'Pilihan antara pengalaman terstruktur di korporat atau fleksibilitas membangun klien mandiri.'
-        )
-        seed2.scenarios[0].name = 'Jalur A : Magang di Tech Company'
-        seed2.scenarios[0].monthlyIncome = 4000000
-        seed2.scenarios[0].monthlyCost = 2500000
-        seed2.scenarios[0].hoursPerWeek = 45
-        seed2.scenarios[0].growth = 85
-        seed2.scenarios[0].risk = 20
-
-        seed2.scenarios[1].name = 'Jalur B : Full-time Freelancer'
-        seed2.scenarios[1].monthlyIncome = 7000000
-        seed2.scenarios[1].monthlyCost = 2000000
-        seed2.scenarios[1].hoursPerWeek = 30
-        seed2.scenarios[1].growth = 70
-        seed2.scenarios[1].risk = 60
-
-        decisions.value = [seed1, seed2]
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('forked_initialized', 'true')
+        }
+      } else if (!hasInitialized) {
+        const seeds = createSampleSeeds()
+        decisions.value = seeds
         await persistAll()
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('forked_initialized', 'true')
+        }
+      } else {
+        decisions.value = []
       }
 
       if (!activeId.value && decisions.value.length) {
@@ -249,6 +275,60 @@ export const useDecisionStore = defineStore('decision', () => {
     } finally {
       busy.value = false
     }
+  }
+
+  async function updateDecisionDetails(id: string, title: string, context: string): Promise<boolean> {
+    const d = decisions.value.find(item => item.id === id)
+    if (!d) return false
+    d.title = title.trim()
+    d.context = context.trim()
+    await persist(d)
+    flash('Keputusan berhasil diperbarui', 'success')
+    return true
+  }
+
+  async function duplicateDecision(id: string): Promise<Decision | null> {
+    const source = decisions.value.find(item => item.id === id)
+    if (!source) return null
+    const cloned: Decision = {
+      ...JSON.parse(JSON.stringify(source)),
+      id: uid(),
+      title: `Salinan - ${source.title}`,
+      createdAt: today(),
+      status: 'exploring',
+      selectedScenarioId: null
+    }
+    cloned.scenarios = cloned.scenarios.map(s => ({
+      ...s,
+      id: uid(),
+      assumptions: (s.assumptions || []).map(a => ({
+        ...a,
+        id: uid(),
+        checked: false
+      }))
+    }))
+    decisions.value.unshift(cloned)
+    activeId.value = cloned.id
+    await persist(cloned)
+    flash(`Keputusan "${source.title}" berhasil diduplikat`, 'success')
+    return cloned
+  }
+
+  async function deleteMultipleDecisions(ids: string[]): Promise<void> {
+    if (!ids.length) return
+    const count = ids.length
+    decisions.value = decisions.value.filter(d => !ids.includes(d.id))
+    for (const id of ids) {
+      try {
+        await idbDeleteDecision(id)
+      } catch (err) {
+        console.error('Failed to delete decision from IDB:', err)
+      }
+    }
+    if (!decisions.value.some(d => d.id === activeId.value)) {
+      activeId.value = decisions.value[0]?.id ?? null
+    }
+    flash(`${count} keputusan berhasil dihapus`, 'info')
   }
 
   async function createDecision(
@@ -522,8 +602,12 @@ export const useDecisionStore = defineStore('decision', () => {
     nextReview,
     flash,
     load,
+    loadSampleTemplates,
     createDecision,
+    updateDecisionDetails,
+    duplicateDecision,
     deleteActiveDecision,
+    deleteMultipleDecisions,
     addScenarioToActive,
     removeScenarioFromActive,
     chooseScenario,

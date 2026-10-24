@@ -32,6 +32,7 @@
 }
 
 :root {
+  color-scheme: light;
   --color-canvas: #f8f8f5;
   --color-canvas-subtle: #f1f4ee;
   --color-surface: #ffffff;
@@ -53,6 +54,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --color-canvas: #111612;
   --color-canvas-subtle: #1b231c;
   --color-surface: #18201a;
@@ -166,8 +168,25 @@ input[type="number"] {
   appearance: textfield;
 }
 
+select {
+  color-scheme: light;
+  background-color: var(--color-surface);
+  color: var(--color-fg);
+}
+
+.dark select {
+  color-scheme: dark;
+  background-color: var(--color-surface);
+  color: var(--color-fg);
+}
+
 select option {
-  background: var(--color-surface);
+  background-color: var(--color-surface);
+  color: var(--color-fg);
+}
+
+select option:checked {
+  background-color: var(--color-canvas-subtle);
   color: var(--color-fg);
 }
 
