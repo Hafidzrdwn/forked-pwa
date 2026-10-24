@@ -6,7 +6,8 @@ import { useI18n } from '../../i18n'
 const {
   canInstall,
   isInstalled,
-  showIosGuide,
+  isIos,
+  showGuide,
   bannerDismissed,
   promptInstall,
   dismissBanner
@@ -14,13 +15,14 @@ const {
 
 const { t } = useI18n()
 
-function closeIosGuide() {
-  showIosGuide.value = false
+function closeGuide() {
+  showGuide.value = false
 }
 </script>
 
 <template>
   <div id="pwa-banner-container">
+    <!-- Floating PWA Install Banner -->
     <aside
       v-if="canInstall && !isInstalled && !bannerDismissed"
       class="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-40 bg-surface border border-border rounded-2xl p-4 shadow-xl transition-all animate-in fade-in slide-in-from-bottom-4 duration-300"
@@ -71,10 +73,11 @@ function closeIosGuide() {
       </div>
     </aside>
 
+    <!-- Visual Step-by-Step Install Guide Modal (for Incognito, iOS, or restricted browsers) -->
     <div
-      v-if="showIosGuide"
+      v-if="showGuide"
       class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200"
-      @click.self="closeIosGuide"
+      @click.self="closeGuide"
     >
       <div
         class="bg-surface border border-border rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4 text-center animate-in zoom-in-95 duration-200"
@@ -82,22 +85,23 @@ function closeIosGuide() {
         aria-modal="true"
       >
         <div class="w-12 h-12 rounded-2xl bg-primary-soft text-primary mx-auto flex items-center justify-center">
-          <Share2 :size="24" />
+          <Share2 v-if="isIos" :size="24" />
+          <Smartphone v-else :size="24" />
         </div>
 
         <div>
           <h3 class="font-display font-bold text-base text-fg">
-            {{ t.pwa.iosTitle }}
+            {{ isIos ? t.pwa.iosTitle : t.pwa.manualTitle }}
           </h3>
           <p class="text-xs text-fg-muted mt-2 leading-relaxed">
-            {{ t.pwa.iosInstruction }}
+            {{ isIos ? t.pwa.iosInstruction : t.pwa.manualInstruction }}
           </p>
         </div>
 
         <button
           type="button"
           class="w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-dark transition-colors cursor-pointer"
-          @click="closeIosGuide"
+          @click="closeGuide"
         >
           {{ t.common.close }}
         </button>

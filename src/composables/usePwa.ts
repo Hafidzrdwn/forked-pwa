@@ -4,7 +4,8 @@ const deferredPrompt = ref<any>(null)
 const canInstall = ref(false)
 const isInstalled = ref(false)
 const isIos = ref(false)
-const showIosGuide = ref(false)
+const isMobile = ref(false)
+const showGuide = ref(false)
 const bannerDismissed = ref(false)
 
 const DISMISS_KEY = 'forked_pwa_dismissed'
@@ -25,13 +26,18 @@ export function usePwa() {
 
     const ua = window.navigator.userAgent.toLowerCase()
     isIos.value = /iphone|ipad|ipod/.test(ua) && !(window.navigator as any).standalone
+    isMobile.value =
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
+      ('ontouchstart' in window && window.innerWidth <= 820)
 
-    if (isIos.value) {
-      canInstall.value = true
-    }
-
+    // Check if dismissed previously
     if (window.localStorage.getItem(DISMISS_KEY)) {
       bannerDismissed.value = true
+    }
+
+    // Always enable install action for mobile browsers (including Chrome Incognito, Safari iOS, etc.)
+    if (isMobile.value || isIos.value) {
+      canInstall.value = true
     }
 
     window.addEventListener('beforeinstallprompt', (e: Event) => {
@@ -48,24 +54,24 @@ export function usePwa() {
   })
 
   async function promptInstall() {
-    if (isIos.value) {
-      showIosGuide.value = true
-      return
-    }
-
-    if (!deferredPrompt.value) return
-
-    try {
-      deferredPrompt.value.prompt()
-      const choice = await deferredPrompt.value.userChoice
-      if (choice && choice.outcome === 'accepted') {
-        isInstalled.value = true
-        canInstall.value = false
+    if (deferredPrompt.value) {
+      try {
+        deferredPrompt.value.prompt()
+        const choice = await deferredPrompt.value.userChoice
+        if (choice && choice.outcome === 'accepted') {
+          isInstalled.value = true
+          canInstall.value = false
+          deferredPrompt.value = null
+          return
+        }
+      } catch {
+        // Fallback to visual install guide if prompt execution errors
       }
-    } catch {
-    } finally {
-      deferredPrompt.value = null
     }
+
+    // Show step-by-step install guide modal when native prompt is unavailable
+    // (e.g. Chrome Incognito mode, iOS Safari, or browser restriction)
+    showGuide.value = true
   }
 
   function dismissBanner() {
@@ -79,7 +85,9 @@ export function usePwa() {
     canInstall,
     isInstalled,
     isIos,
-    showIosGuide,
+    isMobile,
+    showGuide,
+    showIosGuide: showGuide, // backward compatibility
     bannerDismissed,
     promptInstall,
     dismissBanner

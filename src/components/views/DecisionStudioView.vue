@@ -319,29 +319,29 @@ function formatDate(value: string) {
           />
         </div>
 
-        <div id="decision-meta-card" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 p-4 bg-surface border border-border rounded-2xl text-xs md:text-sm text-fg-muted shadow-2xs">
-          <div class="inline-flex items-center gap-2 text-fg font-medium shrink-0 whitespace-nowrap">
+        <div id="decision-meta-card" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 p-3.5 sm:p-4 bg-surface border border-border rounded-2xl text-xs md:text-sm text-fg-muted shadow-2xs overflow-hidden">
+          <div class="inline-flex items-center gap-2 text-fg font-medium min-w-0">
             <CalendarDays :size="16" class="text-primary shrink-0" />
-            <span>{{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}</span>
+            <span class="break-words">{{ interpolate(t.studio.reviewBy, { date: formatDate(activeDecision.reviewDate) }) }}</span>
           </div>
 
-          <div class="flex items-center gap-2.5 shrink-0 w-full sm:w-auto pt-2.5 sm:pt-0 border-t border-border/40 sm:border-0">
+          <div class="flex flex-col xs:flex-row sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto pt-2.5 sm:pt-0 border-t border-border/40 sm:border-0 shrink-0">
             <button
               type="button"
-              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface hover:bg-canvas-subtle hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface hover:bg-canvas-subtle hover:border-primary text-xs font-bold text-fg transition-all cursor-pointer shadow-2xs text-center"
               @click="emit('open-weights')"
             >
-              <Scale :size="14" class="text-primary" />
+              <Scale :size="14" class="text-primary shrink-0" />
               <span>{{ t.studio.weightsBtn }}</span>
             </button>
 
             <button
               type="button"
-              class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-soft hover:bg-primary-soft/80 border border-primary/20 text-xs font-bold text-primary transition-all cursor-pointer shadow-2xs text-center"
               @click="emit('open-journal')"
             >
               <span>{{ t.studio.openJournal }}</span>
-              <ArrowRight :size="13" />
+              <ArrowRight :size="13" class="shrink-0" />
             </button>
           </div>
         </div>

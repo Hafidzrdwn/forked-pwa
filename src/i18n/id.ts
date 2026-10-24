@@ -334,7 +334,9 @@ export const id = {
     installDismiss: 'Nanti Saja',
     installed: 'Aplikasi Terpasang',
     iosTitle: 'Cara Pasang di iPhone / iPad',
-    iosInstruction: 'Ketuk ikon Bagikan (Share) di menu bawah Safari, lalu pilih "Tambahkan ke Layar Utama" (Add to Home Screen).'
+    iosInstruction: 'Ketuk ikon Bagikan (Share) di menu bawah Safari, lalu pilih "Tambahkan ke Layar Utama" (Add to Home Screen).',
+    manualTitle: 'Cara Pasang di Layar Utama',
+    manualInstruction: 'Buka menu peramban (titik tiga ⋮ di Chrome), lalu pilih "Tambahkan ke Layar Utama" (Add to Home screen) atau "Instal Aplikasi".'
   },
   backupModal: {
     title: 'Cadangan & Pemulihan Data',

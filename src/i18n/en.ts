@@ -334,7 +334,9 @@ export const en = {
     installDismiss: 'Maybe Later',
     installed: 'App Installed',
     iosTitle: 'How to Install on iPhone / iPad',
-    iosInstruction: 'Tap the Share button at the bottom of Safari, then select "Add to Home Screen".'
+    iosInstruction: 'Tap the Share button at the bottom of Safari, then select "Add to Home Screen".',
+    manualTitle: 'How to Install on Home Screen',
+    manualInstruction: 'Open the browser menu (three dots ⋮ in Chrome), then select "Add to Home screen" or "Install App".'
   },
   backupModal: {
     title: 'Data Backup & Restore',
