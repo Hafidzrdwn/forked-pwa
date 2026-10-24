@@ -447,5 +447,12 @@ export const en = {
       'No data is stored on remote servers; maintain your backups.',
       'Use Forked as an objective tool for clear trade-off analysis.'
     ]
+  },
+  notFound: {
+    badge: '404 Error',
+    title: 'Page Not Found',
+    desc: 'The page or link you are looking for might have been moved, deleted, or never existed in Forked.',
+    backOverview: 'Back to Overview',
+    backStudio: 'Open Decision Studio'
   }
 }

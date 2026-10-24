@@ -1,3 +1,3 @@
 export * from '../schemas/decision.schema.ts'
 
-export type NavigationTab = 'overview' | 'decisions' | 'journal' | 'privacy' | 'terms'
+export type NavigationTab = 'overview' | 'decisions' | 'journal' | 'privacy' | 'terms' | 'not-found'

@@ -447,5 +447,12 @@ export const id = {
       'Data tidak disimpan di server, simpan file cadangan Anda.',
       'Gunakan sebagai teman berpikir objektif dan terukur.'
     ]
+  },
+  notFound: {
+    badge: 'Galat 404',
+    title: 'Halaman Tidak Ditemukan',
+    desc: 'Tautan yang kamu tuju mungkin telah dipindahkan, dihapus, atau belum pernah dibuat di Forked.',
+    backOverview: 'Kembali ke Ringkasan',
+    backStudio: 'Buka Studio Keputusan'
   }
 }

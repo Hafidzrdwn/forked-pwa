@@ -21,6 +21,7 @@ const pageTitle = computed(() => {
   if (props.currentNav === 'journal') return t.value.nav.journal
   if (props.currentNav === 'privacy') return t.value.nav.privacyPolicy
   if (props.currentNav === 'terms') return t.value.nav.termsOfUse
+  if (props.currentNav === 'not-found') return t.value.notFound?.title ?? '404'
   return t.value.studio.title
 })
 </script>
