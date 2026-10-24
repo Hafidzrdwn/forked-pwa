@@ -449,10 +449,23 @@ export const id = {
     ]
   },
   notFound: {
-    badge: 'Galat 404',
     title: 'Halaman Tidak Ditemukan',
     desc: 'Tautan yang kamu tuju mungkin telah dipindahkan, dihapus, atau belum pernah dibuat di Forked.',
     backOverview: 'Kembali ke Ringkasan',
     backStudio: 'Buka Studio Keputusan'
+  },
+  pageTitles: {
+    overview: 'Forked | Simulator Keputusan',
+    overviewDesc: 'Pantau ringkasan seluruh pertimbangan keputusan penting hidupmu dengan privasi local-first.',
+    decisions: 'Studio Keputusan | Forked',
+    decisionsDesc: 'Bandingkan alternatif pilihan jalan hidup dengan What-If simulator dan matriks skor 4D.',
+    journal: 'Catatan & Evaluasi | Forked',
+    journalDesc: 'Dokumentasikan alasan, ekspektasi, dan pelajari refleksi hasil nyata keputusan Anda.',
+    privacy: 'Kebijakan Privasi | Forked',
+    privacyDesc: 'Transparansi penuh penyimpanan data 100% di browser pengguna tanpa akun atau server.',
+    terms: 'Ketentuan Layanan | Forked',
+    termsDesc: 'Prinsip penggunaan etis dan transparansi sistem skor heuristik pembantu berpikir.',
+    notFound: '404 Halaman Tidak Ditemukan | Forked',
+    notFoundDesc: 'Halaman yang kamu cari tidak dapat ditemukan di Forked.'
   }
 }

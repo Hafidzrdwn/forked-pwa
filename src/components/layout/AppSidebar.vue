@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import {
   LayoutDashboard, GitBranch, BookOpen, ShieldAlert, Download, Copy, FileUp, X, Smartphone, Database, ArrowRight
 } from '../common/AppIcons'
@@ -153,9 +154,9 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
     aria-label="Sidebar navigation"
   >
     <div class="flex items-center justify-between pb-6 px-1 shrink-0">
-      <a class="flex items-center gap-2.5" href="#" @click.prevent="handleNav('overview')">
+      <RouterLink class="flex items-center gap-2.5 transition-opacity hover:opacity-90" to="/" @click="emit('close-mobile-menu')">
         <BrandLogo :size="36" :subtitle="t.nav.brandSubtitle" />
-      </a>
+      </RouterLink>
       <button
         v-if="props.mobileOpen"
         type="button"
@@ -169,49 +170,49 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 
     <div class="px-3 pb-3 text-[11px] tracking-wider font-bold text-fg-subtle uppercase shrink-0">{{ t.nav.workspace }}</div>
 
-    <nav class="grid gap-1.5 shrink-0">
-      <button
-        type="button"
+    <nav class="grid gap-1.5 shrink-0" aria-label="Main Navigation">
+      <RouterLink
+        to="/"
         :class="[
-          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150 cursor-pointer',
+          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150 cursor-pointer no-underline',
           currentNav === 'overview'
             ? 'bg-primary-soft text-primary font-bold shadow-xs'
             : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'
         ]"
         :aria-current="currentNav === 'overview' ? 'page' : undefined"
-        @click="handleNav('overview')"
+        @click="emit('close-mobile-menu')"
       >
         <LayoutDashboard :size="18" /> {{ t.nav.overview }}
-      </button>
+      </RouterLink>
 
-      <button
-        type="button"
+      <RouterLink
+        to="/decisions"
         :class="[
-          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150 cursor-pointer',
+          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150 cursor-pointer no-underline',
           currentNav === 'decisions'
             ? 'bg-primary-soft text-primary font-bold shadow-xs'
             : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'
         ]"
         :aria-current="currentNav === 'decisions' ? 'page' : undefined"
-        @click="handleNav('decisions')"
+        @click="emit('close-mobile-menu')"
       >
         <GitBranch :size="18" /> {{ t.nav.myDecisions }}
         <span class="ml-auto bg-surface border border-border rounded-md px-2 py-0.5 text-xs text-fg-subtle font-normal">{{ totalDecisions }}</span>
-      </button>
+      </RouterLink>
 
-      <button
-        type="button"
+      <RouterLink
+        to="/journal"
         :class="[
-          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150 cursor-pointer',
+          'h-11 rounded-xl px-3 flex items-center gap-3 text-left text-[13.5px] font-medium w-full transition-all duration-150 cursor-pointer no-underline',
           currentNav === 'journal'
             ? 'bg-primary-soft text-primary font-bold shadow-xs'
             : 'text-fg-muted hover:bg-canvas-subtle hover:text-fg'
         ]"
         :aria-current="currentNav === 'journal' ? 'page' : undefined"
-        @click="handleNav('journal')"
+        @click="emit('close-mobile-menu')"
       >
         <BookOpen :size="18" /> {{ t.nav.journal }}
-      </button>
+      </RouterLink>
     </nav>
 
     <div class="mt-auto pt-4 flex flex-col gap-1.5 shrink-0">
@@ -449,27 +450,27 @@ function handleNav(nav: 'overview' | 'decisions' | 'journal') {
 
       <!-- Legal Links -->
       <div class="flex items-center gap-2 px-2 pt-2.5 text-[11px] text-fg-subtle">
-        <button
-          type="button"
+        <RouterLink
+          to="/privacy"
           :class="[
             'hover:text-fg transition-colors cursor-pointer underline-offset-2',
             currentNav === 'privacy' ? 'text-primary font-bold underline' : ''
           ]"
-          @click="emit('navigate', 'privacy'); emit('close-mobile-menu')"
+          @click="emit('close-mobile-menu')"
         >
           {{ t.nav.privacyPolicy }}
-        </button>
+        </RouterLink>
         <span>·</span>
-        <button
-          type="button"
+        <RouterLink
+          to="/terms"
           :class="[
             'hover:text-fg transition-colors cursor-pointer underline-offset-2',
             currentNav === 'terms' ? 'text-primary font-bold underline' : ''
           ]"
-          @click="emit('navigate', 'terms'); emit('close-mobile-menu')"
+          @click="emit('close-mobile-menu')"
         >
           {{ t.nav.termsOfUse }}
-        </button>
+        </RouterLink>
       </div>
 
       <div class="text-[11px] tracking-wider text-fg-subtle px-2 pt-2 uppercase font-semibold">{{ t.nav.tagline }}</div>

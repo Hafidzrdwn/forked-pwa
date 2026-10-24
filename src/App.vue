@@ -36,7 +36,7 @@ const {
 } = useDecisions()
 
 const { confirm: confirmDialog } = useConfirm()
-const { t, interpolate } = useI18n()
+const { t, locale, interpolate } = useI18n()
 
 const showCreate = ref(false)
 const showEdit = ref(false)
@@ -54,6 +54,52 @@ const currentNav = computed<NavigationTab>(() => {
   if (name === 'not-found') return 'not-found'
   return 'overview'
 })
+
+function updatePageMetadata() {
+  const name = String(route.name || 'overview')
+  const titles = t.value.pageTitles
+  if (!titles) return
+
+  let title = titles.overview
+  let desc = titles.overviewDesc
+
+  if (name === 'decisions' || name === 'decision-detail') {
+    title = titles.decisions
+    desc = titles.decisionsDesc
+  } else if (name === 'journal') {
+    title = titles.journal
+    desc = titles.journalDesc
+  } else if (name === 'privacy') {
+    title = titles.privacy
+    desc = titles.privacyDesc
+  } else if (name === 'terms') {
+    title = titles.terms
+    desc = titles.termsDesc
+  } else if (name === 'not-found') {
+    title = titles.notFound
+    desc = titles.notFoundDesc
+  }
+
+  document.title = title
+  const metaDesc = document.querySelector('meta[name="description"]')
+  if (metaDesc) metaDesc.setAttribute('content', desc)
+  const ogTitle = document.querySelector('meta[property="og:title"]')
+  if (ogTitle) ogTitle.setAttribute('content', title)
+  const ogDesc = document.querySelector('meta[property="og:description"]')
+  if (ogDesc) ogDesc.setAttribute('content', desc)
+  const twTitle = document.querySelector('meta[name="twitter:title"]')
+  if (twTitle) twTitle.setAttribute('content', title)
+  const twDesc = document.querySelector('meta[name="twitter:description"]')
+  if (twDesc) twDesc.setAttribute('content', desc)
+
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.lang = locale.value
+  }
+}
+
+watch([() => route.name, () => route.params.id, locale], () => {
+  updatePageMetadata()
+}, { immediate: true })
 
 function onPageBeforeEnter() {
   window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
@@ -171,103 +217,105 @@ async function handleDeleteMultiple(ids: string[]) {
 
 <template>
   <div class="min-h-screen bg-canvas text-fg font-sans antialiased selection:bg-primary-soft selection:text-primary">
-    <AppSidebar
-      :current-nav="currentNav"
-      :total-decisions="totalDecisions"
-      :mobile-open="mobileMenuOpen"
-      @navigate="handleNavigate"
-      @close-mobile-menu="mobileMenuOpen = false"
-      @export="exportBackup"
-      @copy-backup="copyBackupToClipboard"
-      @import-file="importBackupFile"
-    />
+    <!-- Standalone Full-page View for 404 Not Found -->
+    <template v-if="currentNav === 'not-found'">
+      <NotFoundView />
+    </template>
 
-    <main class="md:ml-63 min-h-screen bg-canvas transition-colors duration-200">
-      <AppTopbar
+    <!-- Standard App Shell with Sidebar & Topbar for Application Pages -->
+    <template v-else>
+      <AppSidebar
         :current-nav="currentNav"
-        @toggle-mobile-menu="mobileMenuOpen = !mobileMenuOpen"
+        :total-decisions="totalDecisions"
+        :mobile-open="mobileMenuOpen"
+        @navigate="handleNavigate"
+        @close-mobile-menu="mobileMenuOpen = false"
+        @export="exportBackup"
+        @copy-backup="copyBackupToClipboard"
+        @import-file="importBackupFile"
       />
 
-      <div v-if="busy" class="min-h-[60vh] flex items-center justify-center gap-3 text-fg-muted text-sm" role="status" aria-live="polite">
-        <span class="w-5 h-5 border-2 border-border border-t-primary rounded-full animate-spin"></span> Menyiapkan ruang keputusanmu…
-      </div>
+      <main class="md:ml-63 min-h-screen bg-canvas transition-colors duration-200">
+        <AppTopbar
+          :current-nav="currentNav"
+          @toggle-mobile-menu="mobileMenuOpen = !mobileMenuOpen"
+        />
 
-      <template v-else>
-        <RouterView v-slot="{ route: currentRoute }">
-          <Transition name="page-fade-blur" mode="out-in" @before-enter="onPageBeforeEnter">
-            <OverviewView
-              v-if="currentRoute.name === 'overview'"
-              key="overview"
-              :decisions="decisions"
-              :total-decisions="totalDecisions"
-              :open-decisions="openDecisions"
-              :reviewed-decisions="reviewedDecisions"
-              :next-review="nextReview"
-              @new-decision="showCreate = true"
-              @load-samples="loadSampleTemplates"
-              @open-decision="openDecision"
-              @navigate="handleNavigate"
-            />
+        <div v-if="busy" class="min-h-[60vh] flex items-center justify-center gap-3 text-fg-muted text-sm" role="status" aria-live="polite">
+          <span class="w-5 h-5 border-2 border-border border-t-primary rounded-full animate-spin"></span> Menyiapkan ruang keputusanmu…
+        </div>
 
-            <DecisionStudioView
-              v-else-if="currentRoute.name === 'decisions' || currentRoute.name === 'decision-detail'"
-              :key="currentRoute.name === 'decision-detail' ? (currentRoute.params.id as string) : 'decisions'"
-              v-model:search-term="searchTerm"
-              :decisions="decisions"
-              :active-id="activeId"
-              :active-decision="activeDecision"
-              :filtered-decisions="filteredDecisions"
-              @select-decision="handleSelectDecision"
-              @new-decision="showCreate = true"
-              @load-samples="loadSampleTemplates"
-              @edit-active="showEdit = true"
-              @duplicate-decision="duplicateDecision"
-              @delete-active="handleDeleteActive"
-              @delete-multiple="handleDeleteMultiple"
-              @open-weights="showWeights = true"
-              @open-journal="showJournal = true"
-              @open-share="showShare = true"
-              @add-scenario="addScenarioToActive($event.name, $event.income, $event.cost, $event.hours, $event.growth, $event.risk)"
-              @remove-scenario="removeScenarioFromActive($event)"
-              @choose-scenario="chooseScenario($event)"
-              @update-scenario="updateScenario($event)"
-              @add-assumption="addAssumptionToScenario($event.scenarioId, $event.text, $event.confidence, $event.kind)"
-              @toggle-assumption="toggleAssumption($event.scenarioId, $event.assumptionId)"
-              @remove-assumption="removeAssumption($event.scenarioId, $event.assumptionId)"
-            />
+        <template v-else>
+          <RouterView v-slot="{ route: currentRoute }">
+            <Transition name="page-fade-blur" mode="out-in" @before-enter="onPageBeforeEnter">
+              <OverviewView
+                v-if="currentRoute.name === 'overview'"
+                key="overview"
+                :decisions="decisions"
+                :total-decisions="totalDecisions"
+                :open-decisions="openDecisions"
+                :reviewed-decisions="reviewedDecisions"
+                :next-review="nextReview"
+                @new-decision="showCreate = true"
+                @load-samples="loadSampleTemplates"
+                @open-decision="openDecision"
+                @navigate="handleNavigate"
+              />
 
-            <JournalView
-              v-else-if="currentRoute.name === 'journal'"
-              key="journal"
-              :decisions="decisions"
-              @open-decision="openDecision"
-              @edit-journal="activeId = $event; showJournal = true"
-              @new-decision="showCreate = true"
-            />
+              <DecisionStudioView
+                v-else-if="currentRoute.name === 'decisions' || currentRoute.name === 'decision-detail'"
+                :key="currentRoute.name === 'decision-detail' ? (currentRoute.params.id as string) : 'decisions'"
+                v-model:search-term="searchTerm"
+                :decisions="decisions"
+                :active-id="activeId"
+                :active-decision="activeDecision"
+                :filtered-decisions="filteredDecisions"
+                @select-decision="handleSelectDecision"
+                @new-decision="showCreate = true"
+                @load-samples="loadSampleTemplates"
+                @edit-active="showEdit = true"
+                @duplicate-decision="duplicateDecision"
+                @delete-active="handleDeleteActive"
+                @delete-multiple="handleDeleteMultiple"
+                @open-weights="showWeights = true"
+                @open-journal="showJournal = true"
+                @open-share="showShare = true"
+                @add-scenario="addScenarioToActive($event.name, $event.income, $event.cost, $event.hours, $event.growth, $event.risk)"
+                @remove-scenario="removeScenarioFromActive($event)"
+                @choose-scenario="chooseScenario($event)"
+                @update-scenario="updateScenario($event)"
+                @add-assumption="addAssumptionToScenario($event.scenarioId, $event.text, $event.confidence, $event.kind)"
+                @toggle-assumption="toggleAssumption($event.scenarioId, $event.assumptionId)"
+                @remove-assumption="removeAssumption($event.scenarioId, $event.assumptionId)"
+              />
 
-            <PrivacyPolicyView
-              v-else-if="currentRoute.name === 'privacy'"
-              key="privacy"
-              @back="router.push('/')"
-              @export="exportBackup"
-            />
+              <JournalView
+                v-else-if="currentRoute.name === 'journal'"
+                key="journal"
+                :decisions="decisions"
+                @open-decision="openDecision"
+                @edit-journal="activeId = $event; showJournal = true"
+                @new-decision="showCreate = true"
+              />
 
-            <TermsOfUseView
-              v-else-if="currentRoute.name === 'terms'"
-              key="terms"
-              @back="router.push('/')"
-              @navigate="handleNavigate"
-            />
+              <PrivacyPolicyView
+                v-else-if="currentRoute.name === 'privacy'"
+                key="privacy"
+                @back="router.push('/')"
+                @export="exportBackup"
+              />
 
-            <NotFoundView
-              v-else-if="currentRoute.name === 'not-found'"
-              key="not-found"
-              @navigate="handleNavigate"
-            />
-          </Transition>
-        </RouterView>
-      </template>
-    </main>
+              <TermsOfUseView
+                v-else-if="currentRoute.name === 'terms'"
+                key="terms"
+                @back="router.push('/')"
+                @navigate="handleNavigate"
+              />
+            </Transition>
+          </RouterView>
+        </template>
+      </main>
+    </template>
 
     <CreateDecisionModal
       v-if="showCreate"

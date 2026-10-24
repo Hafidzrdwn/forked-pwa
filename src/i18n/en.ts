@@ -449,10 +449,23 @@ export const en = {
     ]
   },
   notFound: {
-    badge: '404 Error',
     title: 'Page Not Found',
     desc: 'The page or link you are looking for might have been moved, deleted, or never existed in Forked.',
     backOverview: 'Back to Overview',
     backStudio: 'Open Decision Studio'
+  },
+  pageTitles: {
+    overview: 'Forked | Decision Simulator',
+    overviewDesc: 'Track your active life choices and decision reviews with complete local-first privacy.',
+    decisions: 'Decision Studio | Forked',
+    decisionsDesc: 'Compare life and career paths side-by-side with What-If simulator and 4D score matrix.',
+    journal: 'Decision Journal | Forked',
+    journalDesc: 'Log decision rationale, expected outcomes, and reflect on real results over time.',
+    privacy: 'Privacy Policy | Forked',
+    privacyDesc: '100% on-device local storage. No user accounts, tracking, or remote database.',
+    terms: 'Terms of Service | Forked',
+    termsDesc: 'Ethical usage guidelines and transparency into our heuristic decision scoring system.',
+    notFound: '404 Page Not Found | Forked',
+    notFoundDesc: 'The page you are looking for cannot be found in Forked.'
   }
 }
